@@ -1,0 +1,5 @@
+Manifest-Version: 0.0.1
+Project-Name: series-1
+Source: src/main/rascal
+Require-Libraries: 
+    
