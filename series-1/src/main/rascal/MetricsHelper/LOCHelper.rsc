@@ -1,5 +1,7 @@
 module MetricsHelper::LOCHelper
 
+import lang::java::m3::Core;
+import lang::java::m3::AST;
 import GeneralHelper::ProjectHelper;
 
 import String;
