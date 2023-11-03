@@ -1,7 +1,10 @@
 module MetricsHelper::LOCHelper
 
+import GeneralHelper::ProjectHelper;
+
 import String;
 import List;
+import IO;
 
 bool isCurlyBracketLine(str rawCodeLine) {
     return /^\s*\{\s*$/ := rawCodeLine || /^\s*\}\s*$/ := rawCodeLine;
@@ -33,6 +36,16 @@ list[str] getLinesOfCode(str rawSourceCode) {
     return [trim(line) | str line <- splitCodeLines, !isRemovableCodeLine(line)];
 }
 
+list[str] getLinesOfCode(M3 projectModel) {
+    str concatenatedProject = getConcatenatedProjectFile(projectModel);
+    return getLinesOfCode(concatenatedProject);
+}
+
 int getLinesOfCodeAmount(str rawSourceCode) {
     return size(getLinesOfCode(rawSourceCode));
+}
+
+int getLinesOfCodeAmount(M3 projectModel) {
+    str concatenatedProject = getConcatenatedProjectFile(projectModel);
+    return getLinesOfCodeAmount(concatenatedProject);
 }
