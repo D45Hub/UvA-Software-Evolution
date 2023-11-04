@@ -8,6 +8,50 @@ import String;
 import List;
 import IO;
 
+/**
+
+    Currently not implemented but kept in mind:
+
+        - How are import statements counted towards LOC metric? 
+        You could just insert the whole library into the source code.
+        Or you could do multiple import statements VS a wildcard one. I.e. import Math.Add; import Math.Subtract; -> import Math.*
+        Is an import even really a functional LOC?
+
+        - How should the "package" statement be counted towards the LOC metric?
+        Is it really a functional line of code or just "syntactic sugar" to make the file work?
+
+        - Is an annotation a LOC? If so, how should multi-line annotations be handled? As one line? Or multiple ones?
+
+        - How should labelled statements be handled, especially with the label declaration?
+
+        - How should shorthand notations or multi-line string concatenations be handled?
+        Should everything be in it's shortest form possible?
+
+        Example: 
+        MyObj myObj = null;
+            if (a != null) {
+            myObj = a.myObj;
+        }
+
+        Should this be 1 LOC because you could write it as... MyObj myObj = a?.myObj;
+
+        Or this:
+
+        System.out.println("Hello" 
+                            + "World");
+
+        -> System.out.println("HelloWorld");
+
+        - When we look at LOC of a certain method unit. 
+        Should abstract local object implementations (or local classes) be counted towards the method or of that unit itself?
+
+        - How should Java JNI usage be counted towards this, since you can have C-Code be executed from Java code natively?
+        This then opens up the entire rabbithole of, cross programming language specifics and specialized features from other languages.
+
+        - Should, say a JSON file be counted towards this metric, since it could have an effect on the control flow, due to reflection.
+
+*/
+
 // This regex also checks for cases such as e.g. System.out.println("{}") 
 bool isCurlyBracketLine(str rawCodeLine) {
     return /^\s*\{\s*$/ := rawCodeLine || /^\s*\}\s*$/ := rawCodeLine;
