@@ -1,8 +1,15 @@
 module Main
 
-import IO;
+import lang::java::m3::Core;
+import MetricsHelper::LOCHelper;
+import Volume::ManYears;
 
 int main(int testArgument=0) {
-    println("argument: <testArgument>");
+
+    M3 model = createM3FromMavenProject(|file:///C:/SomeFilePath|);
+    int linesOfCode = getLinesOfCodeAmount(model);
+    MYRanking manYearRanking = getManYearsRanking(linesOfCode);
+
+    formatRanking(linesOfCode);
     return testArgument;
 }

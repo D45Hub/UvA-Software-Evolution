@@ -38,7 +38,7 @@ list[MYRanking] allMYRankings = [excellentMYRanking, goodMYRanking,
 
 /* Function to map the resulting man years to according rank*/
 
-private MYRanking getManYearsRanking(int linesOfCode){
+MYRanking getManYearsRanking(int linesOfCode){
 	
 	for(MYRanking ranking <- allMYRankings){
 		if(ranking.maxYears == -1){
