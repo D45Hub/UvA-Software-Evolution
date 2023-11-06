@@ -3,6 +3,7 @@ module Volume::ManYears
 import util::Math;
 import Ranking::Ranking;
 import IO;
+import List;
 /**
 Man Years are calculated based on the amount of lines of code 
 
@@ -38,20 +39,13 @@ list[MYRanking] allMYRankings = [excellentMYRanking, goodMYRanking,
 
 /* Function to map the resulting man years to according rank*/
 
-MYRanking getManYearsRanking(int linesOfCode){
-	
-	for(MYRanking ranking <- allMYRankings){
-		if(ranking.maxYears == -1){
-			return ranking;
-		}
-	
-		if(floor(convertLOCtoKLOC(linesOfCode)) < ranking.maxKLOC){
-			return ranking;
-		}
-	}
-	
-	return veryNegativeMYRanking;
+public MYRanking getManYearsRanking(int linesOfCode){
+    MYRanking resultRanking =  [ranking | ranking <- allMYRankings,
+                                (floor(convertLOCtoKLOC(linesOfCode)) < ranking.maxKLOC
+                                || ranking.maxYears == -1)][0];
+    return resultRanking;
 }
+
 
 public void formatRanking (int linesOfCode) {
     MYRanking manYearRankingResult = getManYearsRanking(linesOfCode);
