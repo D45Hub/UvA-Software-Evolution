@@ -82,7 +82,7 @@ public list[CyclomaticComplexityValue] cyclomaticLinesPerPartion(list[Declaratio
 			case \case(_) : result += 1; // case:
 
             // "try" and "finally" are not included since they don't constitute as control flow structures.
-            // Both blocks are always executed unless an exception gets thrown, in which case the "catch" block gets executed.
+            // Both blocks are always executed, unless an exception gets thrown, in which case the "catch" block gets executed.
 			case \catch(_,_) : result += 1;	 //catch() {}
 	   		case \while(_,_) : result += 1;	//while(_) x
             case \throw(_) : result += 1; // If assert is considered as control flow, then this I guess too... Unsure about that.
