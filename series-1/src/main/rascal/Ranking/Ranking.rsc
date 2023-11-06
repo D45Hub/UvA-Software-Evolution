@@ -54,3 +54,5 @@ RankingLimits getRankingLimits(num rankingValue, list[RankingLimits] rankings){
 	list[RankingLimits] validRankings =  [ranking | ranking <- rankings, round(rankingValue) < ranking.upper];
 	return last(validRankings);
 }
+
+/* Giving the grade for the whole sysem */ 
