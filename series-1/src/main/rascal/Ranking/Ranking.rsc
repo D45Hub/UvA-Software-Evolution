@@ -18,9 +18,9 @@ ranking and the lower and upper bounds (e.g. for a ++ rank in duplication it is 
 alias RankingLimits = tuple[Ranking ranking, num lower, num upper];
 
 /* To calculate an average score in the end, we use numbers from 0 - 4 and map 
-them accordingly to the values from "veryNegative to veryPositive"*/ 
-public Ranking veryPositive = <"++", 4>;
-public Ranking positive = <"+", 3>;
+them accordingly to the values from "veryNegative to excellent"*/ 
+public Ranking excellent = <"++", 4>;
+public Ranking good = <"+", 3>;
 public Ranking neutral = <"o", 2>;
 public Ranking negative = <"-", 1>;
 public Ranking veryNegative = <"--", 0>;
@@ -40,8 +40,8 @@ ambgious and there is an error in the implementation. */
 Ranking findRankingByValue(int val){
 	assert val >= 0 : "Ranking value must be \>= 0";
 	assert val <= 4 : "Ranking value must be \<= 4";
-	assert size([r | r <- [veryPositive, positive, neutral, negative, veryNegative], r.val == val]) == 1 : "Ranking is ambigious";
-	return [r | r <- [veryPositive, positive, neutral, negative, veryNegative], r.val == val][0];
+	assert size([r | r <- [excellent, good, neutral, negative, veryNegative], r.val == val]) == 1 : "Ranking is ambigious";
+	return [r | r <- [excellent, good, neutral, negative, veryNegative], r.val == val][0];
 }
 
 str rankingToString(Ranking ranking){

@@ -18,6 +18,7 @@ important for Unit Sizing, Unit Interfacing and Cyclomatic complexity.
 public Ranking getScaleRating(RiskOverview risks, int totalItems, list[RiskThreshold] RiskThresholds) {
 	RiskOverview rankingDiv = getRisksDiv(risks, totalItems);
     
+	// If for one of the items all the threshholds apply, return the Risk rank. 
 	for(RiskThresholdItem <- RiskThresholds) { // For each 
 		if((rankingDiv.low <= RiskThresholdItem.low || RiskThresholdItem.low == -1) &&
 		   (rankingDiv.moderate <= RiskThresholdItem.moderate || RiskThresholdItem.moderate == -1) &&
