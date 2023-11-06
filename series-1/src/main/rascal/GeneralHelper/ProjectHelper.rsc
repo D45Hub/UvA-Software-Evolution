@@ -4,6 +4,7 @@ import lang::java::m3::Core;
 import lang::java::m3::AST;
 import IO;
 
+// Provides all project file contents inside of a single string concatenated together.
 str getConcatenatedProjectFile(M3 model) {
     set[loc] sourceFileLocations = files(model);
     return ("" | it + "\n" + readFile(l) | loc l <- sourceFileLocations);
@@ -16,6 +17,15 @@ list[Declaration] getASTs(loc projectLocation) {
     return asts;
 }
 
+/** 
+    A unit in Java consists of methods in any kind.
+    This means we include every type of method, which we can visit, as well as constructors.
+
+    Potential Threads to validity:
+
+    - Anonymous Class and Method creation inside of other units. (As well as Lambda Statements...)
+    - The Reflection API, especially the method object included in there.
+*/ 
 list[Declaration] getProjectUnits(list[Declaration] declMethods) {
 
     list[Declaration] projectUnits = [];
