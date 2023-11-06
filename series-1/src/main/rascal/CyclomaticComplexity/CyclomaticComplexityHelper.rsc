@@ -52,8 +52,12 @@ import lang::java::m3::AST;
 
 */
 
-public int cyclomaticLinesPerPartion(list[Declaration] declMethods, M3 model) {
+alias CyclomaticComplexityValue = tuple[Declaration method, int cyclomaticComplexity];
+
+public list[CyclomaticComplexityValue] cyclomaticLinesPerPartion(list[Declaration] declMethods) {
 			
+    list[CyclomaticComplexityValue] complexityValues = [];
+
 	for(m <- declMethods) {
 		
 		//Base complexity is always 1. This is the function body.
@@ -76,16 +80,22 @@ public int cyclomaticLinesPerPartion(list[Declaration] declMethods, M3 model) {
 	  		case \if(_,_) : result += 1;
 			case \if(_,_,_) : result += 1;
 			case \case(_) : result += 1; // case:
+
+            // "try" and "finally" are not included since they don't constitute as control flow structures.
+            // Both blocks are always executed unless an exception gets thrown, in which case the "catch" block gets executed.
 			case \catch(_,_) : result += 1;	 //catch() {}
 	   		case \while(_,_) : result += 1;	//while(_) x
             case \throw(_) : result += 1; // If assert is considered as control flow, then this I guess too... Unsure about that.
     		case \conditional(_, _, _): result += 1; //a ? c : d
     		case \infix(_, /^\|\||&&|^$/, _) : result += 1; //a && b. a || b. a ^ b. -> Other bitwise operators are excluded since they only modify a certain value. (And not change the control flow.)
     		}
+        
+        CyclomaticComplexityValue complexityValue = <m, result>;
+        complexityValues += [complexityValue];
 
         // Question: Can multiple constructors with different arguments be considered as control-flow?
         // Then the "constructorCall" should also be considered in this visit as well.
 	}
 	
-	return result;
+	return complexityValues;
 }
