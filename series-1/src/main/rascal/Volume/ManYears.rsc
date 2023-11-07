@@ -46,7 +46,6 @@ public MYRanking getManYearsRanking(int linesOfCode){
     return resultRanking;
 }
 
-
 public void formatRanking (int linesOfCode) {
     MYRanking manYearRankingResult = getManYearsRanking(linesOfCode);
     println("Lines of code " + toString(linesOfCode));
