@@ -76,6 +76,13 @@ str removeMultiLineComments(str rawSourceCode){
 	};
 }
 
+list[str] getLinesOfCode(list[str] rawSourceCodeLines) {
+    str codeWithoutMultiLineComments1 = removeMultiLineComments(toString(rawSourceCodeLines));
+    list[str] splitCodeLines1 = split("\n", codeWithoutMultiLineComments1);
+
+    return [trim(line) | str line <- splitCodeLines1, !isRemovableCodeLine(line)];
+}
+
 list[str] getLinesOfCode(str rawSourceCode) {
 
     str codeWithoutMultiLineComments = removeMultiLineComments(rawSourceCode);

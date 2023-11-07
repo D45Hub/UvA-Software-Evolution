@@ -8,7 +8,7 @@ import List;
 import IO;
 import String;
 
-alias Size = num;
+alias Size = int;
 alias UnitSizeRanking =  tuple[Ranking rankingType,
                                 Size minLineOfunit,
                                 Size maxLinesOfUnit];
@@ -30,30 +30,30 @@ list[UnitSizeRanking] allUnitSizeRankings = [excellentUnitSizeRanking,
 
 
 
-num sumOfList(list[num] listOfNumbers, int sizeOfList) {
+int sumOfList(list[int] listOfintbers, int sizeOfList) {
     if (sizeOfList == 0) {
         return 0;
     }
-        return listOfNumbers[sizeOfList - 1]
-        + sumOfList(listOfNumbers, sizeOfList - 1);
+        return listOfintbers[sizeOfList - 1]
+        + sumOfList(listOfintbers, sizeOfList - 1);
 }
    
  
-num calculateAverageUnitSize (list[UnitLengthTuple] allMethodsOfProject) {
-    list[num] allSizes =  [method[1] | method <- allMethodsOfProject];
-    num average = sumOfList(allSizes, size(allSizes)) / size(allMethodsOfProject);
+int calculateAverageUnitSize (list[UnitLengthTuple] allMethodsOfProject) {
+    list[int] allSizes =  [method[1] | method <- allMethodsOfProject];
+    int average = sumOfList(allSizes, size(allSizes)) / size(allMethodsOfProject);
     return average;
 }
 
 list[UnitLengthTuple] getAllUnitSizesOfProject(M3 projectModel) {
 
+    // TODO REFACTOR :D 
     list[UnitLengthTuple] unitLengthTuples = [];
 
     classMethods = methods(projectModel);
     classConstructors = constructors(projectModel);
 
     for(method <- classMethods) {
-
         str rawMethod = readFile(method);
         list[str] splitCodeLines = (split("\n", rawMethod))[1..];
 
@@ -61,7 +61,6 @@ list[UnitLengthTuple] getAllUnitSizesOfProject(M3 projectModel) {
     }
 
     for(constructor <- classConstructors) {
-
         str rawConstructor = readFile(constructor);
         list[str] splitConstructorLines = (split("\n", rawConstructor))[1..];
 
@@ -81,5 +80,6 @@ public UnitSizeRanking getUnitSizeRanking(int averageUnitSizeLOC){
 public void formatUnitSizeRanking(M3 projectModel) {
     allMethods = getAllUnitSizesOfProject(projectModel);
     average = calculateAverageUnitSize(allMethods);
-    println(getUnitSizeRanking(average));
+    ranking = getUnitSizeRanking(average); 
+    println(ranking);
 }
