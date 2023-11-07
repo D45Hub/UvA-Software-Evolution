@@ -71,7 +71,15 @@ list[UnitLengthTuple] getAllUnitSizesOfProject(M3 projectModel) {
     return unitLengthTuples;
 }
 
-UnitSizeRanking getResultingUnitSizeRanking(list[UnitLengthTuple] allMethodsOfProject) {
-    // TODO: Finish
-    return excellentUnitSizeRanking;
+public UnitSizeRanking getUnitSizeRanking(int averageUnitSizeLOC){
+    UnitSizeRanking resultRanking =  [ranking | ranking <- allUnitSizeRankings,
+                                (averageUnitSizeLOC < ranking.maxLinesOfUnit
+                                || ranking.maxLinesOfUnit == -1)][0];
+    return resultRanking;
+}
+
+public void formatUnitSizeRanking(M3 projectModel) {
+    allMethods = getAllUnitSizesOfProject(projectModel);
+    average = calculateAverageUnitSize(allMethods);
+    println(getUnitSizeRanking(average));
 }
