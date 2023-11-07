@@ -6,12 +6,13 @@ import lang::java::m3::Core;
 import lang::java::m3::AST;
 import List;
 import IO;
+import String;
 
 alias Size = num;
 alias UnitSizeRanking =  tuple[Ranking rankingType,
                                 Size minLineOfunit,
                                 Size maxLinesOfUnit];
-alias UnitLengthTuple = tuple[Declaration method, num methodLOC];
+alias UnitLengthTuple = tuple[loc method, int methodLOC];
 
 
 // TODO find paper or standard on how long a method has to be in Java
@@ -44,9 +45,30 @@ num calculateAverageUnitSize (list[UnitLengthTuple] allMethodsOfProject) {
     return average;
 }
 
-void getAllUnitSizesOfProject() {
-    //TODO: Denis your turn
-    println("In the end we should have the return type of list[UnitLengthTuple]");
+list[UnitLengthTuple] getAllUnitSizesOfProject(M3 projectModel) {
+
+    list[UnitLengthTuple] unitLengthTuples = [];
+
+    classMethods = methods(projectModel);
+    classConstructors = constructors(projectModel);
+
+    for(method <- classMethods) {
+
+        str rawMethod = readFile(method);
+        list[str] splitCodeLines = (split("\n", rawMethod))[1..];
+
+        unitLengthTuples += [<method, size(splitCodeLines)>];
+    }
+
+    for(constructor <- classConstructors) {
+
+        str rawConstructor = readFile(constructor);
+        list[str] splitConstructorLines = (split("\n", rawConstructor))[1..];
+
+        unitLengthTuples += [<constructor, size(splitConstructorLines)>];
+    }
+
+    return unitLengthTuples;
 }
 
 UnitSizeRanking getResultingUnitSizeRanking(list[UnitLengthTuple] allMethodsOfProject) {
