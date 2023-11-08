@@ -144,6 +144,27 @@ list[str] getListOfHashes(M3 projectModel) {
     return hashCodeLines;
 }
 
+
+
+map[str, int] getDuplicatesOfProgram (list[str] linesOfCode) {
+    i = 0;
+    map[str,int] duplicatedFragments;
+
+    while (i < size(linesOfCode) && (i+5) < size(linesOfCode)) {
+        listForHashing = linesOfCode[i..i+5];
+        hash = genStringHashCode(toString(listForHashing));
+        if (duplicatedFragments[hash] >= 1) {
+            duplicatedFragments[hash] = duplicatedFragments[hash] + 1;
+        } else {
+            duplicatedFragments[hash] = 1;
+        }
+        i = i + 1;
+    }
+    return duplicatedFragments;
+}
+
+
+
 // TODO REFACTOR... This is shit.
 list[list[str]] generateHashWindows(list[str] hashCodeLines) {
 
