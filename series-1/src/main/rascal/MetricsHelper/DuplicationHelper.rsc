@@ -104,8 +104,6 @@ list[str] getListOfHashes(M3 projectModel) {
 
     list[str] hashCodeLines = [];
 
-    int i = 0;
-
     classMethods = methods(projectModel);
     classConstructors = constructors(projectModel);
 
@@ -116,13 +114,17 @@ list[str] getListOfHashes(M3 projectModel) {
 
         list[str] filteredLinesOfCode = getLinesOfCode(splitCodeLines);
 
+        /**
         if(size(filteredLinesOfCode) < 6) {
             continue;
         }
+        */
 
         for (methodLine <- filteredLinesOfCode) {
-            hashCodeLines += [genStringHashCode(methodLine)];
+            hashCodeLines += [(methodLine)];
         }
+
+        //println(hashCodeLines);
     }
 
     for(constructor <- classConstructors) {
@@ -137,7 +139,7 @@ list[str] getListOfHashes(M3 projectModel) {
         }
 
         for (constructorLine <- filteredLinesOfCodeConstructors) {
-            hashCodeLines += [genStringHashCode(constructorLine)];
+            hashCodeLines += [(constructorLine)];
         }
     }
 
@@ -148,19 +150,20 @@ list[str] getListOfHashes(M3 projectModel) {
 
 map[str, int] getDuplicatesOfProgram (list[str] linesOfCode) {
     i = 0;
-    map[str,int] duplicatedFragments;
+    map[str,int] duplicatedFragments = ();
 
     while (i < size(linesOfCode) && (i+5) < size(linesOfCode)) {
         listForHashing = linesOfCode[i..i+5];
-        hash = genStringHashCode(toString(listForHashing));
-        if (duplicatedFragments[hash] >= 1) {
+        hash = genStringHashCode(toString(listForHashing))[1..50];
+        if (hash in duplicatedFragments) {
             duplicatedFragments[hash] = duplicatedFragments[hash] + 1;
         } else {
             duplicatedFragments[hash] = 1;
         }
         i = i + 1;
     }
-    return duplicatedFragments;
+
+    return (duplicate : duplicatedFragments[duplicate] | duplicate <- duplicatedFragments, duplicatedFragments[duplicate] > 1);
 }
 
 
@@ -233,8 +236,12 @@ public DuplicationRanking getDuplicationRanking(int duplicationPercentage){
 
 public void formatDuplicationRanking(M3 projectModel, int linesOfCode) {
     list[str] listOfHashes = getListOfHashes(projectModel);
-    list[list[str]] listOfHashWindows = generateHashWindows(listOfHashes);
-    int amountOfDuplicates = getAmountOfDuplicates(listOfHashWindows);
+    map[str, int] duplicationMap = getDuplicatesOfProgram(listOfHashes);
+    int amountOfDuplicates = 0;
+
+    for(duplEntry <- duplicationMap) {
+        amountOfDuplicates += duplicationMap[duplEntry];
+    }
 
     // It is okay to round down, since in any case the rating wouldn't be influenced anyways, if we were to use the float value.
     int percentageOfDuplication = ((amountOfDuplicates * 6) / linesOfCode) * 100;
