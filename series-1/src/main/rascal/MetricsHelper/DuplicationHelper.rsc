@@ -247,6 +247,5 @@ public void formatDuplicationRanking(M3 projectModel, int linesOfCode) {
     int percentageOfDuplication = ((amountOfDuplicates * 6) / linesOfCode) * 100;
     DuplicationRanking ranking = getDuplicationRanking(percentageOfDuplication);
     
-
     println(ranking);
 }
