@@ -1,0 +1,8 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+simpleencryptor,de.denisthiessen.algorithms,NoEncryptionAlgorithm,0,5,0,0,0,3,0,2,0,2
+simpleencryptor,de.denisthiessen.algorithms,Rot13Algorithm,11,62,7,11,2,13,5,6,0,2
+simpleencryptor,de.denisthiessen.algorithms,XORAlgorithm,0,40,0,2,0,10,0,3,0,2
+simpleencryptor,de.denisthiessen.algorithms,CaesarAlgorithm,4,53,1,5,1,10,1,4,0,2
+simpleencryptor,de.denisthiessen.algorithms,HashingAlgorithm,0,33,0,2,0,7,0,3,0,2
+simpleencryptor,de.denisthiessen,AlgorithmFactory,3,28,0,5,1,6,1,5,1,1
+simpleencryptor,de.denisthiessen,App,33,0,0,0,11,0,2,0,2,0
