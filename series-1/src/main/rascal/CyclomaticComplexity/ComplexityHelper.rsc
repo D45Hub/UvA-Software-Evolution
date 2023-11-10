@@ -27,7 +27,7 @@ list[ComplexityRanking] allComplexityRankings = [excellentComplexityRanking,
                                             negativeComplexityRanking,
                                             veryNegativeComplexityRanking];
 
-public ComplexityRanking getOverallComplexityRating(RiskOverview riskOverview) {
+ComplexityRanking getOverallComplexityRating(RiskOverview riskOverview) {
 
     real overallLines = toReal(getOverallLinesFromOverview(riskOverview));
 
@@ -49,6 +49,11 @@ public ComplexityRanking getOverallComplexityRating(RiskOverview riskOverview) {
     ComplexityRanking resultRanking = resultRankings[0];
                                 
     return resultRanking;
+}
+
+public ComplexityRanking calculateComplexityRanking(list[Declaration] declMethods) {
+    RiskOverview riskOverview = getCyclomaticComplexityRankings(declMethods);
+    return getOverallComplexityRating(riskOverview);
 }
 
 public void formatComplexityRanking(list[Declaration] declMethods) {

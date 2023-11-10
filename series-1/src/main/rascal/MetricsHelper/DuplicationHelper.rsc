@@ -134,9 +134,9 @@ list[str] getListOfHashes(M3 projectModel) {
 
         list[str] filteredLinesOfCodeConstructors = getLinesOfCode(splitConstructorLines);
 
-        if(size(filteredLinesOfCodeConstructors) < 6) {
+        /*if(size(filteredLinesOfCodeConstructors) < 6) {
             continue;
-        }
+        }*/
 
         for (constructorLine <- filteredLinesOfCodeConstructors) {
             hashCodeLines += [(constructorLine)];
@@ -227,14 +227,7 @@ int getAmountOfDuplicates(list[list[str]] hashWindows) {
     return duplicateAmount;
 }
 
-public DuplicationRanking getDuplicationRanking(int duplicationPercentage){
-    DuplicationRanking resultRanking =  [ranking | ranking <- allDuplicationRankings,
-                                (duplicationPercentage < ranking.maxDuplicationOfUnit
-                                || ranking.maxDuplicationOfUnit == -1)][0];
-    return resultRanking;
-}
-
-public void formatDuplicationRanking(M3 projectModel, int linesOfCode) {
+DuplicationRanking getDuplicationRanking(M3 projectModel, int linesOfCode) {
     list[str] listOfHashes = getListOfHashes(projectModel);
     map[str, int] duplicationMap = getDuplicatesOfProgram(listOfHashes);
     int amountOfDuplicates = 0;
@@ -245,7 +238,17 @@ public void formatDuplicationRanking(M3 projectModel, int linesOfCode) {
 
     // It is okay to round down, since in any case the rating wouldn't be influenced anyways, if we were to use the float value.
     int percentageOfDuplication = ((amountOfDuplicates * 6) / linesOfCode) * 100;
-    DuplicationRanking ranking = getDuplicationRanking(percentageOfDuplication);
-    
+    getDuplicationRanking(percentageOfDuplication);
+}
+
+public DuplicationRanking getDuplicationRanking(int duplicationPercentage){
+    DuplicationRanking resultRanking =  [ranking | ranking <- allDuplicationRankings,
+                                (duplicationPercentage < ranking.maxDuplicationOfUnit
+                                || ranking.maxDuplicationOfUnit == -1)][0];
+    return resultRanking;
+}
+
+public void formatDuplicationRanking(M3 projectModel, int linesOfCode) {
+    DuplicationRanking ranking = getDuplicationRanking(projectModel, linesOfCode);
     println(ranking);
 }

@@ -12,8 +12,12 @@ str getConcatenatedProjectFile(M3 model) {
 
 list[Declaration] getASTs(loc projectLocation) {
     M3 model = createM3FromMavenProject(projectLocation);
+    return getASTs(model);
+}
+
+list[Declaration] getASTs(M3 projectModel) {
     list[Declaration] asts = [createAstFromFile(f, true)
-    | f <- files(model.containment), isCompilationUnit(f)];
+        | f <- files(projectModel.containment), isCompilationUnit(f)];
     return asts;
 }
 
@@ -39,4 +43,9 @@ list[Declaration] getProjectUnits(list[Declaration] declMethods) {
     }
 
     return projectUnits;
+}
+
+list[Declaration] getProjectUnits(M3 model) {
+    list[Declaration] asts = getASTs(model);
+    return getProjectUnits(asts);
 }

@@ -77,9 +77,13 @@ public UnitSizeRanking getUnitSizeRanking(int averageUnitSizeLOC){
     return resultRanking;
 }
 
-public void formatUnitSizeRanking(M3 projectModel) {
+UnitSizeRanking calculateUnitSizeRanking(M3 projectModel) {
     allMethods = getAllUnitSizesOfProject(projectModel);
     average = calculateAverageUnitSize(allMethods);
-    ranking = getUnitSizeRanking(average); 
+    return getUnitSizeRanking(average); 
+}
+
+public void formatUnitSizeRanking(M3 projectModel) {
+    UnitSizeRanking ranking = calculateUnitSizeRanking(projectModel);
     println(ranking);
 }
