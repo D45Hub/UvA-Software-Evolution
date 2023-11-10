@@ -2,6 +2,10 @@ module CyclomaticComplexity::CyclomaticComplexityHelper
 
 import lang::java::m3::Core;
 import lang::java::m3::AST;
+import Ranking::RiskRanges;
+import MetricsHelper::LOCHelper;
+
+import IO;
 
 /**
 
@@ -98,4 +102,37 @@ public list[CyclomaticComplexityValue] cyclomaticLinesPerPartion(list[Declaratio
 	}
 	
 	return complexityValues;
+}
+
+public RiskOverview getCyclomaticComplexityRankings(list[Declaration] declMethods) {
+    list[CyclomaticComplexityValue] complexityValues = cyclomaticLinesPerPartion(declMethods);
+
+    int lowRisk = 0;
+    int moderateRisk = 0;
+    int highRisk = 0;
+    int veryHighRisk = 0;
+
+    for(complexity <- complexityValues) {
+        int complexityValue = complexity.cyclomaticComplexity;
+        loc rawMethodLoc = complexity.method.src;
+        str rawMethod = readFile(rawMethodLoc);
+
+        int linesOfMethod = getLinesOfCodeAmount(rawMethod);
+
+        if(complexityValue >= 1 && complexityValue <= 10) {
+            lowRisk += linesOfMethod;
+        } else if(complexityValue >= 11 && complexityValue <= 20) {
+            moderateRisk += linesOfMethod;
+        } else if(complexityValue >= 21 && complexityValue <= 50) {
+            highRisk += linesOfMethod;
+        } else {
+            veryHighRisk += linesOfMethod;
+        }
+    }
+
+    return <lowRisk, moderateRisk, highRisk, veryHighRisk>;
+}
+
+public int getOverallLinesFromOverview(RiskOverview riskOverview){
+    return (riskOverview.low + riskOverview.moderate + riskOverview.high + riskOverview.veryHigh);
 }
