@@ -20,6 +20,38 @@ Code Coverage based on the paper
 
 */ 
 
+/**
+
+    Unit test coverage is an interesting metric since most of the time it's a good measure on your general test coverage and what needs to be added.
+
+    The problem is though, that, especially with projects with larger parts of generated code,
+    it can be hard to receive a good rating though.
+    For this kind of code tests are most likely not needed, since it has been automatically generated.
+    But still it is oftentimes tracked alongside with the manually written code, which definitely needs testing.
+    So therefore the presented view from unit testing is a bit skewed.
+
+    But as the paper stated, calculating this method is not trivial.
+    This is due to the necessity of tracking the executed code lines and instructions.
+    Not only do here the problems from tracking what a line of code do play a role here,
+    but also the problems of tracking executed lines of code and non-executed code branches.
+    Dependent on the programming language used, this may become a lot harder.
+    (For example, with functional programming languages, since control flow is harder to track there.)
+
+    One really simple approach to do this in Java, for example would be to artificially add a "logging" statement after each line of code.
+    Then you could track which logging statements are executed and which are not.
+    From there on you can calculate the coverage. 
+    This has the same problems though, especially with tracking "lines of code", since this presumes that every statement has been written in one line.
+
+    This would be pretty hard to implement in Rascal.
+    So we didn't. (We got better stuff to do.)
+
+    Therefore we took a similar approach to the paper and used an external library. (Jacoco)
+    Using this library we can generate a CSV file automatically. (Either via CMD or Maven or whatever you prefer.)
+    From there on we can use the calculated metrics to calculate a final rating based on the values given from the paper.
+    (Either from a project-wide perspective or per unit.)
+
+*/
+
 alias TestCoverage = int;
 alias TestCoverageRanking =  tuple[Ranking rankingType,
                                 TestCoverage min,
