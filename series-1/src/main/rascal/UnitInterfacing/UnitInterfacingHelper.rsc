@@ -65,8 +65,7 @@ list[UnitInterfacingComplexityValue] getUnitInterfacingValues(list[Declaration] 
 
 list[UnitInterfacingComplexityValue] addToInterfacingValues(list[UnitInterfacingComplexityValue] currentUnitInterfacingValues, Declaration methodUnit, int parameterAmount) {
     list[UnitInterfacingComplexityValue] interfacingValues = currentUnitInterfacingValues;
-	// TODO Undefined m ? 
-    UnitInterfacingComplexityValue complexityValue = <m, parameterAmount>;
+    UnitInterfacingComplexityValue complexityValue = <methodUnit, parameterAmount>;
     unitInterfacingValues += [complexityValue];
 
     return interfacingValues;
