@@ -76,6 +76,7 @@ list[UnitInterfacingComplexityValue] addToInterfacingValues(list[UnitInterfacing
 map[str, int] calculateRiskPercentages(map[str, int] absoluteRiskValues) {
 	int overallMethods = size(absoluteRiskValues);
 	map[str, int]  riskOverview = ("lowRisk" : 0, "mediumRisk" : 0, "highRisk" : 0, "veryHighRisk": 0);
+	// TODO Finish function
 	return riskOverview;
 
 } 
