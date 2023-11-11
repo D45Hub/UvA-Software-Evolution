@@ -80,13 +80,28 @@ list[UnitInterfaceRiskProfile] getAbsolutRiskValues(list[UnitInterfacingComplexi
 	list[UnitInterfaceRiskProfile] riskProfile = [];
 
 	for(complexity <- methodComplexities) {
-		// TODO FIND OUT GOOD VALUES FOR JAVA...
+		/**
+			Since research on how unit interfacing ratings,
+			especially with concrete values mentioned is basically non-existent,
+			we created our own thresholds.
+
+			These are loosely based on the "Deriving Metric Thresholds from Benchmark Data"
+			paper, their evaluated metric distribution, box plot per risk category,
+			and personal experience from Java programming, in equal fashion.
+
+			With this we arrive at the following risk ratings for Java unit interfacing.
+
+			Low risk: 0 and 1 method parameters.
+			Moderate risk: 2 and 3 method parameters.
+			High risk: 4 to 6 method parameters.
+			Very high risk: 7 or more method parameters. 
+		*/
 		int compl = complexity.unitInterfacingComplexity;
 		if(compl == 0 || compl == 1) {
 			riskProfile += <complexity.method, lowRisk>;
-		} else if(compl == 2) {
+		} else if(compl == 2 || compl == 3) {
 			riskProfile += <complexity.method, moderateRisk>;
-		} else if(compl == 3) {
+		} else if(compl >=4 && compl <= 6) {
 			riskProfile += <complexity.method, highRisk>;
 		} else {
 			riskProfile += <complexity.method, veryHighRisk>;
