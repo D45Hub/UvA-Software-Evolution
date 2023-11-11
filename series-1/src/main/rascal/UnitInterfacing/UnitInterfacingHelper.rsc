@@ -5,9 +5,12 @@ import lang::java::m3::AST;
 
 import Ranking::Ranking;
 import Ranking::RiskRanges;
+import MetricsHelper::LOCHelper;
 
 import List;
 import Map;
+import util::Math;
+import IO;
 
 /* 
 In case the metric is more relevant at the unit level, we make use of so-called
@@ -38,9 +41,10 @@ list[RiskThreshold] risks = [<excellent,-1,25,0,0>,
 
 /* Definining values for the individual risks */
 
+alias Risk = str;
+
 alias UnitInterfacingComplexityValue = tuple[Declaration method, int unitInterfacingComplexity];
 alias UnitInterfaceRiskProfile = tuple[Declaration method, Risk risk];
-
 
 list[UnitInterfacingComplexityValue] getUnitInterfacingValues(list[Declaration] methodUnits) {
 
@@ -71,11 +75,66 @@ list[UnitInterfacingComplexityValue] addToInterfacingValues(list[UnitInterfacing
     return interfacingValues;
 }
 
-/* This method calculates the overall percentage of methods lying in a category */
-map[str, int] calculateRiskPercentages(map[str, int] absoluteRiskValues) {
-	int overallMethods = size(absoluteRiskValues);
-	map[str, int]  riskOverview = ("lowRisk" : 0, "mediumRisk" : 0, "highRisk" : 0, "veryHighRisk": 0);
-	// TODO Finish function
-	return riskOverview;
+list[UnitInterfaceRiskProfile] getAbsolutRiskValues(list[UnitInterfacingComplexityValue] methodComplexities) {
 
+	list[UnitInterfaceRiskProfile] riskProfile = [];
+
+	for(complexity <- methodComplexities) {
+		// TODO FIND OUT GOOD VALUES FOR JAVA...
+		int compl = complexity.unitInterfacingComplexity;
+		if(compl == 0 || compl == 1) {
+			riskProfile += <complexity.method, lowRisk>;
+		} else if(compl == 2) {
+			riskProfile += <complexity.method, moderateRisk>;
+		} else if(compl == 3) {
+			riskProfile += <complexity.method, highRisk>;
+		} else {
+			riskProfile += <complexity.method, veryHighRisk>;
+		}
+	}
+
+	return riskProfile;
+}
+
+/* This method calculates the overall percentage of methods lying in a category */
+map[str, int] calculateAbsoluteRiskAmount(list[UnitInterfaceRiskProfile] riskProfiles) {
+
+	map[str, int] riskOverview = ("lowRisk" : 0, "moderateRisk" : 0, "highRisk" : 0, "veryHighRisk": 0);
+
+	for(profile <- riskProfiles) {
+		loc rawMethodLoc = profile.method.src;
+        str rawMethod = readFile(rawMethodLoc);
+		int methodLOC = getLinesOfCodeAmount(rawMethod);
+
+		riskOverview[profile.risk] += methodLOC;
+	}
+
+	return riskOverview;
 } 
+
+map[str, int] calculateRelativeRiskAmount(map[str, int] absoluteRiskAmount) {
+
+	map[str, int] relativeRiskOverview = ("lowRisk" : 0, "moderateRisk" : 0, "highRisk" : 0, "veryHighRisk": 0);
+	real overallLines = toReal((absoluteRiskAmount["lowRisk"] + absoluteRiskAmount["moderateRisk"] + absoluteRiskAmount["highRisk"] + absoluteRiskAmount["veryHighRisk"]));
+	
+	for(riskKey <- absoluteRiskAmount) {
+		real riskPercentage = toReal((absoluteRiskAmount[riskKey] / overallLines) * 100.0);
+		int riskPercentageValue = round(riskPercentage);
+
+		relativeRiskOverview[riskKey] += riskPercentageValue;
+	}
+
+	return relativeRiskOverview;
+}
+
+RiskThreshold calculateRiskThreshold(map[str, int] relativeRiskAmount) {
+
+	list[RiskThreshold] resultRisks = [risk | risk <- risks,
+                                (risk.moderate >= relativeRiskAmount["moderateRisk"]
+                                && risk.high >= relativeRiskAmount["highRisk"]
+								&& risk.veryHigh >= relativeRiskAmount["veryHighRisk"]) 
+                                || risk.veryHigh == -1];
+
+    resultRisks = sort(resultRisks, bool (RiskThreshold a, RiskThreshold b) { return a.rankLevel.val > b.rankLevel.val; });
+    return resultRisks[0];
+}
