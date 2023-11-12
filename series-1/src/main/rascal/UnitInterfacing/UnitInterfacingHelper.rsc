@@ -70,7 +70,7 @@ list[UnitInterfacingComplexityValue] getUnitInterfacingValues(list[Declaration] 
 list[UnitInterfacingComplexityValue] addToInterfacingValues(list[UnitInterfacingComplexityValue] currentUnitInterfacingValues, Declaration methodUnit, int parameterAmount) {
     list[UnitInterfacingComplexityValue] interfacingValues = currentUnitInterfacingValues;
     UnitInterfacingComplexityValue complexityValue = <methodUnit, parameterAmount>;
-    unitInterfacingValues += [complexityValue];
+    interfacingValues += [complexityValue];
 
     return interfacingValues;
 }
@@ -98,13 +98,13 @@ list[UnitInterfaceRiskProfile] getAbsolutRiskValues(list[UnitInterfacingComplexi
 		*/
 		int compl = complexity.unitInterfacingComplexity;
 		if(compl == 0 || compl == 1) {
-			riskProfile += <complexity.method, lowRisk>;
+			riskProfile += <complexity.method, "lowRisk">;
 		} else if(compl == 2 || compl == 3) {
-			riskProfile += <complexity.method, moderateRisk>;
+			riskProfile += <complexity.method, "moderateRisk">;
 		} else if(compl >=4 && compl <= 6) {
-			riskProfile += <complexity.method, highRisk>;
+			riskProfile += <complexity.method, "highRisk">;
 		} else {
-			riskProfile += <complexity.method, veryHighRisk>;
+			riskProfile += <complexity.method, "veryHighRisk">;
 		}
 	}
 
@@ -157,7 +157,8 @@ RiskThreshold calculateRiskThreshold(map[str, int] relativeRiskAmount) {
 public RiskThreshold generateRiskThreshold(list[Declaration] methodUnits) {
 	list[UnitInterfacingComplexityValue] methodComplexities = getUnitInterfacingValues(methodUnits);
 	list[UnitInterfaceRiskProfile] absoluteRiskValues = getAbsolutRiskValues(methodComplexities);
-	map[str, int] relativeRiskValues = calculateRelativeRiskAmount(absoluteRiskValues);
+	map[str, int] absoluteRiskAmount = calculateAbsoluteRiskAmount(absoluteRiskValues);
+	map[str, int] relativeRiskValues = calculateRelativeRiskAmount(absoluteRiskAmount);
 
 	return calculateRiskThreshold(relativeRiskValues);
 }

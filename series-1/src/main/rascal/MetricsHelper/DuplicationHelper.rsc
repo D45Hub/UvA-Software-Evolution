@@ -238,7 +238,7 @@ DuplicationRanking getDuplicationRanking(M3 projectModel, int linesOfCode) {
 
     // It is okay to round down, since in any case the rating wouldn't be influenced anyways, if we were to use the float value.
     int percentageOfDuplication = ((amountOfDuplicates * 6) / linesOfCode) * 100;
-    getDuplicationRanking(percentageOfDuplication);
+    return getDuplicationRanking(percentageOfDuplication);
 }
 
 public DuplicationRanking getDuplicationRanking(int duplicationPercentage){

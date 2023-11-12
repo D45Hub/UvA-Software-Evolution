@@ -5,6 +5,7 @@ import lang::java::m3::AST;
 
 import UnitInterfacing::UnitInterfacingHelper;
 import Ranking::Ranking;
+import Ranking::RiskRanges;
 
 // Unit interfacing, Module Coupling
 

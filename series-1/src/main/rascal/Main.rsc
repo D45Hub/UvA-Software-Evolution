@@ -1,15 +1,36 @@
 module Main
 
 import lang::java::m3::Core;
-import MetricsHelper::LOCHelper;
-import Volume::ManYears;
+import lang::java::m3::AST;
+import GeneralHelper::ProjectHelper;
+import MetricsHelper::DuplicationHelper;
+import CyclomaticComplexity::ComplexityHelper;
+import UnitInterfacing::UnitInterfacingHelper;
+import GeneralHelper::ReportHelper;
+import Ratings::Analyzability;
+import Ratings::Changeability;
+import Ratings::Stability;
+import Ratings::Testability;
+import Ranking::Ranking;
+import IO;
 
-int main(int testArgument=0) {
+void main() {
 
-    M3 model = createM3FromMavenProject(|file:///C:/SomeFilePath|);
-    int linesOfCode = getLinesOfCodeAmount(model);
-    MYRanking manYearRanking = getManYearsRanking(linesOfCode);
+    M3 model = createM3FromMavenProject(|file:///some/project|);
+    list[Declaration] unitDeclarations = getProjectUnits(model);
 
-    formatRanking(linesOfCode);
-    return testArgument;
+    Ranking analyzabilityRanking = getAnalyzabilityRating(model);
+    Ranking changabilityRanking = getChangabilityRating(model, unitDeclarations);
+    Ranking stabilityRanking = getStabilityRanking(model, unitDeclarations); 
+    Ranking testabilityRanking = getTestabilityRanking(model, unitDeclarations);
+
+    // TODO ADD OTHER METRICS TO THE REPORT WITH VALUES???
+    // THINK HOW ESPECIALLY... WE DONT WANT TO DUPLICATE CALCULATION.
+
+    addToReport("Analyzability", analyzabilityRanking);
+    addToReport("Changability", changabilityRanking);
+    addToReport("Stability", stabilityRanking);
+    addToReport("Testability", testabilityRanking);
+
+    writeCSVReport();
 }

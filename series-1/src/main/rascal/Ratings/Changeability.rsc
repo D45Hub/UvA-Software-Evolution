@@ -7,6 +7,7 @@ import MetricsHelper::DuplicationHelper;
 import CyclomaticComplexity::ComplexityHelper;
 import Ranking::Ranking;
 import UnitSize::UnitSize;
+import MetricsHelper::LOCHelper;
 
 // Duplication, Unit Complexity 
 

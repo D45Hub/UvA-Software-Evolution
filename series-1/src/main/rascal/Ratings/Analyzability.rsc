@@ -6,6 +6,7 @@ import Volume::ManYears;
 import MetricsHelper::DuplicationHelper;
 import UnitSize::UnitSize;
 import Ranking::Ranking;
+import MetricsHelper::LOCHelper;
 
 // Includes the Volume, Duplication, Unit Size
 
