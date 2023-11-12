@@ -153,3 +153,16 @@ RiskThreshold calculateRiskThreshold(map[str, int] relativeRiskAmount) {
     resultRisks = sort(resultRisks, bool (RiskThreshold a, RiskThreshold b) { return a.rankLevel.val > b.rankLevel.val; });
     return resultRisks[0];
 }
+
+public RiskThreshold generateRiskThreshold(list[Declaration] methodUnits) {
+	list[UnitInterfacingComplexityValue] methodComplexities = getUnitInterfacingValues(methodUnits);
+	list[UnitInterfaceRiskProfile] absoluteRiskValues = getAbsolutRiskValues(methodComplexities);
+	map[str, int] relativeRiskValues = calculateRelativeRiskAmount(absoluteRiskValues);
+
+	return calculateRiskThreshold(relativeRiskValues);
+}
+
+public void formatRiskThreshold(list[Declaration] methodUnits) {
+	RiskThreshold riskThreshold = generateRiskThreshold(methodUnits);
+	println(riskThreshold);
+}
