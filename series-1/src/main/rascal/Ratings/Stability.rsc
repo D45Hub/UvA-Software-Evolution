@@ -12,9 +12,8 @@ import Ranking::Ranking;
 public Ranking getStabilityRanking(M3 projectModel, list[Declaration] methodUnits) {
 
     // TODO THINK ABOUT RATING...
-    //list[UnitInterfacingComplexityValue] unitInterfacingValues = getUnitInterfacingValues(methodUnits);
-    //list[Ranking] metricRankings = [unitInterfacingValues.rankingType];
+    RiskThreshold unitInterfacingRisk = generateRiskThreshold(methodUnits);
+    list[Ranking] metricRankings = [unitInterfacingRisk.rankLevel];
 
-    //return averageRanking(metricRankings);
-    return undefined;
+    return averageRanking(metricRankings);
 }
