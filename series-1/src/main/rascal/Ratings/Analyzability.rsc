@@ -21,6 +21,10 @@ public Ranking getAnalyzabilityRating(M3 projectModel) {
 
     // TODO THINK ABOUT HOW TO HANDLE UNIT TESTING...
 
+    return getAnalyzabilityRating(manYearRanking, duplicationRanking, unitSizeRanking);
+}
+
+public Ranking getAnalyzabilityRating(MYRanking manYearRanking, DuplicationRanking duplicationRanking, UnitSizeRanking unitSizeRanking) {
     list[Ranking] metricRankings = [manYearRanking.rankingType, duplicationRanking.rankingType, unitSizeRanking.rankingType];
 
     return averageRanking(metricRankings);

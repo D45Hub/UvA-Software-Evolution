@@ -15,6 +15,10 @@ public Ranking getTestabilityRanking(M3 projectModel, list[Declaration] declMeth
     UnitSizeRanking unitSizeRanking = calculateUnitSizeRanking(projectModel);
     ComplexityRanking complexityRanking = calculateComplexityRanking(declMethods);
 
+    return getTestabilityRanking(unitSizeRanking, complexityRanking);
+}
+
+public Ranking getTestabilityRanking(UnitSizeRanking unitSizeRanking, ComplexityRanking complexityRanking) {
     list[Ranking] metricRankings = [unitSizeRanking.rankingType, complexityRanking.rankingType];
 
     return averageRanking(metricRankings);

@@ -14,6 +14,11 @@ public Ranking getStabilityRanking(M3 projectModel, list[Declaration] methodUnit
 
     // TODO THINK ABOUT RATING...
     RiskThreshold unitInterfacingRisk = generateRiskThreshold(methodUnits);
+
+    return getStabilityRanking(unitInterfacingRisk);
+}
+
+public Ranking getStabilityRanking(RiskThreshold unitInterfacingRisk) {
     list[Ranking] metricRankings = [unitInterfacingRisk.rankLevel];
 
     return averageRanking(metricRankings);

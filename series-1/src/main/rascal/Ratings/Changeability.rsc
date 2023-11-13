@@ -17,6 +17,10 @@ public Ranking getChangabilityRating(M3 projectModel, list[Declaration] declMeth
     DuplicationRanking duplicationRanking = getDuplicationRanking(projectModel, linesOfCodeAmount);
     ComplexityRanking complexityRanking = calculateComplexityRanking(declMethods);
 
+    return getChangabilityRating(duplicationRanking, complexityRanking);
+}
+
+public Ranking getChangabilityRating(DuplicationRanking duplicationRanking, ComplexityRanking complexityRanking) {
     list[Ranking] metricRankings = [duplicationRanking.rankingType, complexityRanking.rankingType];
 
     return averageRanking(metricRankings);
