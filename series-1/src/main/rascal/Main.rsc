@@ -45,6 +45,13 @@ void mandatoryMetric() {
     addToReport("Lines of Code", toString(linesOfCodeAmount));
     addToReport("Number of Methods", toString(size(unitDeclarations)));
 
+    println("Duplication");
+    startMeasure("duplication");
+    DuplicationRanking duplicationRanking = getDuplicationRanking(model, linesOfCodeAmount);
+    stopMeasure("duplication");
+    println(duplicationRanking);
+
+
     println("Man Years");
     startMeasure("ManYears");
     MYRanking manYearRanking = getManYearsRanking(linesOfCodeAmount);
@@ -60,11 +67,6 @@ void mandatoryMetric() {
     addToReport("Unit Size", unitSizeRanking.rankingType);
     println(unitSizeRanking);
 
-    println("Duplication");
-    startMeasure("duplication");
-    DuplicationRanking duplicationRanking = getDuplicationRanking(model, linesOfCodeAmount);
-    stopMeasure("duplication");
-    println(duplicationRanking);
 
 
     println("Unit Complexity");

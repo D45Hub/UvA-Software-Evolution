@@ -110,38 +110,40 @@ list[str] getListOfHashes(M3 projectModel) {
     for(method <- classMethods) {
 
         str rawMethod = readFile(method);
-        list[str] splitCodeLines = (split("\n", rawMethod))[1..];
+        list[str] splitCodeLines = split("\n", rawMethod); // first line is omitted bv. function declaration
+        list[str] trimmedCodeLines = [ trim(codeLine) | codeLine <- splitCodeLines];
+        list[str] filteredLinesOfCode = [codeLine | codeLine <- trimmedCodeLines , !startsWith(codeLine, "//")
+                                                                            && !startsWith(codeLine, "/*")
+                                                                            && !startsWith(codeLine, "/**")
+                                                                            && !startsWith(codeLine,"*")
+                                                                            && !endsWith(codeLine, "*/") ];
 
-        list[str] filteredLinesOfCode = getLinesOfCode(splitCodeLines);
-
-        /**
+        /** According to the current definition there is no point in comparing methods with less than 6 l ines of code,
+        so we skip it.  */ 
         if(size(filteredLinesOfCode) < 6) {
             continue;
         }
-        */
-
+        
         for (methodLine <- filteredLinesOfCode) {
             hashCodeLines += [(methodLine)];
         }
-
-        //println(hashCodeLines);
     }
 
-    for(constructor <- classConstructors) {
+    // for(constructor <- classConstructors) {
 
-        str rawConstructor = readFile(constructor);
-        list[str] splitConstructorLines = (split("\n", rawConstructor))[1..];
+    //     str rawConstructor = readFile(constructor);
+    //     list[str] splitConstructorLines = (split("\n", rawConstructor))[1..];
 
-        list[str] filteredLinesOfCodeConstructors = getLinesOfCode(splitConstructorLines);
+    //     list[str] filteredLinesOfCodeConstructors = getLinesOfCode(splitConstructorLines);
 
-        /*if(size(filteredLinesOfCodeConstructors) < 6) {
-            continue;
-        }*/
+    //     /*if(size(filteredLinesOfCodeConstructors) < 6) {
+    //         continue;
+    //     }*/
 
-        for (constructorLine <- filteredLinesOfCodeConstructors) {
-            hashCodeLines += [(constructorLine)];
-        }
-    }
+    //     for (constructorLine <- filteredLinesOfCodeConstructors) {
+    //         hashCodeLines += [(constructorLine)];
+    //     }
+    // }
 
     return hashCodeLines;
 }
@@ -163,73 +165,15 @@ map[str, int] getDuplicatesOfProgram (list[str] linesOfCode) {
         i = i + 1;
     }
 
-    return (duplicate : duplicatedFragments[duplicate] | duplicate <- duplicatedFragments, duplicatedFragments[duplicate] > 1);
+    return (duplicate : duplicatedFragments[duplicate] | duplicate <- duplicatedFragments, duplicatedFragments[duplicate] > 2);
 }
 
-
-
-// TODO REFACTOR... This is shit.
-list[list[str]] generateHashWindows(list[str] hashCodeLines) {
-
-    list[list[str]] hashCodeWindows = [];
-    int index = 0;
-    int i = 0;
-    int windowIndex = 0;
-    int hashCodeLinesAmount = size(hashCodeLines);
-    int maxWindowChunks = hashCodeLinesAmount / 6;
-
-    while(i < 6) {
-
-        while(windowIndex < maxWindowChunks){
-            println("Window Index: " + toString(windowIndex));
-            list[str] hashWindow = [];
-            while(index < 6) {
-                int hashCodeIndex = (windowIndex * 6 + index + i);
-
-                if (hashCodeIndex < hashCodeLinesAmount){
-                    str hash = hashCodeLines[hashCodeIndex];
-                    hashWindow += [hash];
-                }
-                index += 1;
-            }
-
-            windowIndex += 1;
-            index = 0;
-
-            if(size(hashWindow) == 6) {
-                hashCodeWindows += [hashWindow];
-            }
-        }
-
-        i += 1;
-        windowIndex = 0;
-        index = 0;
-    }
-
-
-    return hashCodeWindows;
-}
-
-int getAmountOfDuplicates(list[list[str]] hashWindows) {
-
-    int duplicateAmount = 0;
-
-    for(hashWindow <- hashWindows) {
-
-        hashWindows = hashWindows - [hashWindow];
-
-        while(hashWindow in hashWindows) {
-            hashWindows = hashWindows - [hashWindow];
-            duplicateAmount += 1;
-        }
-    }
-
-    return duplicateAmount;
-}
 
 DuplicationRanking getDuplicationRanking(M3 projectModel, int linesOfCode) {
     list[str] listOfHashes = getListOfHashes(projectModel);
     map[str, int] duplicationMap = getDuplicatesOfProgram(listOfHashes);
+    println("duplication map");
+    println(duplicationMap);
     int amountOfDuplicates = 0;
 
     for(duplEntry <- duplicationMap) {
@@ -242,6 +186,8 @@ DuplicationRanking getDuplicationRanking(M3 projectModel, int linesOfCode) {
 }
 
 public DuplicationRanking getDuplicationRanking(int duplicationPercentage){
+    println("duplicationPercentage");
+    println(duplicationPercentage);
     DuplicationRanking resultRanking =  [ranking | ranking <- allDuplicationRankings,
                                 (duplicationPercentage < ranking.maxDuplicationOfUnit
                                 || ranking.maxDuplicationOfUnit == -1)][0];
