@@ -54,16 +54,19 @@ import IO;
 
 // This regex also checks for cases such as e.g. System.out.println("{}") 
 bool isCurlyBracketLine(str rawCodeLine) {
-    return /^\s*\{\s*$/ := rawCodeLine || /^\s*\}\s*$/ := rawCodeLine;
+    str trimmedLine = trim(rawCodeLine);
+    return trimmedLine == "{" || trimmedLine == "}";
 }
 
 bool isEmptyLine(str rawCodeLine) {
-    return /^\s*$/ := rawCodeLine;
+    str trimmedLine = trim(rawCodeLine);
+    return isEmpty(trimmedLine);
 }
 
 // This regex also checks for cases such as e.g. System.out.println("//") or System.out.println("/* */")
 bool isSingleLineComment(str rawCodeLine) {
-    return /^(\s*\/\/)/ := rawCodeLine;
+    str trimmedLine = trim(rawCodeLine);
+    return startsWith(trimmedLine, "//");
 }
 
 bool isRemovableCodeLine(str rawCodeLine) {
