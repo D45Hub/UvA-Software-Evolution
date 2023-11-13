@@ -181,7 +181,10 @@ DuplicationRanking getDuplicationRanking(M3 projectModel, int linesOfCode) {
     }
 
     // It is okay to round down, since in any case the rating wouldn't be influenced anyways, if we were to use the float value.
-    int percentageOfDuplication = ((amountOfDuplicates * 6) / linesOfCode) * 100;
+    real duplicateLinesAmount = toReal((amountOfDuplicates * 6));
+    real duplicationPercentage = toReal((duplicateLinesAmount / toReal(linesOfCode)));
+
+    int percentageOfDuplication = round(duplicationPercentage * 100.0);
     return getDuplicationRanking(percentageOfDuplication);
 }
 
