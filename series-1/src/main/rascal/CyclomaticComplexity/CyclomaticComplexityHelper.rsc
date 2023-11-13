@@ -58,18 +58,28 @@ import IO;
 
 alias CyclomaticComplexityValue = tuple[Declaration method, int cyclomaticComplexity];
 
-public list[CyclomaticComplexityValue] cyclomaticLinesPerPartion(list[Declaration] declMethods) {
-			
+public list[CyclomaticComplexityValue] cyclo(decl) {
     list[CyclomaticComplexityValue] complexityValues = [];
 
-	for(m <- declMethods) {
+    visit(decl) {
+            case Declaration x:\method(_,_,_,_) : complexityValues += <x, cyclomaticLinesPerPartion(x)>;
+            case Declaration x:\method(_,_,_,_,_) : complexityValues += <x, cyclomaticLinesPerPartion(x)>;
+            case Declaration x:\constructor(_,_,_,_) : complexityValues += <x, cyclomaticLinesPerPartion(x)>;
+        }
+
+    return complexityValues;
+}
+
+public int cyclomaticLinesPerPartion(ast) {
+			
+    list[CyclomaticComplexityValue] complexityValues = [];
 		
 		//Base complexity is always 1. This is the function body.
 		int result = 1;
 		
 		//Calculates the complexity by looking up the different conditional operators.
         // Reference https://www.rascal-mpl.org/docs/Library/lang/java/m3/AST/
-		visit(m) {
+		visit(ast) {
             case \assert(_) : result += 1;
             case \assert(_,_) : result += 1;
             case \break() : result += 1;
@@ -94,18 +104,17 @@ public list[CyclomaticComplexityValue] cyclomaticLinesPerPartion(list[Declaratio
     		case \infix(_, /^\|\||&&|^$/, _) : result += 1; //a && b. a || b. a ^ b. -> Other bitwise operators are excluded since they only modify a certain value. (And not change the control flow.)
     		}
         
-        CyclomaticComplexityValue complexityValue = <m, result>;
-        complexityValues += [complexityValue];
+        return result;
+        //return <ast, result>;
 
         // Question: Can multiple constructors with different arguments be considered as control-flow?
         // Then the "constructorCall" should also be considered in this visit as well.
-	}
 	
-	return complexityValues;
+	//return complexityValues;
 }
 
 public RiskOverview getCyclomaticComplexityRankings(list[Declaration] declMethods) {
-    list[CyclomaticComplexityValue] complexityValues = cyclomaticLinesPerPartion(declMethods);
+    list[CyclomaticComplexityValue] complexityValues = cyclo(declMethods);
 
     int lowRisk = 0;
     int moderateRisk = 0;
