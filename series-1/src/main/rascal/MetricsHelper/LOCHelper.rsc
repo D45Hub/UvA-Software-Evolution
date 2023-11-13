@@ -52,6 +52,8 @@ import IO;
 
 */
 
+alias RemovedMultiLineComments = tuple[str filteredSourceCode, int amountCommentsRemoved];
+
 // This regex also checks for cases such as e.g. System.out.println("{}") 
 bool isCurlyBracketLine(str rawCodeLine) {
     str trimmedLine = trim(rawCodeLine);
@@ -77,6 +79,17 @@ str removeMultiLineComments(str rawSourceCode){
 	return visit(rawSourceCode){
    		case /\/\*[\s\S]*?\*\// => ""  
 	};
+}
+
+RemovedMultiLineComments removeMultiLineCommentsWithAmountTrack(str rawSourceCode){
+
+    // This does not work... We need to filter out the multi lines while also keeping track of the amount of multi line comments removed.
+    int removedMultiLineComments = 0;
+	str filteredSourceCode = visit(rawSourceCode){
+   		case x:/\/\*[\s\S]*?\*\//: {x = ""; removedMultiLineComments += 1;}
+	};
+
+    return <filteredSourceCode, removedMultiLineComments>;
 }
 
 list[str] getLinesOfCode(list[str] rawSourceCodeLines) {
