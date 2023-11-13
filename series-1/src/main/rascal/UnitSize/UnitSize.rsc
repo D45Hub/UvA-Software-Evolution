@@ -30,18 +30,9 @@ list[UnitSizeRanking] allUnitSizeRankings = [excellentUnitSizeRanking,
 
 
 
-int sumOfList(list[int] listOfintbers, int sizeOfList) {
-    if (sizeOfList == 0) {
-        return 0;
-    }
-        return listOfintbers[sizeOfList - 1]
-        + sumOfList(listOfintbers, sizeOfList - 1);
-}
-   
- 
 int calculateAverageUnitSize (list[UnitLengthTuple] allMethodsOfProject) {
     list[int] allSizes =  [method[1] | method <- allMethodsOfProject];
-    int average = sumOfList(allSizes, size(allSizes)) / size(allMethodsOfProject);
+    int average = sum(allSizes) / size(allMethodsOfProject);
     return average;
 }
 
