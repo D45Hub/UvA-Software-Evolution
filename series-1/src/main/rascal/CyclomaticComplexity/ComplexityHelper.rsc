@@ -15,6 +15,8 @@ alias ComplexityRanking = tuple[Ranking rankingType,
                                 int highRisk,
                                 int veryHighRisk];
 
+alias ComplexityValue = tuple[ComplexityRanking complexityRanking, RiskOverview complexityPercentages];
+
 ComplexityRanking excellentComplexityRanking = <excellent, 25, 0, 0>;
 ComplexityRanking goodComplexityRanking = <good, 30, 5, 0>;
 ComplexityRanking neutralComplexityRanking = <neutral, 40, 10, 0>;
@@ -51,9 +53,9 @@ ComplexityRanking getOverallComplexityRating(RiskOverview riskOverview) {
     return resultRanking;
 }
 
-public ComplexityRanking calculateComplexityRanking(list[Declaration] declMethods) {
+public ComplexityValue calculateComplexityRanking(list[Declaration] declMethods) {
     RiskOverview riskOverview = getCyclomaticComplexityRankings(declMethods);
-    return getOverallComplexityRating(riskOverview);
+    return <getOverallComplexityRating(riskOverview), riskOverview>;
 }
 
 public void formatComplexityRanking(list[Declaration] declMethods) {

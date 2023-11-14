@@ -46,6 +46,8 @@ alias Risk = str;
 alias UnitInterfacingComplexityValue = tuple[Declaration method, int unitInterfacingComplexity];
 alias UnitInterfaceRiskProfile = tuple[Declaration method, Risk risk];
 
+alias UnitInterfacingOverallValue = tuple[RiskThreshold riskThreshold, str riskPercentages];
+
 list[UnitInterfacingComplexityValue] getUnitInterfacingValues(list[Declaration] methodUnits) {
 
     list[UnitInterfacingComplexityValue] unitInterfacingValues = [];
@@ -154,13 +156,23 @@ RiskThreshold calculateRiskThreshold(map[str, int] relativeRiskAmount) {
     return resultRisks[0];
 }
 
-public RiskThreshold generateRiskThreshold(list[Declaration] methodUnits) {
+map[str, int] getRelativeRiskValues(list[Declaration] methodUnits) {
 	list[UnitInterfacingComplexityValue] methodComplexities = getUnitInterfacingValues(methodUnits);
 	list[UnitInterfaceRiskProfile] absoluteRiskValues = getAbsolutRiskValues(methodComplexities);
 	map[str, int] absoluteRiskAmount = calculateAbsoluteRiskAmount(absoluteRiskValues);
-	map[str, int] relativeRiskValues = calculateRelativeRiskAmount(absoluteRiskAmount);
+	return calculateRelativeRiskAmount(absoluteRiskAmount);
+}
+
+public RiskThreshold generateRiskThreshold(list[Declaration] methodUnits) {
+	map[str, int] relativeRiskValues = getRelativeRiskValues(methodUnits);
 
 	return calculateRiskThreshold(relativeRiskValues);
+}
+
+public UnitInterfacingOverallValue generateOverallRiskThresholdValues(list[Declaration] methodUnits) {
+	map[str, int] relativeRiskValues = getRelativeRiskValues(methodUnits);
+
+	return <calculateRiskThreshold(relativeRiskValues), toString(relativeRiskValues)>;
 }
 
 public void formatRiskThreshold(list[Declaration] methodUnits) {

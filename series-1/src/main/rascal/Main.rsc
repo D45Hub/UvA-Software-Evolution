@@ -58,28 +58,29 @@ void mandatoryMetric() {
     addToReport("Man Years", manYearRanking.rankingType);
     println(manYearRanking);
 
-
     println("Unit Size");
     startMeasure("unitSize");
-    UnitSizeRanking unitSizeRanking = calculateUnitSizeRanking(model);
+    UnitSizeValue unitSizeRankingValue = calculateUnitSizeRankingValues(model);
     startMeasure("stopMeasure");
-    addToReport("Unit Size", unitSizeRanking.rankingType);
-    println(unitSizeRanking);
+    UnitSizeRanking unitSizeRanking = unitSizeRankingValue.unitSizeRanking;
+    addToReport("Unit Size", unitSizeRanking.rankingType.name, toString(unitSizeRankingValue.averageUnitSizeLOC));
+    println(unitSizeRankingValue);
 
     println("Duplication");
     startMeasure("duplication");
-    DuplicationRanking duplicationRanking = getDuplicationRanking(model, volumeMetric["Actual Lines of Code"]);
+    DuplicationValue duplicationRankingValue = getDuplicationRankingValue(model, volumeMetric["Actual Lines of Code"]);
     stopMeasure("duplication");
-    println(duplicationRanking);
-
+    DuplicationRanking duplicationRanking = duplicationRankingValue.duplicationRanking;
+    println(duplicationRankingValue);
+    addToReport("Duplication", duplicationRanking.rankingType.name, toString(duplicationRankingValue.duplicationPercentage));
 
     println("Unit Complexity");
     startMeasure("complexity");
-    ComplexityRanking complexityRanking = calculateComplexityRanking(unitDeclarations);
+    ComplexityValue complexityRankingValue = calculateComplexityRanking(unitDeclarations);
     stopMeasure("complexity");
-    addToReport("Complexity", complexityRanking.rankingType);
-    println(complexityRanking);
-
+    ComplexityRanking complexityRanking = complexityRankingValue.complexityRanking;
+    addToReport("Complexity", complexityRanking.rankingType.name, stringifyRiskOverview(complexityRankingValue.complexityPercentages));
+    println(complexityRankingValue);
 
 
     Ranking analyzabilityRanking = getAnalyzabilityRating(manYearRanking, duplicationRanking, unitSizeRanking);

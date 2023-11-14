@@ -12,8 +12,10 @@ alias Size = int;
 alias UnitSizeRanking =  tuple[Ranking rankingType,
                                 Size minLineOfunit,
                                 Size maxLinesOfUnit];
+
 alias UnitLengthTuple = tuple[loc method, int methodLOC];
 
+alias UnitSizeValue = tuple[UnitSizeRanking unitSizeRanking, int averageUnitSizeLOC];
 
 // TODO find paper or standard on how long a method has to be in Java
 UnitSizeRanking excellentUnitSizeRanking = <excellent, 0, 15>;
@@ -34,6 +36,11 @@ int calculateAverageUnitSize (list[UnitLengthTuple] allMethodsOfProject) {
     list[int] allSizes =  [method[1] | method <- allMethodsOfProject];
     int average = sum(allSizes) / size(allMethodsOfProject);
     return average;
+}
+
+int calculateAverageUnitSizeFromProject(M3 projectModel) {
+    allMethods = getAllUnitSizesOfProject(projectModel);
+    return calculateAverageUnitSize(allMethods);
 }
 
 list[UnitLengthTuple] getAllUnitSizesOfProject(M3 projectModel) {
@@ -69,12 +76,16 @@ public UnitSizeRanking getUnitSizeRanking(int averageUnitSizeLOC){
 }
 
 UnitSizeRanking calculateUnitSizeRanking(M3 projectModel) {
-    allMethods = getAllUnitSizesOfProject(projectModel);
-    average = calculateAverageUnitSize(allMethods);
+    int average = calculateAverageUnitSizeFromProject(projectModel);
     return getUnitSizeRanking(average); 
 }
 
+public UnitSizeValue calculateUnitSizeRankingValues(M3 projectModel) {
+    int average = calculateAverageUnitSizeFromProject(projectModel);
+    return <getUnitSizeRanking(average), average>; 
+}
+
 public void formatUnitSizeRanking(M3 projectModel) {
-    UnitSizeRanking ranking = calculateUnitSizeRanking(projectModel);
+    UnitSizeValue rankingValue = calculateUnitSizeRankingValues(projectModel);
     println(ranking);
 }

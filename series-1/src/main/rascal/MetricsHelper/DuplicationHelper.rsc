@@ -18,6 +18,7 @@ alias DuplicationRanking =  tuple[Ranking rankingType,
                                 Size minDuplicationOfUnit,
                                 Size maxDuplicationOfUnit];
 
+alias DuplicationValue = tuple[DuplicationRanking duplicationRanking, int duplicationPercentage];
 
 DuplicationRanking excellentDuplicationRanking = <excellent, 0, 3>;
 DuplicationRanking goodDuplicationRanking = <good, 3, 5>;
@@ -146,8 +147,6 @@ list[str] getListOfHashes(M3 projectModel) {
     return hashCodeLines;
 }
 
-
-
 map[str, int] getDuplicatesOfProgram (list[str] linesOfCode) {
     i = 0;
     map[str,int] duplicatedFragments = ();
@@ -166,68 +165,17 @@ map[str, int] getDuplicatesOfProgram (list[str] linesOfCode) {
     return (duplicate : duplicatedFragments[duplicate] | duplicate <- duplicatedFragments, duplicatedFragments[duplicate] > 1);
 }
 
-
-
-// TODO REFACTOR... This is shit.
-list[list[str]] generateHashWindows(list[str] hashCodeLines) {
-
-    list[list[str]] hashCodeWindows = [];
-    int index = 0;
-    int i = 0;
-    int windowIndex = 0;
-    int hashCodeLinesAmount = size(hashCodeLines);
-    int maxWindowChunks = hashCodeLinesAmount / 6;
-
-    while(i < 6) {
-
-        while(windowIndex < maxWindowChunks){
-            println("Window Index: " + toString(windowIndex));
-            list[str] hashWindow = [];
-            while(index < 6) {
-                int hashCodeIndex = (windowIndex * 6 + index + i);
-
-                if (hashCodeIndex < hashCodeLinesAmount){
-                    str hash = hashCodeLines[hashCodeIndex];
-                    hashWindow += [hash];
-                }
-                index += 1;
-            }
-
-            windowIndex += 1;
-            index = 0;
-
-            if(size(hashWindow) == 6) {
-                hashCodeWindows += [hashWindow];
-            }
-        }
-
-        i += 1;
-        windowIndex = 0;
-        index = 0;
-    }
-
-
-    return hashCodeWindows;
-}
-
-int getAmountOfDuplicates(list[list[str]] hashWindows) {
-
-    int duplicateAmount = 0;
-
-    for(hashWindow <- hashWindows) {
-
-        hashWindows = hashWindows - [hashWindow];
-
-        while(hashWindow in hashWindows) {
-            hashWindows = hashWindows - [hashWindow];
-            duplicateAmount += 1;
-        }
-    }
-
-    return duplicateAmount;
-}
-
 DuplicationRanking getDuplicationRanking(M3 projectModel, int linesOfCode) {
+    int percentageOfDuplication = getDuplicationPercentage(projectModel, linesOfCode);
+    return getDuplicationRanking(percentageOfDuplication);
+}
+
+public DuplicationValue getDuplicationRankingValue(M3 projectModel, int linesOfCode) {
+    int percentageOfDuplication = getDuplicationPercentage(projectModel, linesOfCode);
+    return <getDuplicationRanking(percentageOfDuplication), percentageOfDuplication>;
+}
+
+int getDuplicationPercentage(M3 projectModel, int linesOfCode) {
     list[str] listOfHashes = getListOfHashes(projectModel);
     map[str, int] duplicationMap = getDuplicatesOfProgram(listOfHashes);
     int amountOfDuplicates = 0;
@@ -238,10 +186,10 @@ DuplicationRanking getDuplicationRanking(M3 projectModel, int linesOfCode) {
 
     // It is okay to round down, since in any case the rating wouldn't be influenced anyways, if we were to use the float value.
     real duplicateLinesAmount = toReal((amountOfDuplicates * 6));
+    println(duplicateLinesAmount);
+    println(linesOfCode);
     real duplicationPercentage = toReal((duplicateLinesAmount / toReal(linesOfCode)));
-    int percentageOfDuplication = round(duplicationPercentage * 100.0);
-    
-    return getDuplicationRanking(percentageOfDuplication);
+    return round(duplicationPercentage * 100.0);
 }
 
 public DuplicationRanking getDuplicationRanking(int duplicationPercentage){
@@ -252,6 +200,6 @@ public DuplicationRanking getDuplicationRanking(int duplicationPercentage){
 }
 
 public void formatDuplicationRanking(M3 projectModel, int linesOfCode) {
-    DuplicationRanking ranking = getDuplicationRanking(projectModel, linesOfCode);
+    DuplicationValue ranking = getDuplicationRankingValue(projectModel, linesOfCode);
     println(ranking);
 }
