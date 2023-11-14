@@ -1,10 +1,8 @@
 module Volume::LOCVolume
 
 import String;
-import IO;
 import Configuration;
-import List;
-import Configuration;
+
 bool isLineOneLineComment(str rawLine) {
 	str trimmedLine = trim(rawLine);
     return startsWith(trimmedLine, "//");
@@ -96,7 +94,7 @@ bool isLineCodeLine(str line, bool areCurlyBracketsAreCode){
 
 list[str] getLOC(str source) = getLOC(source, CURLY_BRACKETS_ARE_CODE);
 
-list[str] getAllLOC(str source, bool areCurlyBracketsAreCode) {
+list[str] getAllLOC(str source) {
 	source = "\n" + source + "\n";
   	list[str] codeLines = split("\n", source);
   	return [trim(l) | str l <- codeLines];
@@ -109,22 +107,4 @@ list[str] getLOC(str source, bool areCurlyBracketsAreCode){
 	
   	list[str] codeLines = split("\n", source);
   	return [trim(l) | str l <- codeLines, isLineCodeLine(l, areCurlyBracketsAreCode)];
-}
-
-map[str,list[int]] getLOCMapping(list[str] lines){	
-	map[str,list[int]] locMapping = ();
-	int i = 0;
-	
-	while(i < size(lines)){
-		str l = lines[i];
-		
-		if(l in locMapping == false){
-			locMapping[l] = [];
-		}
-		
-		locMapping[l] = locMapping[l] + [i];
-		i += 1;
-	}
-	
-	return locMapping;
 }
