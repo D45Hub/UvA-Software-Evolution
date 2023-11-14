@@ -21,13 +21,13 @@ import String;
 import List;
 import util::Math;
 import GeneralHelper::TimeHelper;
-
+import Map;
 
 
 void mandatoryMetric() {
     startMeasure("Overall");
 
-    M3 model = createM3FromMavenProject(|file:///Users/ekletsko/Downloads/hsqldb-2.3.1|);
+    M3 model = createM3FromMavenProject(|file:///Users/ekletsko/Downloads/smallsql0.21_src|);
 
     println("Starting measure the mandatory stuff");
     println("Volume");
@@ -36,18 +36,24 @@ void mandatoryMetric() {
     list[Declaration] unitDeclarations = getProjectUnits(model);
     stopMeasure("unitDeclarations");
     startMeasure("linesOfCode");
-    int linesOfCodeAmount = getLinesOfCodeAmount(model);
+    list[str] linesOfCode = getLinesOfCode(model);
+
+    
     stopMeasure("linesOfCode");
 
-    println(linesOfCodeAmount);
+    println("V O L U M E");
+    map[str, int] volumeMetric = getVolumeMetric(model);
+    println(volumeMetric);
+    addToReport("Volume Metric", toString(volumeMetric));
+
+    println("U N I T D E C L A R A T I O N S");
     println(size(unitDeclarations));
 
-    addToReport("Lines of Code", toString(linesOfCodeAmount));
     addToReport("Number of Methods", toString(size(unitDeclarations)));
 
     println("Man Years");
     startMeasure("ManYears");
-    MYRanking manYearRanking = getManYearsRanking(linesOfCodeAmount);
+    MYRanking manYearRanking = getManYearsRanking(volumeMetric["Actual Lines of Code"]);
     stopMeasure("ManYears");
     addToReport("Man Years", manYearRanking.rankingType);
     println(manYearRanking);
@@ -62,7 +68,7 @@ void mandatoryMetric() {
 
     println("Duplication");
     startMeasure("duplication");
-    DuplicationRanking duplicationRanking = getDuplicationRanking(model, linesOfCodeAmount);
+    DuplicationRanking duplicationRanking = getDuplicationRanking(model, volumeMetric["Actual Lines of Code"]);
     stopMeasure("duplication");
     println(duplicationRanking);
 
@@ -80,6 +86,8 @@ void mandatoryMetric() {
     Ranking changabilityRanking = getChangabilityRating(duplicationRanking, complexityRanking);
     //Ranking stabilityRanking = getStabilityRanking(unitInterfacingRisk); 
     Ranking testabilityRanking = getTestabilityRanking(unitSizeRanking, complexityRanking);
+    overallMaintainability = ((analyzabilityRanking.val + changabilityRanking.val + testabilityRanking.val ) / 4);
+    addToReport("Overall Maintainability", toString(overallMaintainability));
 
     writeCSVReport();
     stopMeasure("Overall");

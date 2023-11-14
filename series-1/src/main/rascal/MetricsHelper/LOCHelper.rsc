@@ -73,11 +73,59 @@ bool isRemovableCodeLine(str rawCodeLine) {
     return isCurlyBracketLine(rawCodeLine) || isEmptyLine(rawCodeLine) || isSingleLineComment(rawCodeLine);
 }
 
+bool isCommentLine (str rawCodeLine) {
+    return startsWith("//", rawCodeLine) || startsWith("/**", rawCodeLine) ||
+    endsWith("*/", rawCodeLine) ||  startsWith("*", rawCodeLine);
+}
+
 str removeMultiLineComments(str rawSourceCode){
 	return visit(rawSourceCode){
    		case /\/\*[\s\S]*?\*\// => ""  
 	};
 }
+
+list[str] getAllCodeLines(list[str] rawSourceCodeLines) {
+    println(size(rawSourceCodeLines));
+    return rawSourceCodeLines;
+}
+
+list[str] getLinesOfComments(list[str] rawSourceCodeLines) {
+    return [line | str line <- rawSourceCodeLines, isCommentLine(line)];
+}
+
+list[str] getLinesOfCurlyBraces(list[str] rawSourceCodeLines) {
+    return [line | str line <- rawSourceCodeLines, (startsWith(line, "{") || endsWith(line, "}")) ];
+}
+
+list[str] getEmptyLines(list[str] rawSourceCodeLines) {
+    return [line| str line <- rawSourceCodeLines, isEmpty(line)];
+}
+
+map[str, int] getVolumeMetric(projectModel) {
+    str concatenatedProject = getConcatenatedProjectFile(projectModel);
+    list[str] splitLine = split("\n",concatenatedProject );
+    list[str] trimmedCodeLines = [trim(line) | line <- splitLine]; 
+
+
+    allLines = getAllCodeLines(trimmedCodeLines);
+    comments = getLinesOfComments(trimmedCodeLines);
+    curlyBraces = getLinesOfCurlyBraces(trimmedCodeLines);
+    emptyLines = getEmptyLines(trimmedCodeLines);
+
+    map[str, int] volumeMetrics = ("Overall Lines of Code" : size(allLines),
+                    "Comment Lines of Code":  size(comments),
+                    "Curly Braces Lines of Code" : size(curlyBraces),
+                    "Empty Lines of Code": size(emptyLines),
+                    "Actual Lines of Code": (size(allLines) - size(comments)) - size(curlyBraces) - size(emptyLines));
+
+    return volumeMetrics;
+}
+
+int getAmountOfCodeLines(list[str] codeLines) {
+    return size(codeLines);
+}
+
+
 
 list[str] getLinesOfCode(list[str] rawSourceCodeLines) {
     str codeWithoutMultiLineComments1 = removeMultiLineComments(toString(rawSourceCodeLines));
