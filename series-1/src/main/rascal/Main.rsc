@@ -31,15 +31,18 @@ void analyse() {
     //Create M3 model
 	println("Loading eclipse project ");
 	startMeasure("LoadEclipseProject");
-	M3 model = createM3FromMavenProject(|file:///Users/ekletsko/Downloads/smallsql0.21_src|);
+	M3 model = createM3FromMavenProject(|project://series-1/smallsql|);
 	stopMeasure("LoadEclipseProject");
 
 	//Get a list off all files that are relevant to test
-	println("Getting files...");
+	
+    println("Getting files...");
 	startMeasure("GetFilesListFromModel");
-	list[loc] files = toList(files(model));
+    
+    list[loc] files = toList(files(model));
 	stopMeasure("GetFilesListFromModel");
 	
+    
 	println("Getting project files...");
 	startMeasure("GetProjectFilesList");
 	list[loc] projectFiles = getProjectFiles(files);
@@ -51,7 +54,8 @@ void analyse() {
 	list[str] codeLines = getCodeLinesFromFiles(projectFiles);
 
     println(size(codeLines));
-	
+
+    stopMeasure("Analyse");
 }
 
 // void mandatoryMetric() {

@@ -63,7 +63,7 @@ public list[str] getCodeLinesFromFiles(list[loc] files) {
 
 public list[str] getCodeLinesFromFiles(list[loc] files, ProjectFileOptions options){
 	str source = getConcatinatedSourceFromFiles(files, options);	
-	list[str] lines = getCodeLines(source);
+	list[str] lines = getLOC(source);
 	
 	return lines;
 }

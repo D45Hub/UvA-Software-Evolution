@@ -1,4 +1,4 @@
-module Volume::LinesOfCodeHelpers
+module Volume::LOCVolume
 
 import String;
 import IO;
