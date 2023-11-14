@@ -1,1 +1,9 @@
-
+metric,rating,result
+Man Years,++,
+Unit Size,++,8
+Complexity,--,"Low: 891100 (69%), moderate: 115189 (9%), High: 195601 (15%), VeryHigh: 96407 (7%)"
+Volume Metric,"(""Actual Lines of Code"":20245,""Curly Braces Lines of Code"":4511,""Comment Lines of Code"":8273,""Empty Lines of Code"":5509,""Overall Lines of Code"":38538)",
+Duplication,++,0
+Overall Maintainability,2,
+Unit Size,++,
+Number of Methods,4660,

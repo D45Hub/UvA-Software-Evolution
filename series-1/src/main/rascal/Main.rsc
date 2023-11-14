@@ -3,6 +3,7 @@ module Main
 import lang::java::m3::Core;
 import lang::java::m3::AST;
 import GeneralHelper::ProjectHelper;
+import GeneralHelper::ProjectFileHelper;
 import MetricsHelper::DuplicationHelper;
 import CyclomaticComplexity::ComplexityHelper;
 import UnitInterfacing::UnitInterfacingHelper;
@@ -22,78 +23,107 @@ import List;
 import util::Math;
 import GeneralHelper::TimeHelper;
 import Map;
+import util::FileSystem;
+import Set;
 
 
-void mandatoryMetric() {
-    startMeasure("Overall");
+void analyse() {
+    //Create M3 model
+	println("Loading eclipse project ");
+	startMeasure("LoadEclipseProject");
+	M3 model = createM3FromMavenProject(|file:///Users/ekletsko/Downloads/smallsql0.21_src|);
+	stopMeasure("LoadEclipseProject");
 
-    M3 model = createM3FromMavenProject(|file:///Users/ekletsko/Downloads/smallsql0.21_src|);
+	//Get a list off all files that are relevant to test
+	println("Getting files...");
+	startMeasure("GetFilesListFromModel");
+	list[loc] files = toList(files(model));
+	stopMeasure("GetFilesListFromModel");
+	
+	println("Getting project files...");
+	startMeasure("GetProjectFilesList");
+	list[loc] projectFiles = getProjectFiles(files);
+	stopMeasure("GetProjectFilesList");
+	
+	startMeasure("Analyse");
+		
+	println("Getting code lines from files...");
+	list[str] codeLines = getCodeLinesFromFiles(projectFiles);
 
-    println("Starting measure the mandatory stuff");
-    println("Volume");
+    println(size(codeLines));
+	
+}
 
-    startMeasure("unitDeclarations");
-    list[Declaration] unitDeclarations = getProjectUnits(model);
-    stopMeasure("unitDeclarations");
-    startMeasure("linesOfCode");
-    list[str] linesOfCode = getLinesOfCode(model);
+// void mandatoryMetric() {
+//     startMeasure("Overall");
+
+//     M3 model = createM3FromMavenProject(|file:///Users/ekletsko/Downloads/smallsql0.21_src|);
+
+//     println("Starting measure the mandatory stuff");
+//     println("Volume");
+
+//     startMeasure("unitDeclarations");
+//     list[Declaration] unitDeclarations = getProjectUnits(model);
+//     stopMeasure("unitDeclarations");
+//     startMeasure("linesOfCode");
+//     list[str] linesOfCode = getLinesOfCode(model);
 
     
-    stopMeasure("linesOfCode");
+//     stopMeasure("linesOfCode");
 
-    println("V O L U M E");
-    map[str, int] volumeMetric = getVolumeMetric(model);
-    println(volumeMetric);
-    addToReport("Volume Metric", toString(volumeMetric));
+//     println("V O L U M E");
+//     map[str, int] volumeMetric = getVolumeMetric(model);
+//     println(volumeMetric);
+//     addToReport("Volume Metric", toString(volumeMetric));
 
-    println("U N I T D E C L A R A T I O N S");
-    println(size(unitDeclarations));
+//     println("U N I T D E C L A R A T I O N S");
+//     println(size(unitDeclarations));
 
-    addToReport("Number of Methods", toString(size(unitDeclarations)));
+//     addToReport("Number of Methods", toString(size(unitDeclarations)));
 
-    println("Man Years");
-    startMeasure("ManYears");
-    MYRanking manYearRanking = getManYearsRanking(volumeMetric["Actual Lines of Code"]);
-    stopMeasure("ManYears");
-    addToReport("Man Years", manYearRanking.rankingType);
-    println(manYearRanking);
+//     println("Man Years");
+//     startMeasure("ManYears");
+//     MYRanking manYearRanking = getManYearsRanking(volumeMetric["Actual Lines of Code"]);
+//     stopMeasure("ManYears");
+//     addToReport("Man Years", manYearRanking.rankingType);
+//     println(manYearRanking);
 
-    println("Unit Size");
-    startMeasure("unitSize");
-    UnitSizeValue unitSizeRankingValue = calculateUnitSizeRankingValues(model);
-    startMeasure("stopMeasure");
-    UnitSizeRanking unitSizeRanking = unitSizeRankingValue.unitSizeRanking;
-    addToReport("Unit Size", unitSizeRanking.rankingType.name, toString(unitSizeRankingValue.averageUnitSizeLOC));
-    println(unitSizeRankingValue);
+//     println("Unit Size");
+//     startMeasure("unitSize");
+//     UnitSizeValue unitSizeRankingValue = calculateUnitSizeRankingValues(model);
+//     startMeasure("stopMeasure");
+//     UnitSizeRanking unitSizeRanking = unitSizeRankingValue.unitSizeRanking;
+//     addToReport("Unit Size", unitSizeRanking.rankingType.name, toString(unitSizeRankingValue.averageUnitSizeLOC));
+//     println(unitSizeRankingValue);
 
-    println("Duplication");
-    startMeasure("duplication");
-    DuplicationValue duplicationRankingValue = getDuplicationRankingValue(model, volumeMetric["Actual Lines of Code"]);
-    stopMeasure("duplication");
-    DuplicationRanking duplicationRanking = duplicationRankingValue.duplicationRanking;
-    println(duplicationRankingValue);
-    addToReport("Duplication", duplicationRanking.rankingType.name, toString(duplicationRankingValue.duplicationPercentage));
+//     println("Duplication");
+//     startMeasure("duplication");
+//     DuplicationValue duplicationRankingValue = getDuplicationRankingValue(model, volumeMetric["Actual Lines of Code"]);
+//     stopMeasure("duplication");
+//     DuplicationRanking duplicationRanking = duplicationRankingValue.duplicationRanking;
+//     println(duplicationRankingValue);
+//     addToReport("Duplication", duplicationRanking.rankingType.name, toString(duplicationRankingValue.duplicationPercentage));
 
-    println("Unit Complexity");
-    startMeasure("complexity");
-    ComplexityValue complexityRankingValue = calculateComplexityRanking(unitDeclarations);
-    stopMeasure("complexity");
-    ComplexityRanking complexityRanking = complexityRankingValue.complexityRanking;
-    addToReport("Complexity", complexityRanking.rankingType.name, stringifyRiskOverview(complexityRankingValue.complexityPercentages));
-    println(complexityRankingValue);
+//     println("Unit Complexity");
+//     startMeasure("complexity");
+//     ComplexityValue complexityRankingValue = calculateComplexityRanking(unitDeclarations);
+//     stopMeasure("complexity");
+//     ComplexityRanking complexityRanking = complexityRankingValue.complexityRanking;
+//     addToReport("Complexity", complexityRanking.rankingType.name, stringifyRiskOverview(complexityRankingValue.complexityPercentages));
+//     println(complexityRankingValue);
 
 
-    Ranking analyzabilityRanking = getAnalyzabilityRating(manYearRanking, duplicationRanking, unitSizeRanking);
-    Ranking changabilityRanking = getChangabilityRating(duplicationRanking, complexityRanking);
-    //Ranking stabilityRanking = getStabilityRanking(unitInterfacingRisk); 
-    Ranking testabilityRanking = getTestabilityRanking(unitSizeRanking, complexityRanking);
-    overallMaintainability = ((analyzabilityRanking.val + changabilityRanking.val + testabilityRanking.val ) / 4);
-    addToReport("Overall Maintainability", toString(overallMaintainability));
+//     Ranking analyzabilityRanking = getAnalyzabilityRating(manYearRanking, duplicationRanking, unitSizeRanking);
+//     Ranking changabilityRanking = getChangabilityRating(duplicationRanking, complexityRanking);
+//     //Ranking stabilityRanking = getStabilityRanking(unitInterfacingRisk); 
+//     Ranking testabilityRanking = getTestabilityRanking(unitSizeRanking, complexityRanking);
+//     overallMaintainability = ((analyzabilityRanking.val + changabilityRanking.val + testabilityRanking.val ) / 4);
+//     addToReport("Overall Maintainability", toString(overallMaintainability));
 
-    writeCSVReport();
-    stopMeasure("Overall");
+//     writeCSVReport();
+//     stopMeasure("Overall");
 
-}
+// }
 void main() {
     // TODO ADD OTHER METRICS TO THE REPORT WITH VALUES???
 
