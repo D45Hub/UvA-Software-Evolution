@@ -4,7 +4,7 @@ import String;
 import IO;
 import Configuration;
 import List;
-
+import Configuration;
 bool isLineOneLineComment(str rawLine) {
 	str trimmedLine = trim(rawLine);
     return startsWith(trimmedLine, "//");
@@ -96,6 +96,12 @@ bool isLineCodeLine(str line, bool areCurlyBracketsAreCode){
 
 list[str] getLOC(str source) = getLOC(source, CURLY_BRACKETS_ARE_CODE);
 
+list[str] getAllLOC(str source, bool areCurlyBracketsAreCode) {
+	source = "\n" + source + "\n";
+  	list[str] codeLines = split("\n", source);
+  	return [trim(l) | str l <- codeLines];
+
+}
 list[str] getLOC(str source, bool areCurlyBracketsAreCode){
 	source = "\n" + source + "\n";
 	source = replaceStringEdgeCase(source);
