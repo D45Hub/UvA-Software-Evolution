@@ -5,6 +5,7 @@ import lang::java::m3::AST;
 import Volume::LOCVolumeMetric;
 import Helper::ProjectHelper;
 import UnitSize::UnitSize;
+import UnitSize::UnitSizeRanking;
 import CyclomaticComplexity::CyclomaticComplexityRanking;
 import CyclomaticComplexity::CyclomaticComplexity;
 
@@ -32,7 +33,12 @@ void analyseSmallSQL() {
 
 	println(size(listOfLocations));
 	allUnitSizes = getAllUnitSizesOfProject(model);
-	getUnitSizeDistribution(allUnitSizes,24050);
+	UnitSizeDistribution absoluteUnitSizes = getAbsoluteUnitSizeDistribution(allUnitSizes);
+	UnitSizeDistribution relativeUnitSizes = getRelativeUnitSizeDistribution(absoluteUnitSizes, 24050);
+	UnitSizeRankingValues unitSizeRanking = getUnitSizeRanking(relativeUnitSizes);
+	println(absoluteUnitSizes);
+	println(relativeUnitSizes);
+	println(unitSizeRanking);
 
   	riskOverview = getCyclomaticRanking(getCyclomaticRiskOverview(methods), volume["Actual Lines of Code"]);
 	println("cyclomaticComplexityRanking");

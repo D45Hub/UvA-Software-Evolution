@@ -88,7 +88,7 @@ public UnitSizeRanking getUnitSizeRanking(int averageUnitSizeLOC){
     return resultRanking;
 }
 
-public void getUnitSizeDistribution(list[UnitLengthTuple] allSizes, int linesOfCode) {
+UnitSizeDistribution getAbsoluteUnitSizeDistribution(list[UnitLengthTuple] allSizes) {
     UnitSizeDistribution distribution = <0,0,0>;
 
     for (unit <- allSizes) {
@@ -103,13 +103,25 @@ public void getUnitSizeDistribution(list[UnitLengthTuple] allSizes, int linesOfC
         }
     }
 
+    return distribution;
+}
 
+public UnitSizeDistribution getRelativeUnitSizeDistribution(UnitSizeDistribution distribution, int linesOfCode) {
     int percentageVeryHighRisk =  round(( toReal(distribution.veryHighRisk) / toReal(linesOfCode) ) * 100);
     int percentageHighRisk =  round(toReal(distribution.highRisk) / (toReal(linesOfCode)) * 100);
-    int percentagModerateRisk =  round(toReal(distribution.moderateRisk) /(toReal(linesOfCode)  ) * 100);
+    int percentageModerateRisk =  round(toReal(distribution.moderateRisk) /(toReal(linesOfCode)  ) * 100);
+
+    return <percentageModerateRisk, percentageHighRisk, percentageVeryHighRisk>;
+}
+
+public void getUnitSizeDistribution(list[UnitLengthTuple] allSizes, int linesOfCode) {
+    UnitSizeDistribution distribution = getAbsoluteUnitSizeDistribution(allSizes);
+    UnitSizeDistribution relativeDistribution = getRelativeUnitSizeDistribution(distribution, linesOfCode);
 
     println(distribution);
+    println(relativeDistribution);
 }
+
 UnitSizeRanking calculateUnitSizeRanking(M3 projectModel) {
     int average = calculateAverageUnitSizeFromProject(projectModel);
     return getUnitSizeRanking(average); 
