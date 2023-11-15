@@ -22,15 +22,20 @@ void analyseSmallSQL() {
 	println("Getting files...");
     
 	listOfLocations = toList(methods(model));
+
+	println("Extracting methods...");
+	list[Declaration] declarations = [ createAstFromFile(file, true) | file <- toList(files(model))]; 
+	list[Declaration] methods = [];
+	for(int i <- [0 .. size(declarations)]) {
+		methods = methods + [dec | /Declaration dec := declarations[i], dec is method || dec is constructor || dec is initializer];
+	}
+
 	println(size(listOfLocations));
 	allUnitSizes = getAllUnitSizesOfProject(model);
 	getUnitSizeDistribution(allUnitSizes,24050);
 
-  	riskOverview = getCyclomaticRiskOverview(allUnitSizes);
-	println("risk overview");
+  	riskOverview = getCyclomaticRanking(getCyclomaticRiskOverview(methods), volume["Actual Lines of Code"]);
+	println("cyclomaticComplexityRanking");
 	println(riskOverview);
-
-
-	println("Unit Size");
 	}
 

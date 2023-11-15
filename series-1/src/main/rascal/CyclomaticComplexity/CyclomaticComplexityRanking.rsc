@@ -2,6 +2,8 @@ module CyclomaticComplexity::CyclomaticComplexityRanking
 import Ranking::Ranking;
 import Ranking::RiskRanges;
 import CyclomaticComplexity::CyclomaticComplexity;
+import lang::java::m3::Core;
+import lang::java::m3::AST;
 import IO;
 import util::Math;
 alias ComplexityValue = tuple[ComplexityRanking complexityRanking, RiskOverview complexityPercentages];
@@ -21,7 +23,7 @@ ComplexityRanking neutralComplexityRanking = <neutral, 40, 10, 0>;
 ComplexityRanking negativeComplexityRanking = <negative, 50, 25, 5>;
 ComplexityRanking veryNegativeComplexityRanking = <veryNegative, -1, -1, -1>;
 
-map[str, int] getCyclomaticRiskRating(list[loc] locMethods, int linesOfCode) {
+map[str, int] getCyclomaticRiskRating(list[Declaration] locMethods, int linesOfCode) {
     
     map[str, int] complexityRating = ();
     complexityTuple = getCyclomaticRiskOverview(locMethods);  
@@ -48,18 +50,23 @@ map[str, int] getCyclomaticRiskRating(list[loc] locMethods, int linesOfCode) {
     );
 }
 
-ComplexityRanking getCyclomaticRanking(map[str, int] riskRating) {
+ComplexityRanking getCyclomaticRanking(RiskOverview riskRating, int linesOfCode) {
 
-        if (riskRating["veryHigh"] <= 5 && riskRating["high"] <= 15 && riskRating["moderate"] <= 50) {
+        int lowPercentage = round(toReal(riskRating.low) / toReal(linesOfCode) * 100);
+        int moderatePercentage = round(toReal(riskRating.moderate) / toReal(linesOfCode) * 100);
+        int highPercentage = round(toReal(riskRating.high) / toReal(linesOfCode) * 100);
+        int veryHighPercentage = round(toReal(riskRating.veryHigh) / toReal(linesOfCode) * 100);
+
+        if (veryHighPercentage <= 5 && highPercentage <= 15 && moderatePercentage <= 50) {
             return negativeComplexityRanking;
         }
-        if (riskRating["veryHigh"] <= 0 && riskRating["high"] <= 10 && riskRating["moderate"] <= 40) {
+        if (veryHighPercentage <= 0 && highPercentage <= 10 && moderatePercentage <= 40) {
             return negativeComplexityRanking;
         }
-        if (riskRating["veryHigh"] <= 0 && riskRating["high"] <= 5 && riskRating["moderate"] <= 30) {
+        if (veryHighPercentage <= 0 && highPercentage <= 5 && moderatePercentage <= 30) {
             return negativeComplexityRanking;
         }
-        if (riskRating["veryHigh"] <= 0 && riskRating["high"] <= 0 && riskRating["moderate"] <= 25) {
+        if (veryHighPercentage <= 0 &&highPercentage <= 0 && moderatePercentage <= 25) {
             return negativeComplexityRanking;
         }
         return veryNegativeComplexityRanking;
