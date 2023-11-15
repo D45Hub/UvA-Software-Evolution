@@ -42,7 +42,7 @@ int calculateAverageUnitSizeFromProject(M3 projectModel) {
     return calculateAverageUnitSize(allMethods);
 }
 
-list[UnitLengthTuple] getAllUnitSizesOfProject(list[Declaration] unitDecl) {
+list[UnitLengthTuple] getAllUnitSizesOfProject(M3 projectModel) {
 
     list[UnitLengthTuple] unitLengthTuples = [];
 
