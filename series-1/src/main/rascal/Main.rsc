@@ -17,7 +17,7 @@ void analyseSmallSQL() {
 	M3 model = createM3FromMavenProject(|file:///Users/ekletsko/Downloads/smallsql0.21_src|);
 	println(getVolumeMetric(model));
 	formatUnitSizeRanking(model);
-}
+
 	println("Getting files...");
     
 	listOfLocations = toList(methods(model));
