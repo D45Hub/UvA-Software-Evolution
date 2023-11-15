@@ -6,6 +6,7 @@ import Volume::LOCVolumeMetric;
 import Helper::ProjectHelper;
 import UnitSize::UnitSize;
 import CyclomaticComplexity::CyclomaticComplexityRanking;
+import CyclomaticComplexity::CyclomaticComplexity;
 
 import IO;
 import List; 
@@ -22,14 +23,14 @@ void analyseSmallSQL() {
     
 	listOfLocations = toList(methods(model));
 	println(size(listOfLocations));
-  	riskOverview = getCyclomaticRiskRating(listOfLocations, volume["Actual Lines of Code"]);
+	allUnitSizes = getAllUnitSizesOfProject(model);
+	getUnitSizeDistribution(allUnitSizes,24050);
+
+  	riskOverview = getCyclomaticRiskOverview(allUnitSizes);
 	println("risk overview");
 	println(riskOverview);
-	riskRanking = getCyclomaticRanking(riskOverview);
-	println("Risk Ranking");
-	println(riskRanking);
+
 
 	println("Unit Size");
-getUnitSizeDistribution(getAllUnitSizesOfProject(model),24050);
 	}
 

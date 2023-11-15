@@ -92,7 +92,6 @@ public void getUnitSizeDistribution(list[UnitLengthTuple] allSizes, int linesOfC
     UnitSizeDistribution distribution = <0,0,0>;
 
     for (unit <- allSizes) {
-        println(unit.methodLOC);
         if (unit.methodLOC > unitRiskVeryHigh.min) {
             distribution.veryHighRisk += unit.methodLOC;
         }
