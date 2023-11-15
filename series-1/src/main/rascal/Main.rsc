@@ -15,16 +15,17 @@ import Set;
 void analyseSmallSQL() {
     //Create M3 model
 	M3 model = createM3FromMavenProject(|file:///Users/ekletsko/Downloads/smallsql0.21_src|);
-	println(getVolumeMetric(model));
+	volume = getVolumeMetric(model);
 	formatUnitSizeRanking(model);
 
 	println("Getting files...");
     
 	listOfLocations = toList(methods(model));
-	println("amount of methods");
 	println(size(listOfLocations));
 	listOfDeclarations = [ createAstFromFile(location, true)| location <- listOfLocations ];
-  	riskOverview = getCyclomaticRiskRating(listOfLocations);
+  	riskOverview = getCyclomaticRiskRating(listOfLocations, (409 + 2340 + 250 + 196));
+	println("risk overview");
+	println(riskOverview);
 	riskRanking = getCyclomaticRanking(riskOverview);
 	println("Risk Ranking");
 	println(riskRanking);

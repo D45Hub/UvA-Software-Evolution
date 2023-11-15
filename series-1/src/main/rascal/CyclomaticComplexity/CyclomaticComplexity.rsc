@@ -8,9 +8,9 @@ import List;
 import Ranking::RiskRanges;
 import Volume::LOCVolume;
 
-ComplexityThreshholds mid = <11,20>;
+ComplexityThreshholds mid = <11,21>;
 ComplexityThreshholds high = <21,50>;
-ComplexityThreshholds veryHigh = <51,-1>;
+ComplexityThreshholds veryHigh = <50,-1>;
 
 /**
 Determines, how many lines of code are in each category of risks 
@@ -20,13 +20,17 @@ public RiskOverview getCyclomaticRiskOverview(list[loc] locMethods) {
     // How many lines of code are in one risk category.
 	RiskOverview complexity = <0, 0, 0, 0>;
 	
-	for(m <- locMethods) {
+	list[Declaration] declarations = [ createAstFromFile(file, true) | file <- locMethods]; 
+	list[Declaration] methods = [];
+	for(int i <- [0 .. size(declarations)]) {
+		methods = methods + [dec | /Declaration dec := declarations[i], dec is method || dec is constructor || dec is initializer];
+	}
 
+	for(m <- methods) {
 		//Base complexity is always 1. This is the function body
 		int result = 1;
-
 		//Calculate in the method the complexity
-		visit(createAstFromFile(m, true)) {
+		visit(m) {
 	    	case \do(_,_) : result += 1;
 	    	case \foreach(_,_,_) : result += 1;	
 	    	case \for(_,_,_,_) : result += 1;
@@ -43,16 +47,21 @@ public RiskOverview getCyclomaticRiskOverview(list[loc] locMethods) {
 		// After you calculated the possible complexity for one unit, you need
         // to add it into the correct risk category.
 		// Because we need to divide the stuff in the end, we use the size.
-		if(result >= mid.min && result <= mid.max) {
-			complexity.moderate += size(getLOC(readFile(m), false));
-		} else if (result >= high.min && result <= high.max) {
-			complexity.high  += size(getLOC(readFile(m), false));
-		} else if (result >= veryHigh.min ) {
-			complexity.veryHigh  += size(getLOC(readFile(m), false));
-		} else {
-			complexity.low  += size(getLOC(readFile(m), false));
-		}
+		int linesOfMethod = size(getLOC(readFile(m.src), true));
+		if(result >= 1 && result <= 10) {
+            complexity.low += linesOfMethod;
+        } else if(result >= 11 && result <= 20) {
+             complexity.moderate += linesOfMethod;
+        } else if(result >= 21 && result <= 50) {
+             complexity.high += linesOfMethod;
+        } else if(result > 51) {
+             complexity.veryHigh += linesOfMethod;
+        }
+	
+
 	}
 	
+	println("returning complexity");
+	println(complexity);
 	return complexity;
 }

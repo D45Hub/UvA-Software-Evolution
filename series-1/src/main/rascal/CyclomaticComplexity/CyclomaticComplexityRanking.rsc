@@ -18,20 +18,28 @@ alias ComplexityThreshholds = tuple[int min, int max];
 ComplexityRanking excellentComplexityRanking = <excellent, 25, 0, 0>;
 ComplexityRanking goodComplexityRanking = <good, 30, 5, 0>;
 ComplexityRanking neutralComplexityRanking = <neutral, 40, 10, 0>;
-ComplexityRanking negativeComplexityRanking = <negative, 50, 15, 5>;
+ComplexityRanking negativeComplexityRanking = <negative, 50, 25, 5>;
 ComplexityRanking veryNegativeComplexityRanking = <veryNegative, -1, -1, -1>;
 
-map[str, int] getCyclomaticRiskRating(list[loc] locMethods) {
+map[str, int] getCyclomaticRiskRating(list[loc] locMethods, int linesOfCode) {
     
     map[str, int] complexityRating = ();
     complexityTuple = getCyclomaticRiskOverview(locMethods);  
-    linesOfCode = complexityTuple.low + complexityTuple.moderate + complexityTuple.high + complexityTuple.veryHigh;
 
+    println("complexity tuple");
+    println(complexityTuple);
     lowPercentageOfCode = round((toReal(complexityTuple.low) / toReal(linesOfCode)) * 100);
     mediumPercentageOfCode = round((toReal(complexityTuple.moderate) / toReal(linesOfCode)) * 100);
     highPercentageOfCode = round((toReal(complexityTuple.high) / toReal(linesOfCode)) * 100);
     veryHighPercentageOfCode = round((toReal(complexityTuple.veryHigh) / toReal(linesOfCode)) * 100);
 
+    println("risk rating");
+    println((
+        "low": lowPercentageOfCode,
+        "medium" : mediumPercentageOfCode,
+        "high" : highPercentageOfCode,
+        "veryHigh" : veryHighPercentageOfCode
+    ));
     return (
         "low": lowPercentageOfCode,
         "medium" : mediumPercentageOfCode,
@@ -41,6 +49,7 @@ map[str, int] getCyclomaticRiskRating(list[loc] locMethods) {
 }
 
 ComplexityRanking getCyclomaticRanking(map[str, int] riskRating) {
+
         if (riskRating["veryHigh"] <= 5 && riskRating["high"] <= 15 && riskRating["moderate"] <= 50) {
             return negativeComplexityRanking;
         }
