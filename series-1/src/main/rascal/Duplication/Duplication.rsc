@@ -1,16 +1,15 @@
-module MetricsHelper::DuplicationHelper
+module Duplication::Duplication
 
 import lang::java::m3::Core;
 import lang::java::m3::AST;
 
-import MetricsHelper::LOCHelper;
 
 import IO;
 
 import String;
 import util::Math;
 import Ranking::Ranking;
-
+import Volume::LOCVolume;
 import List;
 
 alias Size = int;
@@ -111,9 +110,8 @@ list[str] getListOfHashes(M3 projectModel) {
     for(method <- classMethods) {
 
         str rawMethod = readFile(method);
-        list[str] splitCodeLines = (split("\n", rawMethod))[1..];
 
-        list[str] filteredLinesOfCode = getLinesOfCode(splitCodeLines);
+        list[str] filteredLinesOfCode = getLOC(rawMethod);
 
         /**
         if(size(filteredLinesOfCode) < 6) {
@@ -131,9 +129,7 @@ list[str] getListOfHashes(M3 projectModel) {
     for(constructor <- classConstructors) {
 
         str rawConstructor = readFile(constructor);
-        list[str] splitConstructorLines = (split("\n", rawConstructor))[1..];
-
-        list[str] filteredLinesOfCodeConstructors = getLinesOfCode(splitConstructorLines);
+        list[str] filteredLinesOfCodeConstructors = getLOC(rawConstructor);
 
         /*if(size(filteredLinesOfCodeConstructors) < 6) {
             continue;
@@ -185,7 +181,7 @@ int getDuplicationPercentage(M3 projectModel, int linesOfCode) {
     }
 
     // It is okay to round down, since in any case the rating wouldn't be influenced anyways, if we were to use the float value.
-    real duplicateLinesAmount = toReal((amountOfDuplicates * 6));
+    real duplicateLinesAmount = toReal((amountOfDuplicates));
     println(duplicateLinesAmount);
     println(linesOfCode);
     real duplicationPercentage = toReal((duplicateLinesAmount / toReal(linesOfCode)));
