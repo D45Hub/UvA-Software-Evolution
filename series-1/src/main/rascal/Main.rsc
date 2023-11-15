@@ -19,31 +19,31 @@ void analyseSmallSQL() {
 		println("Getting files...");
 	M3 model = createM3FromMavenProject(|file:///Users/ekletsko/Downloads/hsqldb-2.3.1|);
 	volume = getVolumeMetric(model);
-	formatUnitSizeRanking(model);
+	// formatUnitSizeRanking(model);
 
     	println("Getting locations...");
 
-	listOfLocations = toList(methods(model));
+	// listOfLocations = toList(methods(model));
 
-	println("Extracting methods...");
-	list[Declaration] declarations = [ createAstFromFile(file, true) | file <- toList(files(model))]; 
-	list[Declaration] methods = [];
-	for(int i <- [0 .. size(declarations)]) {
-		methods = methods + [dec | /Declaration dec := declarations[i], dec is method || dec is constructor || dec is initializer];
-	}
+	// println("Extracting methods...");
+	// list[Declaration] declarations = [ createAstFromFile(file, true) | file <- toList(files(model))]; 
+	// list[Declaration] methods = [];
+	// for(int i <- [0 .. size(declarations)]) {
+	// 	methods = methods + [dec | /Declaration dec := declarations[i], dec is method || dec is constructor || dec is initializer];
+	// }
 
-	println(size(listOfLocations));
-	allUnitSizes = getAllUnitSizesOfProject(model);
-	UnitSizeDistribution absoluteUnitSizes = getAbsoluteUnitSizeDistribution(allUnitSizes);
-	UnitSizeDistribution relativeUnitSizes = getRelativeUnitSizeDistribution(absoluteUnitSizes, 24050);
-	UnitSizeRankingValues unitSizeRanking = getUnitSizeRanking(relativeUnitSizes);
-	println(absoluteUnitSizes);
-	println(relativeUnitSizes);
-	println(unitSizeRanking);
+	// println(size(listOfLocations));
+	// allUnitSizes = getAllUnitSizesOfProject(model);
+	// UnitSizeDistribution absoluteUnitSizes = getAbsoluteUnitSizeDistribution(allUnitSizes);
+	// UnitSizeDistribution relativeUnitSizes = getRelativeUnitSizeDistribution(absoluteUnitSizes, 24050);
+	// UnitSizeRankingValues unitSizeRanking = getUnitSizeRanking(relativeUnitSizes);
+	// println(absoluteUnitSizes);
+	// println(relativeUnitSizes);
+	// println(unitSizeRanking);
 
-  	riskOverview = getCyclomaticRanking(getCyclomaticRiskOverview(methods), volume["Actual Lines of Code"]);
-	println("cyclomaticComplexityRanking");
-	println(riskOverview);
+  	// riskOverview = getCyclomaticRanking(getCyclomaticRiskOverview(methods), volume["Actual Lines of Code"]);
+	// println("cyclomaticComplexityRanking");
+	// println(riskOverview);
 	// println("Extracting methods...");
 	// list[Declaration] declarations = [ createAstFromFile(file, true) | file <- toList(files(model))]; 
 	// list[Declaration] methods = [];
@@ -59,6 +59,6 @@ void analyseSmallSQL() {
 	// println("cyclomaticComplexityRanking");
 	// println(riskOverview);
 	println("duplication");
-	getDuplicationPercentage(model, volume["Actual Lines of Code"] );
+	getDuplicationPercentage(model,  volume["Actual Lines of Code"]);
 	}
 
