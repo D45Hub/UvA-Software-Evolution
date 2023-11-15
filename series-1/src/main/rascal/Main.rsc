@@ -22,12 +22,14 @@ void analyseSmallSQL() {
     
 	listOfLocations = toList(methods(model));
 	println(size(listOfLocations));
-	listOfDeclarations = [ createAstFromFile(location, true)| location <- listOfLocations ];
-  	riskOverview = getCyclomaticRiskRating(listOfLocations, (409 + 2340 + 250 + 196));
+  	riskOverview = getCyclomaticRiskRating(listOfLocations, volume["Actual Lines of Code"]);
 	println("risk overview");
 	println(riskOverview);
 	riskRanking = getCyclomaticRanking(riskOverview);
 	println("Risk Ranking");
 	println(riskRanking);
+
+	println("Unit Size");
+getUnitSizeDistribution(getAllUnitSizesOfProject(model),24050);
 	}
 

@@ -47,7 +47,10 @@ public RiskOverview getCyclomaticRiskOverview(list[loc] locMethods) {
 		// After you calculated the possible complexity for one unit, you need
         // to add it into the correct risk category.
 		// Because we need to divide the stuff in the end, we use the size.
-		int linesOfMethod = size(getLOC(readFile(m.src), true));
+		methodSource = readFile(m.src);
+		println("method source");
+		println(methodSource);
+		int linesOfMethod = size(getLOC(methodSource, true));
 		if(result >= 1 && result <= 10) {
             complexity.low += linesOfMethod;
         } else if(result >= 11 && result <= 20) {

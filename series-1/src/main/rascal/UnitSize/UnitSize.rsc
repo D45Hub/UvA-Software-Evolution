@@ -8,6 +8,7 @@ import Ranking::Ranking;
 import List;
 import IO;
 import String;
+import util::Math;
 
 alias Size = int;
 alias UnitSizeRanking =  tuple[Ranking rankingType,
@@ -18,9 +19,23 @@ alias UnitLengthTuple = tuple[loc method, int methodLOC];
 
 alias UnitSizeValue = tuple[UnitSizeRanking unitSizeRanking, int averageUnitSizeLOC];
 
+alias UnitRiskCategory = tuple[int min, int max];
+
+/* How many lines are in which category*/ 
+alias UnitSizeRiskRanking = tuple[Ranking rankingType,
+                                UnitSizeDistribution unitSizeDistribution];
+
+alias UnitSizeDistribution =  tuple[num moderateRisk,
+                                num highRisk,
+                                num veryHighRisk];
+UnitRiskCategory unitRiskLow = <1,15>;
+UnitRiskCategory unitRiskModerate = <16,30>;
+UnitRiskCategory unitRiskHigh = <30,60>;
+UnitRiskCategory unitRiskVeryHigh = <61,-1>;
+
 // TODO find paper or standard on how long a method has to be in Java
-UnitSizeRanking excellentUnitSizeRanking = <excellent, 0, 15>;
-UnitSizeRanking goodUnitSizeRanking = <good, 16, 20>;
+UnitSizeRanking excellentUnitSizeRanking = <excellent, 1, 15>;
+UnitSizeRanking goodUnitSizeRanking = <good, 16, 40>;
 UnitSizeRanking neutralUnitSizeRanking = <neutral, 21, 30>;
 UnitSizeRanking negativeUnitSizeRanking = <negative, 30, 50>;
 UnitSizeRanking veryNegativeUnitSizeRanking = <veryNegative, 50, -1>;
@@ -73,6 +88,29 @@ public UnitSizeRanking getUnitSizeRanking(int averageUnitSizeLOC){
     return resultRanking;
 }
 
+public void getUnitSizeDistribution(list[UnitLengthTuple] allSizes, int linesOfCode) {
+    UnitSizeDistribution distribution = <0,0,0>;
+
+    for (unit <- allSizes) {
+        println(unit.methodLOC);
+        if (unit.methodLOC > unitRiskVeryHigh.min) {
+            distribution.veryHighRisk += unit.methodLOC;
+        }
+        else if (unit.methodLOC >= unitRiskHigh.min && unit.methodLOC <= unitRiskHigh.max) {
+            distribution.highRisk += unit.methodLOC;
+        } 
+        else if (unit.methodLOC >= unitRiskModerate.min && unit.methodLOC <= unitRiskModerate.max) {
+            distribution.moderateRisk += unit.methodLOC;
+        }
+    }
+
+
+    int percentageVeryHighRisk =  round(( toReal(distribution.veryHighRisk) / toReal(linesOfCode) ) * 100);
+    int percentageHighRisk =  round(toReal(distribution.highRisk) / (toReal(linesOfCode)) * 100);
+    int percentagModerateRisk =  round(toReal(distribution.moderateRisk) /(toReal(linesOfCode)  ) * 100);
+
+    println(distribution);
+}
 UnitSizeRanking calculateUnitSizeRanking(M3 projectModel) {
     int average = calculateAverageUnitSizeFromProject(projectModel);
     return getUnitSizeRanking(average); 
