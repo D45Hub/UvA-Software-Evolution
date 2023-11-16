@@ -48,13 +48,13 @@ ComplexityRanking getCyclomaticRanking(RiskOverview riskRating, int linesOfCode)
             return negativeComplexityRanking;
         }
         if (veryHighPercentage <= 0 && highPercentage <= 10 && moderatePercentage <= 40) {
-            return negativeComplexityRanking;
+            return neutralComplexityRanking;
         }
         if (veryHighPercentage <= 0 && highPercentage <= 5 && moderatePercentage <= 30) {
-            return negativeComplexityRanking;
+            return goodComplexityRanking;
         }
-        if (veryHighPercentage <= 0 &&highPercentage <= 0 && moderatePercentage <= 25) {
-            return negativeComplexityRanking;
+        if (veryHighPercentage <= 0 && highPercentage <= 0 && moderatePercentage <= 25) {
+            return excellentComplexityRanking;
         }
         return veryNegativeComplexityRanking;
 

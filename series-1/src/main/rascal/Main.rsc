@@ -8,6 +8,7 @@ import Helper::ProjectHelper;
 import Helper::BenchmarkHelper;
 import UnitSize::UnitSize;
 import UnitSize::UnitSizeRanking;
+import UnitInterfacing::UnitInterfacing;
 import CyclomaticComplexity::CyclomaticComplexityRanking;
 import CyclomaticComplexity::CyclomaticComplexity;
 import Duplication::Duplication;
@@ -47,6 +48,15 @@ void analyseSmallSQL() {
 	cyclomaticOverview = getCyclomaticRiskRating(linesOfCode, complexityTuple );
   	cyclomaticRanking = getCyclomaticRanking(complexityTuple, linesOfCode);
 
+	// Unit Interfacing
+	// Get all parameters
+	allParamtersOfUnits = getUnitInterfacingValues(methods);
+	// absolute lines of Code for Each category
+	absoluteParameterCategories = getAbsolutRiskValues(allParamtersOfUnits);
+	absoluteLinesOfCodePerCategorie = calculateAbsoluteRiskAmount(absoluteParameterCategories);
+	relativeUnitAmounts = calculateRelativeRiskAmount(absoluteLinesOfCodePerCategorie);
+	unitInterfaceRanking = getUnitInterfacingRanking(relativeUnitAmounts);
+
 	println("+----------------------------------+");
 	println("|         Volume Metrics           |");
 	println("+----------------------------------+");
@@ -58,6 +68,8 @@ void analyseSmallSQL() {
 	println(volume["Comment Lines of Code"]);
 	println("Actual Lines of Code");
 	println(linesOfCode);
+	println("Number of Methods");
+	println(size(listOfLocations));
 	println("|      Ranking With Man Years      |");
 	println(getManYearsRanking(linesOfCode).rankingType.name);
 
@@ -94,6 +106,17 @@ void analyseSmallSQL() {
 	println("+----------------------------------+");
 	println("|      Unit Interfacing            |");
 	println("+----------------------------------+");
+	println("|      Low  Risk Units             |");
+	println("|      Moderate  Risk Units        |");
+	println("|      High  Risk Units            |");
+	println("|      Very High  Risk Units       |");
+	println("+----------------------------------+");
+	println("overall interfacing");
+	println(unitInterfaceRanking);
+	println("relative amound");
+	println(absoluteLinesOfCodePerCategorie);
+	println(relativeUnitAmounts);
+
 
 	println("+----------------------------------+");
 	println("|      Duplication                 |");
