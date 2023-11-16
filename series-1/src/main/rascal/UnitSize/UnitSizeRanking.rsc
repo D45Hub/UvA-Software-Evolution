@@ -8,6 +8,7 @@ alias UnitSizeRankingValues = tuple[Ranking rankingType,
                                 num highRisk,
                                 num veryHighRisk];
 
+
 // TODO Fill out with better metrics... Good = SIG Paper, 4 Star Rating.
 UnitSizeRankingValues excellentUnitSizeRanking = <excellent, 50, 15, 3>;
 UnitSizeRankingValues goodUnitSizeRanking = <good, 44.5, 20.3, 6.7>;
@@ -20,6 +21,7 @@ list[UnitSizeRankingValues] allUnitSizeRankings = [excellentUnitSizeRanking,
                                                 neutralUnitSizeRanking, 
                                                 negativeUnitSizeRanking, 
                                                 veryNegativeUnitSizeRanking];
+
 
 public UnitSizeRankingValues getUnitSizeRanking(UnitSizeDistribution relativeDistribution) {
 

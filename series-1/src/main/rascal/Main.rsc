@@ -25,21 +25,9 @@ void analyseSmallSQL() {
 
 	M3 model = createM3FromMavenProject(|file:///Users/ekletsko/Downloads/smallsql0.21_src|);
 	volume = getVolumeMetric(model);
-	println("Getting the volume ranking for the project");
-	formatUnitSizeRanking(model);
-
-	println("+----------------------------------+");
-	println("|         Volume Metrics           |");
-	println("+----------------------------------+");
-	println("Overall Lines");
-	println(volume["Overall lines"]);
-	println("Blank Lines");
-	println(volume["Blank Lines"]);
-	
-
-
 	listOfLocations = toList(methods(model));
 	linesOfCode = volume["Actual Lines of Code"];
+
 
 	list[Declaration] declarations = [ createAstFromFile(file, true) | file <- toList(files(model))]; 
 	list[Declaration] methods = [];
@@ -48,31 +36,45 @@ void analyseSmallSQL() {
 		methods = methods + [dec | /Declaration dec := declarations[i], dec is method || dec is constructor || dec is initializer];
 	}
 
-	// println("+----------------------------------+");
-	// println("|         Unit Size                |");
-	// println("+----------------------------------+");
+	allUnitSizes = getAllUnitSizesOfProject(model);
+	UnitSizeDistribution absoluteUnitSizes = getAbsoluteUnitSizeDistribution(allUnitSizes);
+	UnitSizeDistribution relativeUnitSizes = getRelativeUnitSizeDistribution(absoluteUnitSizes, volume["Actual Lines of Code"]);
+	UnitSizeRankingValues unitSizeRanking = getUnitSizeRanking(relativeUnitSizes);
 
-	// allUnitSizes = getAllUnitSizesOfProject(model);
-	// UnitSizeDistribution absoluteUnitSizes = getAbsoluteUnitSizeDistribution(allUnitSizes);
-	// UnitSizeDistribution relativeUnitSizes = getRelativeUnitSizeDistribution(absoluteUnitSizes, volume["Actual Lines of Code"]);
-	// UnitSizeRankingValues unitSizeRanking = getUnitSizeRanking(relativeUnitSizes);
-	// println("Absolute Unit size distribution");
-	// println(absoluteUnitSizes);
-	// println("Relative Unit size distribution");
-	// println(relativeUnitSizes);
-	// 	println("Ranking Unit size distribution");
-	// println(unitSizeRanking);
+	
+    complexityTuple = getCyclomaticRiskOverview(methods);  
+	cyclomaticOverview = getCyclomaticRiskRating(linesOfCode, complexityTuple );
+  	cyclomaticRanking = getCyclomaticRanking(complexityTuple, linesOfCode);
 
+	println("+----------------------------------+");
+	println("|         Volume Metrics           |");
+	println("+----------------------------------+");
+	println("Overall Lines");
+	println(volume["Overall lines"]);
+	println("Blank Lines");
+	println(volume["Blank Lines"]);
+	println("Comment Lines");
+	println(volume["Comment Lines of Code"]);
+	println("Actual Lines of Code");
+	println(linesOfCode);
 
-
+	println("+----------------------------------+");
+	println("|         Unit Size                |");
+	println("+----------------------------------+");
+	println("|      Low  Risk Unit Size         |");
+	println("|      Moderate  Risk Unit Size    |");
+	println("| " + toString(absoluteUnitSizes.moderateRisk) + " lines (" + toString(relativeUnitSizes.moderateRisk) + " %) |");
+	println("|      High  Risk Unit Size        |");
+	println("| " + toString(absoluteUnitSizes.highRisk) + " lines (" + toString(relativeUnitSizes.highRisk) + " %) |");
+	println("|      Very High Risk Unit Size    |");
+	println("| " + toString(absoluteUnitSizes.veryHighRisk) + " lines (" + toString(relativeUnitSizes.veryHighRisk) + " %) |");
+	println("|      Overall Ranking             |");
+	println(unitSizeRanking.rankingType.name);
 
 	println("+----------------------------------+");
 	println("|      Unit Complexity             |");
 	println("+----------------------------------+");
 
-    complexityTuple = getCyclomaticRiskOverview(methods);  
-	cyclomaticOverview = getCyclomaticRiskRating(linesOfCode, complexityTuple );
-  	cyclomaticRanking = getCyclomaticRanking(complexityTuple, linesOfCode);
 	println("|      Low  Risk Units             |");
 	println(toString(complexityTuple.low) + " lines (" + toString(cyclomaticOverview["low"]) + " %)");
 	println("|      Moderate  Risk Units        |");
@@ -96,7 +98,6 @@ void analyseSmallSQL() {
 	println("• Duplication Ranking ");
 	ranking = getDuplicationRanking(duplicationPercentage);
 	println(ranking.rankingType.name);
-
 
 	}
 
