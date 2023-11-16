@@ -131,5 +131,9 @@ void analyseSmallSQL() {
 	ranking = getDuplicationRanking(duplicationPercentage);
 	println(ranking.rankingType.name);
 
+	println("+----------------------------------+");
+	println("|      Duplication                 |");
+	println("+----------------------------------+");
+
 	}
 
