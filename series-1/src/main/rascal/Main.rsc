@@ -3,6 +3,7 @@ module Main
 import lang::java::m3::Core;
 import lang::java::m3::AST;
 import Volume::LOCVolumeMetric;
+import Volume::ManYears;
 import Helper::ProjectHelper;
 import Helper::BenchmarkHelper;
 import UnitSize::UnitSize;
@@ -57,6 +58,10 @@ void analyseSmallSQL() {
 	println(volume["Comment Lines of Code"]);
 	println("Actual Lines of Code");
 	println(linesOfCode);
+	println("|      Ranking With Man Years      |");
+	println(getManYearsRanking(linesOfCode).rankingType.name);
+
+
 
 	println("+----------------------------------+");
 	println("|         Unit Size                |");
@@ -85,6 +90,10 @@ void analyseSmallSQL() {
 	println("| " + toString(complexityTuple.veryHigh) + " lines (" + toString(cyclomaticOverview["veryHigh"]) + " %) |");
 	println("|      Overall Ranking             |");
 	println(cyclomaticRanking.rankingType.name);
+
+	println("+----------------------------------+");
+	println("|      Unit Interfacing            |");
+	println("+----------------------------------+");
 
 	println("+----------------------------------+");
 	println("|      Duplication                 |");
