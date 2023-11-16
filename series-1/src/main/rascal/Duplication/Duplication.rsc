@@ -17,7 +17,7 @@ alias DuplicationRanking =  tuple[Ranking rankingType,
                                 Size minDuplicationOfUnit,
                                 Size maxDuplicationOfUnit];
 
-alias DuplicationValue = tuple[DuplicationRanking duplicationRanking, int duplicationPercentage];
+alias DuplicationValue = tuple[DuplicationRanking duplicationRanking, real duplicationPercentage];
 
 DuplicationRanking excellentDuplicationRanking = <excellent, 0, 3>;
 DuplicationRanking goodDuplicationRanking = <good, 3, 5>;
@@ -113,17 +113,13 @@ list[str] getListOfHashes(M3 projectModel) {
 
         list[str] filteredLinesOfCode = getLOC(rawMethod);
 
-        /**
         if(size(filteredLinesOfCode) < 6) {
             continue;
         }
-        */
 
         for (methodLine <- filteredLinesOfCode) {
             hashCodeLines += [(methodLine)];
         }
-
-        //println(hashCodeLines);
     }
 
     for(constructor <- classConstructors) {
@@ -131,9 +127,9 @@ list[str] getListOfHashes(M3 projectModel) {
         str rawConstructor = readFile(constructor);
         list[str] filteredLinesOfCodeConstructors = getLOC(rawConstructor);
 
-        /*if(size(filteredLinesOfCodeConstructors) < 6) {
+        if(size(filteredLinesOfCodeConstructors) < 6) {
             continue;
-        }*/
+        }
 
         for (constructorLine <- filteredLinesOfCodeConstructors) {
             hashCodeLines += [(constructorLine)];
@@ -161,41 +157,31 @@ map[str, int] getDuplicatesOfProgram (list[str] linesOfCode) {
     return (duplicate : duplicatedFragments[duplicate] | duplicate <- duplicatedFragments, duplicatedFragments[duplicate] > 1);
 }
 
-DuplicationRanking getDuplicationRanking(M3 projectModel, int linesOfCode) {
-    int percentageOfDuplication = getDuplicationPercentage(projectModel, linesOfCode);
-    return getDuplicationRanking(percentageOfDuplication);
-}
 
-public DuplicationValue getDuplicationRankingValue(M3 projectModel, int linesOfCode) {
-    int percentageOfDuplication = getDuplicationPercentage(projectModel, linesOfCode);
+public DuplicationValue getDuplicationRankingValue(real percentageOfDuplication) {
     return <getDuplicationRanking(percentageOfDuplication), percentageOfDuplication>;
 }
 
-int getDuplicationPercentage(M3 projectModel, int linesOfCode) {
+int getDuplicatedLines(M3 projectModel) {
     list[str] listOfHashes = getListOfHashes(projectModel);
     map[str, int] duplicationMap = getDuplicatesOfProgram(listOfHashes);
-    int amountOfDuplicates = 0;
+    int amountOfDuplicatedLines = 0;
 
     for(duplEntry <- duplicationMap) {
-        amountOfDuplicates += duplicationMap[duplEntry];
+        amountOfDuplicatedLines += duplicationMap[duplEntry];
     }
 
-    // It is okay to round down, since in any case the rating wouldn't be influenced anyways, if we were to use the float value.
-    real duplicateLinesAmount = toReal((amountOfDuplicates));
-    println(duplicateLinesAmount);
-    println(linesOfCode);
-    real duplicationPercentage = toReal((duplicateLinesAmount / toReal(linesOfCode)));
-    return round(duplicationPercentage * 100.0);
+    return amountOfDuplicatedLines;
 }
 
-public DuplicationRanking getDuplicationRanking(int duplicationPercentage){
+real getDuplicationPercentage(int duplicatedLines, int overallLines) {
+    real duplicationPercentage = toReal((duplicatedLines / toReal(overallLines)));
+    return (toReal(duplicationPercentage) * 100.0);
+} 
+
+public DuplicationRanking getDuplicationRanking(real duplicationPercentage){
     DuplicationRanking resultRanking =  [ranking | ranking <- allDuplicationRankings,
                                 (duplicationPercentage < ranking.maxDuplicationOfUnit
                                 || ranking.maxDuplicationOfUnit == -1)][0];
     return resultRanking;
-}
-
-public void formatDuplicationRanking(M3 projectModel, int linesOfCode) {
-    DuplicationValue ranking = getDuplicationRankingValue(projectModel, linesOfCode);
-    println(ranking);
 }

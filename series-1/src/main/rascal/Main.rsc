@@ -4,6 +4,7 @@ import lang::java::m3::Core;
 import lang::java::m3::AST;
 import Volume::LOCVolumeMetric;
 import Helper::ProjectHelper;
+import Helper::BenchmarkHelper;
 import UnitSize::UnitSize;
 import UnitSize::UnitSizeRanking;
 import CyclomaticComplexity::CyclomaticComplexityRanking;
@@ -13,52 +14,89 @@ import IO;
 import List; 
 import util::FileSystem;
 import Set;
+import util::Math;
+
 
 void analyseSmallSQL() {
-    //Create M3 model
-		println("Getting files...");
-	M3 model = createM3FromMavenProject(|file:///Users/ekletsko/Downloads/hsqldb-2.3.1|);
+	
+	println("+----------------------------------+");
+	println("|         Setting up Project       |");
+	println("+----------------------------------+");
+
+	M3 model = createM3FromMavenProject(|file:///Users/ekletsko/Downloads/smallsql0.21_src|);
 	volume = getVolumeMetric(model);
-	// formatUnitSizeRanking(model);
+	println("Getting the volume ranking for the project");
+	formatUnitSizeRanking(model);
 
-    	println("Getting locations...");
+	println("+----------------------------------+");
+	println("|         Volume Metrics           |");
+	println("+----------------------------------+");
+	println("Overall Lines");
+	println(volume["Overall lines"]);
+	println("Blank Lines");
+	println(volume["Blank Lines"]);
+	
 
-	// listOfLocations = toList(methods(model));
 
-	// println("Extracting methods...");
-	// list[Declaration] declarations = [ createAstFromFile(file, true) | file <- toList(files(model))]; 
-	// list[Declaration] methods = [];
-	// for(int i <- [0 .. size(declarations)]) {
-	// 	methods = methods + [dec | /Declaration dec := declarations[i], dec is method || dec is constructor || dec is initializer];
-	// }
+	listOfLocations = toList(methods(model));
+	linesOfCode = volume["Actual Lines of Code"];
 
-	// println(size(listOfLocations));
+	list[Declaration] declarations = [ createAstFromFile(file, true) | file <- toList(files(model))]; 
+	list[Declaration] methods = [];
+
+	for(int i <- [0 .. size(declarations)]) {
+		methods = methods + [dec | /Declaration dec := declarations[i], dec is method || dec is constructor || dec is initializer];
+	}
+
+	// println("+----------------------------------+");
+	// println("|         Unit Size                |");
+	// println("+----------------------------------+");
+
 	// allUnitSizes = getAllUnitSizesOfProject(model);
 	// UnitSizeDistribution absoluteUnitSizes = getAbsoluteUnitSizeDistribution(allUnitSizes);
-	// UnitSizeDistribution relativeUnitSizes = getRelativeUnitSizeDistribution(absoluteUnitSizes, 24050);
+	// UnitSizeDistribution relativeUnitSizes = getRelativeUnitSizeDistribution(absoluteUnitSizes, volume["Actual Lines of Code"]);
 	// UnitSizeRankingValues unitSizeRanking = getUnitSizeRanking(relativeUnitSizes);
+	// println("Absolute Unit size distribution");
 	// println(absoluteUnitSizes);
+	// println("Relative Unit size distribution");
 	// println(relativeUnitSizes);
+	// 	println("Ranking Unit size distribution");
 	// println(unitSizeRanking);
 
-  	// riskOverview = getCyclomaticRanking(getCyclomaticRiskOverview(methods), volume["Actual Lines of Code"]);
-	// println("cyclomaticComplexityRanking");
-	// println(riskOverview);
-	// println("Extracting methods...");
-	// list[Declaration] declarations = [ createAstFromFile(file, true) | file <- toList(files(model))]; 
-	// list[Declaration] methods = [];
-	// for(int i <- [0 .. size(declarations)]) {
-	// 	methods = methods + [dec | /Declaration dec := declarations[i], dec is method || dec is constructor || dec is initializer];
-	// }
 
-	// println(size(listOfLocations));
-	// allUnitSizes = getAllUnitSizesOfProject(model);
-	// getUnitSizeDistribution(allUnitSizes,24050);
 
-  	// riskOverview = getCyclomaticRanking(getCyclomaticRiskOverview(methods), volume["Actual Lines of Code"]);
-	// println("cyclomaticComplexityRanking");
-	// println(riskOverview);
-	println("duplication");
-	getDuplicationPercentage(model,  volume["Actual Lines of Code"]);
+
+	println("+----------------------------------+");
+	println("|      Unit Complexity             |");
+	println("+----------------------------------+");
+
+    complexityTuple = getCyclomaticRiskOverview(methods);  
+	cyclomaticOverview = getCyclomaticRiskRating(linesOfCode, complexityTuple );
+  	cyclomaticRanking = getCyclomaticRanking(complexityTuple, linesOfCode);
+	println("|      Low  Risk Units             |");
+	println(toString(complexityTuple.low) + " lines (" + toString(cyclomaticOverview["low"]) + " %)");
+	println("|      Moderate  Risk Units        |");
+	println(toString(complexityTuple.moderate) + " lines (" + toString(cyclomaticOverview["moderate"]) + " %)");
+	println("|      High  Risk Units            |");
+	println(toString(complexityTuple.high) + " lines (" + toString(cyclomaticOverview["high"]) + " %)");
+	println("|      Very High Risk Units        |");
+	println("| " + toString(complexityTuple.veryHigh) + " lines (" + toString(cyclomaticOverview["veryHigh"]) + " %) |");
+	println("|      Overall Ranking             |");
+	println(cyclomaticRanking.rankingType.name);
+
+	println("+----------------------------------+");
+	println("|      Duplication                 |");
+	println("+----------------------------------+");
+	println("• Duplicated Lines ");
+	int duplicatedLines = getDuplicatedLines(model);
+	println(duplicatedLines);
+	println("• Duplication Percentage ");
+	real duplicationPercentage = getDuplicationPercentage(duplicatedLines, volume["Actual Lines of Code"]);
+	println(duplicationPercentage);
+	println("• Duplication Ranking ");
+	ranking = getDuplicationRanking(duplicationPercentage);
+	println(ranking.rankingType.name);
+
+
 	}
 

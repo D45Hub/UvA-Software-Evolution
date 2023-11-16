@@ -117,9 +117,6 @@ public UnitSizeDistribution getRelativeUnitSizeDistribution(UnitSizeDistribution
 public void getUnitSizeDistribution(list[UnitLengthTuple] allSizes, int linesOfCode) {
     UnitSizeDistribution distribution = getAbsoluteUnitSizeDistribution(allSizes);
     UnitSizeDistribution relativeDistribution = getRelativeUnitSizeDistribution(distribution, linesOfCode);
-
-    println(distribution);
-    println(relativeDistribution);
 }
 
 UnitSizeRanking calculateUnitSizeRanking(M3 projectModel) {

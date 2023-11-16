@@ -45,20 +45,16 @@ public RiskOverview getCyclomaticRiskOverview(list[Declaration] methods) {
 		int linesOfMethod = size(getLOC(readFile(m.src)));
 
 		if(result >= 1 && result <= 10) {
-			println("result");
-			println(result);
+
             complexity.low += linesOfMethod;
         } else if(result >= 11 && result <= 20) {
-				println("result");
-			println(result);
+
              complexity.moderate += linesOfMethod;
         } else if(result >= 21 && result <= 50) {
-				println("result");
-			println(result);
+
              complexity.high += linesOfMethod;
         } else if(result > 51) {
-				println("result");
-			println(result);
+
              complexity.veryHigh += linesOfMethod;
         }
 	

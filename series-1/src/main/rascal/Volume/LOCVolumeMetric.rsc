@@ -16,7 +16,7 @@ map[str, int] getVolumeMetric(projectModel) {
     map[str, int] volumeMetrics = (
                     "Overall lines" : size(overAllLines),
                     "Actual Lines of Code" : size(codeLines),
-                    "Blank lines":  size(overAllLines) - size(nonBlankLines),
+                    "Blank Lines":  size(overAllLines) - size(nonBlankLines),
                     "Comment Lines of Code":  size(nonBlankLines) - size(codeLines));
 
     return volumeMetrics;

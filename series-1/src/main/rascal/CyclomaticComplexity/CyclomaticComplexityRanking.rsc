@@ -23,28 +23,15 @@ ComplexityRanking neutralComplexityRanking = <neutral, 40, 10, 0>;
 ComplexityRanking negativeComplexityRanking = <negative, 50, 25, 5>;
 ComplexityRanking veryNegativeComplexityRanking = <veryNegative, -1, -1, -1>;
 
-map[str, int] getCyclomaticRiskRating(list[Declaration] locMethods, int linesOfCode) {
+map[str, int] getCyclomaticRiskRating(int linesOfCode, RiskOverview complexityTuple) {
     
-    map[str, int] complexityRating = ();
-    complexityTuple = getCyclomaticRiskOverview(locMethods);  
-
-    println("complexity tuple");
-    println(complexityTuple);
     lowPercentageOfCode = round((toReal(complexityTuple.low) / toReal(linesOfCode)) * 100);
     mediumPercentageOfCode = round((toReal(complexityTuple.moderate) / toReal(linesOfCode)) * 100);
     highPercentageOfCode = round((toReal(complexityTuple.high) / toReal(linesOfCode)) * 100);
     veryHighPercentageOfCode = round((toReal(complexityTuple.veryHigh) / toReal(linesOfCode)) * 100);
-
-    println("risk rating");
-    println((
-        "low": lowPercentageOfCode,
-        "medium" : mediumPercentageOfCode,
-        "high" : highPercentageOfCode,
-        "veryHigh" : veryHighPercentageOfCode
-    ));
     return (
         "low": lowPercentageOfCode,
-        "medium" : mediumPercentageOfCode,
+        "moderate" : mediumPercentageOfCode,
         "high" : highPercentageOfCode,
         "veryHigh" : veryHighPercentageOfCode
     );

@@ -36,7 +36,6 @@ list[Declaration] getProjectUnits(list[Declaration] declMethods) {
     list[Declaration] projectUnits = [];
 
     for(m <- declMethods) {
-        println("at a new method project unit");
         visit(m) {
             case \method(_,_,_,_) : projectUnits += [m];
             case \method(_,_,_,_,_) : projectUnits += [m];
