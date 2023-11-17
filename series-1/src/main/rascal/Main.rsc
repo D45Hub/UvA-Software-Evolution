@@ -21,15 +21,23 @@ import util::Math;
 
 alias ProjectLocation = tuple[loc projectFolderLocation, loc unitCoverageReportLocation];
 
-ProjectLocation smallSQLLocation = <|file:///Users/ekletsko/Downloads/smallsql0.21_src|, |project://series-1/src/main/rsc/jacoco_simpleencryptor.csv|>;
+ProjectLocation smallSQLLocation = <|file:///Users/ekletsko/Downloads/smallsql0.21_src|, |project://nothing|>;
+ProjectLocation smallEncryptorLocation = <|project://series-1/simpleencryptor|, |project://series-1/src/main/rsc/jacoco_simpleencryptor.csv|>;
 
 void analyseSmallSQL() {
-	
+	analyseProject(smallSQLLocation, false);
+}
+
+void analyseEncryptorProject() {
+	analyseProject(smallEncryptorLocation, true);
+}
+
+void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	println("+----------------------------------+");
 	println("|         Setting up Project       |");
 	println("+----------------------------------+");
 
-	M3 model = createM3FromMavenProject(smallSQLLocation.projectFolderLocation);
+	M3 model = createM3FromMavenProject(projectLocation.projectFolderLocation);
 	volume = getVolumeMetric(model);
 	listOfLocations = toList(methods(model));
 	linesOfCode = volume["Actual Lines of Code"];
@@ -139,9 +147,11 @@ void analyseSmallSQL() {
 	println("|      Duplication                 |");
 	println("+----------------------------------+");
 
-	println("+----------------------------------+");
-	println("|         Unit Coverage            |");
-	println("+----------------------------------+");
-	formatOverallStatistics(smallSQLLocation.unitCoverageReportLocation);
-	formatClassStatistics(smallSQLLocation.unitCoverageReportLocation);
+	if(testUnitCoverage) {
+		println("+----------------------------------+");
+		println("|         Unit Coverage            |");
+		println("+----------------------------------+");
+		formatOverallStatistics(projectLocation.unitCoverageReportLocation);
+		formatClassStatistics(projectLocation.unitCoverageReportLocation);
+	}
 }
