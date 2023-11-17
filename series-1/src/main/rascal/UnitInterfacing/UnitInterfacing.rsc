@@ -106,9 +106,9 @@ list[UnitInterfaceRiskProfile] getAbsolutRiskValues(list[UnitInterfacingComplexi
 		*/
 		/* From SIG Paper .*/ 
 		int compl = complexity.unitInterfacingComplexity;
-		if(compl == 0 || compl == 2) {
+		if(compl >= 0 && compl <= 2) {
 			riskProfile += <complexity.method, "lowRisk">;
-		} else if(compl == 3 || compl == 4) {
+		} else if(compl >= 3 || compl <= 4) {
 			riskProfile += <complexity.method, "moderateRisk">;
 		} else if(compl >=5 && compl <= 6) {
 			riskProfile += <complexity.method, "highRisk">;
@@ -139,7 +139,11 @@ map[str, int] calculateAbsoluteRiskAmount(list[UnitInterfaceRiskProfile] riskPro
 UnitInterfaceRiskOverview calculateRelativeRiskAmount(map[str, int] absoluteRiskAmount) {
 
 	map[str, int] relativeRiskOverview = ("lowRisk" : 0, "moderateRisk" : 0, "highRisk" : 0, "veryHighRisk": 0);
-	real overallLines = toReal((absoluteRiskAmount["lowRisk"] + absoluteRiskAmount["moderateRisk"] + absoluteRiskAmount["highRisk"] + absoluteRiskAmount["veryHighRisk"]));
+	real overallLines = toReal((
+						absoluteRiskAmount["lowRisk"]
+	 					+ absoluteRiskAmount["moderateRisk"]
+						+ absoluteRiskAmount["highRisk"]
+						+ absoluteRiskAmount["veryHighRisk"]));
 	
 	for(riskKey <- absoluteRiskAmount) {
 		real riskPercentage = toReal((absoluteRiskAmount[riskKey] / overallLines) * 100.0);
@@ -165,6 +169,7 @@ UnitRankingValues veryNegativeUnitRankingValues = <veryNegative,-1.0,-1.0,-1.0>;
 
 
 UnitRankingValues getUnitInterfacingRanking(UnitInterfaceRiskOverview riskRating) {
+
 
         int lowPercentage = riskRating["lowRisk"];
         int moderatePercentage = riskRating["moderateRisk"];

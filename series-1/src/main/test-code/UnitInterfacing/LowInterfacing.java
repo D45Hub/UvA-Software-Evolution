@@ -1,7 +1,7 @@
 /* Whole class should have a low interface */ 
 public class LowInterfacing {
 
-    public void lowInterfaceZero(int one) {
+    public void lowInterfaceZero() {
 		/* some random code */ 
 	}
     public void lowInterfaceOne(int one) {
