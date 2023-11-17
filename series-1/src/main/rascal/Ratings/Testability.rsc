@@ -8,7 +8,7 @@ import Ranking::Ranking;
 import CyclomaticComplexity::ComplexityHelper;
 import UnitSize::UnitSize;
 
-// Unit Size, Unit Complexity
+// Unit Size, Unit Complexity, Unit Testing
 
 public Ranking getTestabilityRanking(M3 projectModel, list[Declaration] declMethods) {
 

@@ -156,7 +156,13 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	println("+----------------------------------+");
 	println("|      Changeability               |");
 	println("+----------------------------------+");
-	println(getChangabilityRating(duplicationRanking, cyclomaticRanking));
+	println(getChangabilityRating(duplicationRanking, cyclomaticRanking).rankingType.name);
+
+	println("+----------------------------------+");
+	println("|      Testability                 |");
+	println("+----------------------------------+");
+	println(getChangabilityRating(duplicationRanking, cyclomaticRanking).rankingType.name);
+
 
 	if(testUnitCoverage) {
 		println("+----------------------------------+");
