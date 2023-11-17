@@ -9,6 +9,7 @@ import Helper::BenchmarkHelper;
 import UnitSize::UnitSize;
 import UnitSize::UnitSizeRanking;
 import UnitInterfacing::UnitInterfacing;
+import UnitTestingQuality::UnitTestingQuality;
 import CyclomaticComplexity::CyclomaticComplexityRanking;
 import CyclomaticComplexity::CyclomaticComplexity;
 import Duplication::Duplication;
@@ -46,6 +47,7 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 
 
 	list[Declaration] declarations = [ createAstFromFile(file, true) | file <- toList(files(model))]; 
+	
 	list[Declaration] methods = [];
 
 	for(int i <- [0 .. size(declarations)]) {
@@ -71,98 +73,108 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	relativeUnitAmounts = calculateRelativeRiskAmount(absoluteLinesOfCodePerCategorie);
 	unitInterfaceRanking = getUnitInterfacingRanking(relativeUnitAmounts);
 
-	println("+----------------------------------+");
-	println("|         Volume Metrics           |");
-	println("+----------------------------------+");
-	println("Overall Lines");
-	println(volume["Overall lines"]);
-	println("Blank Lines");
-	println(volume["Blank Lines"]);
-	println("Comment Lines");
-	println(volume["Comment Lines of Code"]);
-	println("Actual Lines of Code");
-	println(linesOfCode);
-	println("Number of Methods");
-	println(size(listOfLocations));
-	println("|      Ranking With Man Years      |");
-	manYearsRanking = getManYearsRanking(linesOfCode);
-	println(manYearsRanking.rankingType.name);
+	// println("+----------------------------------+");
+	// println("|         Volume Metrics           |");
+	// println("+----------------------------------+");
+	// println("Overall Lines");
+	// println(volume["Overall lines"]);
+	// println("Blank Lines");
+	// println(volume["Blank Lines"]);
+	// println("Comment Lines");
+	// println(volume["Comment Lines of Code"]);
+	// println("Actual Lines of Code");
+	// println(linesOfCode);
+	// println("Number of Methods");
+	// println(size(listOfLocations));
+	// println("|      Ranking With Man Years      |");
+	// manYearsRanking = getManYearsRanking(linesOfCode);
+	// println(manYearsRanking.rankingType.name);
 
 
 
-	println("+----------------------------------+");
-	println("|         Unit Size                |");
-	println("+----------------------------------+");
-	println("|      Low  Risk Unit Size         |");
-	println("|      Moderate  Risk Unit Size    |");
-	println("| " + toString(absoluteUnitSizes.moderateRisk) + " lines (" + toString(relativeUnitSizes.moderateRisk) + " %) |");
-	println("|      High  Risk Unit Size        |");
-	println("| " + toString(absoluteUnitSizes.highRisk) + " lines (" + toString(relativeUnitSizes.highRisk) + " %) |");
-	println("|      Very High Risk Unit Size    |");
-	println("| " + toString(absoluteUnitSizes.veryHighRisk) + " lines (" + toString(relativeUnitSizes.veryHighRisk) + " %) |");
-	println("|      Overall Ranking             |");
-	println(unitSizeRanking.rankingType.name);
+	// println("+----------------------------------+");
+	// println("|         Unit Size                |");
+	// println("+----------------------------------+");
+	// println("|      Low  Risk Unit Size         |");
+	// println("|      Moderate  Risk Unit Size    |");
+	// println("| " + toString(absoluteUnitSizes.moderateRisk) + " lines (" + toString(relativeUnitSizes.moderateRisk) + " %) |");
+	// println("|      High  Risk Unit Size        |");
+	// println("| " + toString(absoluteUnitSizes.highRisk) + " lines (" + toString(relativeUnitSizes.highRisk) + " %) |");
+	// println("|      Very High Risk Unit Size    |");
+	// println("| " + toString(absoluteUnitSizes.veryHighRisk) + " lines (" + toString(relativeUnitSizes.veryHighRisk) + " %) |");
+	// println("|      Overall Ranking             |");
+	// println(unitSizeRanking.rankingType.name);
 
-	println("+----------------------------------+");
-	println("|      Unit Complexity             |");
-	println("+----------------------------------+");
+	// println("+----------------------------------+");
+	// println("|      Unit Complexity             |");
+	// println("+----------------------------------+");
 
-	println("|      Low  Risk Units             |");
-	println(toString(complexityTuple.low) + " lines (" + toString(cyclomaticOverview["low"]) + " %)");
-	println("|      Moderate  Risk Units        |");
-	println(toString(complexityTuple.moderate) + " lines (" + toString(cyclomaticOverview["moderate"]) + " %)");
-	println("|      High  Risk Units            |");
-	println(toString(complexityTuple.high) + " lines (" + toString(cyclomaticOverview["high"]) + " %)");
-	println("|      Very High Risk Units        |");
-	println("| " + toString(complexityTuple.veryHigh) + " lines (" + toString(cyclomaticOverview["veryHigh"]) + " %) |");
-	println("|      Overall Ranking             |");
-	println(cyclomaticRanking.rankingType.name);
+	// println("|      Low  Risk Units             |");
+	// println(toString(complexityTuple.low) + " lines (" + toString(cyclomaticOverview["low"]) + " %)");
+	// println("|      Moderate  Risk Units        |");
+	// println(toString(complexityTuple.moderate) + " lines (" + toString(cyclomaticOverview["moderate"]) + " %)");
+	// println("|      High  Risk Units            |");
+	// println(toString(complexityTuple.high) + " lines (" + toString(cyclomaticOverview["high"]) + " %)");
+	// println("|      Very High Risk Units        |");
+	// println("| " + toString(complexityTuple.veryHigh) + " lines (" + toString(cyclomaticOverview["veryHigh"]) + " %) |");
+	// println("|      Overall Ranking             |");
+	// println(cyclomaticRanking.rankingType.name);
 
-	println("+----------------------------------+");
-	println("|      Unit Interfacing            |");
-	println("+----------------------------------+");
-	println("|      Low  Risk Units             |");
-	println("|      Moderate  Risk Units        |");
-	println("|      High  Risk Units            |");
-	println("|      Very High  Risk Units       |");
-	println("+----------------------------------+");
-	println("overall interfacing");
-	println(unitInterfaceRanking);
-	println("relative amound");
-	println(absoluteLinesOfCodePerCategorie);
-	println(relativeUnitAmounts);
-
-
-	println("+----------------------------------+");
-	println("|      Duplication                 |");
-	println("+----------------------------------+");
-	println("• Duplicated Lines ");
-	int duplicatedLines = getDuplicatedLines(model);
-	println(duplicatedLines);
-	println("• Duplication Percentage ");
-	real duplicationPercentage = getDuplicationPercentage(duplicatedLines, volume["Actual Lines of Code"]);
-	println(duplicationPercentage);
-	println("• Duplication Ranking ");
-	duplicationRanking = getDuplicationRanking(duplicationPercentage);
-	println(duplicationRanking.rankingType.name);
-
-	println("+----------------------------------+");
-	println("|      Analyzability               |");
-	println("+----------------------------------+");
-	// TODO Don't know, fix the type issue.
-	//println(getAnalyzabilityRating(manYearsRanking,duplicationRanking,unitSizeRanking));
+	// println("+----------------------------------+");
+	// println("|      Unit Interfacing            |");
+	// println("+----------------------------------+");
+	// println("|      Low  Risk Units             |");
+	// println("|      Moderate  Risk Units        |");
+	// println("|      High  Risk Units            |");
+	// println("|      Very High  Risk Units       |");
+	// println("+----------------------------------+");
+	// println("overall interfacing");
+	// println(unitInterfaceRanking);
+	// println("relative amound");
+	// println(absoluteLinesOfCodePerCategorie);
+	// println(relativeUnitAmounts);
 
 
-	println("+----------------------------------+");
-	println("|      Changeability               |");
-	println("+----------------------------------+");
-	println(getChangabilityRating(duplicationRanking, cyclomaticRanking).rankingType.name);
+	// println("+----------------------------------+");
+	// println("|      Duplication                 |");
+	// println("+----------------------------------+");
+	// println("• Duplicated Lines ");
+	// int duplicatedLines = getDuplicatedLines(model);
+	// println(duplicatedLines);
+	// println("• Duplication Percentage ");
+	// real duplicationPercentage = getDuplicationPercentage(duplicatedLines, volume["Actual Lines of Code"]);
+	// println(duplicationPercentage);
+	// println("• Duplication Ranking ");
+	// duplicationRanking = getDuplicationRanking(duplicationPercentage);
+	// println(duplicationRanking.rankingType.name);
+
+	// println("+----------------------------------+");
+	// println("|      Analyzability               |");
+	// println("+----------------------------------+");
+	// // TODO Don't know, fix the type issue.
+	// //println(getAnalyzabilityRating(manYearsRanking,duplicationRanking,unitSizeRanking));
+
+
+	// changeabilityRating = getChangabilityRating(duplicationRanking, cyclomaticRanking);
+	// println("+----------------------------------+");
+	// println("|      Changeability               |");
+	// println("+----------------------------------+");
+	// println(changeabilityRating.name);
 
 	println("+----------------------------------+");
 	println("|      Testability                 |");
 	println("+----------------------------------+");
-	println(getChangabilityRating(duplicationRanking, cyclomaticRanking).rankingType.name);
-
+	testClasses = getTestFilesOfProject(listOfLocations);
+	println("testclasses");
+	moreTest = getTestClasses(testClasses);
+	assertions = 0;
+	for (testClass <- moreTest) {
+		assertions = assertions + getAssertionForMethod(testClass);
+	}
+	println("sum assertions");
+	println(assertions);
+	println("amount of methods in project");
+	println(size(listOfLocations));
 
 	if(testUnitCoverage) {
 		println("+----------------------------------+");

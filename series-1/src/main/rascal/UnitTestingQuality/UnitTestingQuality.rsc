@@ -8,7 +8,8 @@ import List;
 // We get the test classes from the test folder, since this is I believe a Java 
 // convention that the stuff should be in a test folder
 
-str testFolder = "/test/";
+alias TestClasses = list[Declaration];
+alias TestMethods = list[Declaration];
 
 public list[loc] getTestFilesOfProject(list[loc] files) {
 
@@ -24,21 +25,34 @@ public list[loc] getTestFilesOfProject(list[loc] files) {
 	return validFiles;
 }
 
-public list[Declaration] getTestFileDelcaration (list[loc] testFiles) {
-    
-}
-
 public bool isValidTestClass(str file) {
 	
-	if(!contains(file, "/test/")) {
+	if(!contains(file, "/junit/")  ) {
 		return false;
     }
 
 	return true;
 }
 
-private int getAssertions(Declaration testClass) {
- 
+
+
+	
+
+
+// Declarations are the ASTs from each class in the project.
+// They are predefined with the file test filter (if it appears int he sourcecode.)
+public TestClasses getTestClasses(list[loc] files) {
+    list[Declaration] fileDeclarations = [ createAstFromFile(file, true) | file <- files]; 
+    TestClasses classItems = [];
+	for(int i <- [0 .. size(fileDeclarations)]) {
+		classItems = classItems + [dec | /Declaration dec := fileDeclarations[i],
+        dec is class && (contains(dec.src.path, "/junit/"))];
+	}
+    return classItems;
+}
+
+public int getAssertionForMethod(Declaration testClass) {
+
  	int assertions = 0;
 
 	visit (testClass) {
