@@ -128,7 +128,7 @@ map[str, int] calculateAbsoluteRiskAmount(list[UnitInterfaceRiskProfile] riskPro
 	for(profile <- riskProfiles) {
 		loc rawMethodLoc = profile.method.src;
         str rawMethod = readFile(rawMethodLoc);
-		int methodLOC =size( getLOC(rawMethod));
+		int methodLOC =size(getLOC(rawMethod));
 
 		riskOverview[profile.risk] += methodLOC;
 	}

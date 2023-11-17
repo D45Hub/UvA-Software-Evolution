@@ -65,3 +65,18 @@ test bool isHighUnitInterfacing() {
             relativeUnitAmounts["highRisk"] != 0 && 
             relativeUnitAmounts["veryHighRisk"] == 0;
 }
+
+test bool isVeryHighUnitInterfacing() {
+	loc file = |project://series-1/src/main/test-code/UnitInterfacing/VeryHighInterfacing.java|;
+    methods = getMethodsForUnitInterfacingTest(file);
+	allParamtersOfUnits = getUnitInterfacingValues(methods);
+	absoluteParameterCategories = getAbsolutRiskValues(allParamtersOfUnits);
+	absoluteLinesOfCodePerCategorie = calculateAbsoluteRiskAmount(absoluteParameterCategories);
+	relativeUnitAmounts = calculateRelativeRiskAmount(absoluteLinesOfCodePerCategorie);
+	unitInterfaceRanking = getUnitInterfacingRanking(relativeUnitAmounts);
+
+	return  relativeUnitAmounts["lowRisk"] == 0 &&
+            relativeUnitAmounts["moderateRisk"] == 0 &&
+            relativeUnitAmounts["highRisk"] == 0 && 
+            relativeUnitAmounts["veryHighRisk"] != 0;
+}
