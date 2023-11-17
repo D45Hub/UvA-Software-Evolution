@@ -9,7 +9,7 @@ import IO;
 
 
 test bool lowComplexityTest(){
-	loc file = |file:///Users/ekletsko/Documents/Master/SoftwareEvolution/UvA-Software-Evolution/series-1/src/main/test-code/CyclomaticComplexity/HighCyclomaticComplexity.java|;
+	loc file = |project://series-1/src/main/test-code/CyclomaticComplexity/LowCyclomaticComplexity.java|;
 
 	Declaration declaration = createAstFromFile(file, true);
 	lowComplexity = getCyclomaticComplexity(declaration);
@@ -18,7 +18,7 @@ test bool lowComplexityTest(){
 }
 
 test bool moderateComplexityTest(){
-	loc file = |file:///Users/ekletsko/Documents/Master/SoftwareEvolution/UvA-Software-Evolution/series-1/src/main/test-code/CyclomaticComplexity/HighCyclomaticComplexity.java|;
+	loc file = |project://series-1/src/main/test-code/CyclomaticComplexity/MediumCyclomaticComplexity.java|;
 
 	Declaration declaration = createAstFromFile(file, true);
 	lowComplexity = getCyclomaticComplexity(declaration);
@@ -27,7 +27,7 @@ test bool moderateComplexityTest(){
 }
 
 test bool highComplexityTest(){
-	loc file = |file:///Users/ekletsko/Documents/Master/SoftwareEvolution/UvA-Software-Evolution/series-1/src/main/test-code/CyclomaticComplexity/HighCyclomaticComplexity.java|;
+	loc file = |project://series-1/src/main/test-code/CyclomaticComplexity/HighCyclomaticComplexity.java|;
 
 	Declaration declaration = createAstFromFile(file, true);
 	lowComplexity = getCyclomaticComplexity(declaration);
@@ -36,7 +36,7 @@ test bool highComplexityTest(){
 }
 
 test bool veryHighComplexityTest(){
-	loc file = |file:///Users/ekletsko/Documents/Master/SoftwareEvolution/UvA-Software-Evolution/series-1/src/main/test-code/CyclomaticComplexity/HighCyclomaticComplexity.java|;
+	loc file = |project://series-1/src/main/test-code/CyclomaticComplexity/VeryHighCyclomaticComplexity.java|;
 
 	Declaration declaration = createAstFromFile(file, true);
 	lowComplexity = getCyclomaticComplexity(declaration);

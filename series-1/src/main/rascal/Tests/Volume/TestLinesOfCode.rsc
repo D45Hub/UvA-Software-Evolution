@@ -11,7 +11,7 @@ import String;
 import List;
 
 test bool commentsOnlyLocTest(){
-	loc file = |file:///Users/ekletsko/Documents/Master/SoftwareEvolution/UvA-Software-Evolution/series-1/src/main/test-code/volume/CommentsOnlyFile.java|;
+	loc file = |project://series-1/src/main/test-code/Volume/CommentsOnlyFile.java|;
 	list[str] codeLines = getLOC(readFile(file));
 	return size(codeLines) == 0;
 }
