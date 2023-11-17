@@ -20,20 +20,19 @@ alias UnitLengthTuple = tuple[loc method, int methodLOC];
 alias UnitSizeValue = tuple[UnitSizeRanking unitSizeRanking, int averageUnitSizeLOC];
 
 alias UnitRiskCategory = tuple[int min, int max];
-
+alias UnitSizeDistribution =  tuple[num moderateRisk,
+                                num highRisk,
+                                num veryHighRisk];
 /* How many lines are in which category*/ 
 alias UnitSizeRiskRanking = tuple[Ranking rankingType,
                                 UnitSizeDistribution unitSizeDistribution];
 
-alias UnitSizeDistribution =  tuple[num moderateRisk,
-                                num highRisk,
-                                num veryHighRisk];
+
 UnitRiskCategory unitRiskLow = <1,15>;
 UnitRiskCategory unitRiskModerate = <16,30>;
 UnitRiskCategory unitRiskHigh = <30,60>;
 UnitRiskCategory unitRiskVeryHigh = <61,-1>;
 
-// TODO find paper or standard on how long a method has to be in Java
 UnitSizeRanking excellentUnitSizeRanking = <excellent, 1, 15>;
 UnitSizeRanking goodUnitSizeRanking = <good, 16, 40>;
 UnitSizeRanking neutralUnitSizeRanking = <neutral, 21, 30>;

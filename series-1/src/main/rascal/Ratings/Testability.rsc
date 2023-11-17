@@ -1,25 +1,20 @@
 module Ratings::Testability
 
-import lang::java::m3::Core;
-import lang::java::m3::AST;
 
-import UnitInterfacing::UnitInterfacingHelper;
+
+import UnitInterfacing::UnitInterfacing;
 import Ranking::Ranking;
-import CyclomaticComplexity::ComplexityHelper;
+import CyclomaticComplexity::CyclomaticComplexity;
+import CyclomaticComplexity::CyclomaticComplexityRanking;
 import UnitSize::UnitSize;
-
+import IO;
 // Unit Size, Unit Complexity, Unit Testing
 
-public Ranking getTestabilityRanking(M3 projectModel, list[Declaration] declMethods) {
 
-    UnitSizeRanking unitSizeRanking = calculateUnitSizeRanking(projectModel);
-    ComplexityRanking complexityRanking = calculateComplexityRanking(declMethods);
-
-    return getTestabilityRanking(unitSizeRanking, complexityRanking);
-}
-
-public Ranking getTestabilityRanking(UnitSizeRanking unitSizeRanking, ComplexityRanking complexityRanking) {
+public Ranking getTestabilityRanking(UnitSizeRiskRanking unitSizeRanking, ComplexityRanking complexityRanking) {
+    println("Im here");
     list[Ranking] metricRankings = [unitSizeRanking.rankingType, complexityRanking.rankingType];
 
+    println("before averging");
     return averageRanking(metricRankings);
 }
