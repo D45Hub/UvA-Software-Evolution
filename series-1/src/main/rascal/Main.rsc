@@ -18,6 +18,8 @@ import List;
 import util::FileSystem;
 import Set;
 import util::Math;
+import Ratings::Analyzability;
+import Ratings::Changeability;
 
 alias ProjectLocation = tuple[loc projectFolderLocation, loc unitCoverageReportLocation];
 
@@ -83,7 +85,8 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	println("Number of Methods");
 	println(size(listOfLocations));
 	println("|      Ranking With Man Years      |");
-	println(getManYearsRanking(linesOfCode).rankingType.name);
+	manYearsRanking = getManYearsRanking(linesOfCode);
+	println(manYearsRanking.rankingType.name);
 
 
 
@@ -140,12 +143,20 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	real duplicationPercentage = getDuplicationPercentage(duplicatedLines, volume["Actual Lines of Code"]);
 	println(duplicationPercentage);
 	println("• Duplication Ranking ");
-	ranking = getDuplicationRanking(duplicationPercentage);
-	println(ranking.rankingType.name);
+	duplicationRanking = getDuplicationRanking(duplicationPercentage);
+	println(duplicationRanking.rankingType.name);
 
 	println("+----------------------------------+");
-	println("|      Duplication                 |");
+	println("|      Analyzability               |");
 	println("+----------------------------------+");
+	// TODO Don't know, fix the type issue.
+	//println(getAnalyzabilityRating(manYearsRanking,duplicationRanking,unitSizeRanking));
+
+
+	println("+----------------------------------+");
+	println("|      Changeability               |");
+	println("+----------------------------------+");
+	println(getChangabilityRating(duplicationRanking, cyclomaticRanking));
 
 	if(testUnitCoverage) {
 		println("+----------------------------------+");
