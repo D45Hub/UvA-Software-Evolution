@@ -108,9 +108,9 @@ list[UnitInterfaceRiskProfile] getAbsolutRiskValues(list[UnitInterfacingComplexi
 		int compl = complexity.unitInterfacingComplexity;
 		if(compl >= 0 && compl <= 2) {
 			riskProfile += <complexity.method, "lowRisk">;
-		} else if(compl >= 3 || compl <= 4) {
+		} else if(compl >= 3 && compl <= 4) {
 			riskProfile += <complexity.method, "moderateRisk">;
-		} else if(compl >=5 && compl <= 6) {
+		} else if(compl >= 5 && compl <= 6) {
 			riskProfile += <complexity.method, "highRisk">;
 		} else {
 			riskProfile += <complexity.method, "veryHighRisk">;
