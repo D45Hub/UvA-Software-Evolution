@@ -14,18 +14,17 @@ test bool lowComplexityTest(){
 	Declaration declaration = createAstFromFile(file, true);
 	lowComplexity = getCyclomaticComplexity(declaration);
     println(lowComplexity);
-	return lowComplexity == 24;
+	return lowComplexity == 9;
 }
 
 test bool moderateComplexityTest(){
 	loc file = |project://series-1/src/main/test-code/CyclomaticComplexity/MediumCyclomaticComplexity.java|;
-
 	Declaration declaration = createAstFromFile(file, true);
-	lowComplexity = getCyclomaticComplexity(declaration);
-    println(lowComplexity);
-	return lowComplexity == 24;
+	moderateComplexity = getCyclomaticComplexity(declaration);
+	return moderateComplexity == 24;
 }
 
+// TODO I don't know why this is not working. 
 test bool highComplexityTest(){
 	loc file = |project://series-1/src/main/test-code/CyclomaticComplexity/HighCyclomaticComplexity.java|;
 
@@ -35,6 +34,7 @@ test bool highComplexityTest(){
 	return lowComplexity == 24;
 }
 
+// TODO I don't know why this is not working. 
 test bool veryHighComplexityTest(){
 	loc file = |project://series-1/src/main/test-code/CyclomaticComplexity/VeryHighCyclomaticComplexity.java|;
 
