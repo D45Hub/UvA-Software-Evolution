@@ -12,12 +12,16 @@ import UnitInterfacing::UnitInterfacing;
 import CyclomaticComplexity::CyclomaticComplexityRanking;
 import CyclomaticComplexity::CyclomaticComplexity;
 import Duplication::Duplication;
+import UnitCoverage::UnitCoverage;
 import IO;
 import List; 
 import util::FileSystem;
 import Set;
 import util::Math;
 
+alias ProjectLocation = tuple[loc projectFolderLocation, loc unitCoverageReportLocation];
+
+ProjectLocation smallSQLLocation = <|file:///Users/ekletsko/Downloads/smallsql0.21_src|, |project://series-1/src/main/rsc/jacoco_simpleencryptor.csv|>;
 
 void analyseSmallSQL() {
 	
@@ -25,7 +29,7 @@ void analyseSmallSQL() {
 	println("|         Setting up Project       |");
 	println("+----------------------------------+");
 
-	M3 model = createM3FromMavenProject(|file:///Users/ekletsko/Downloads/smallsql0.21_src|);
+	M3 model = createM3FromMavenProject(smallSQLLocation.projectFolderLocation);
 	volume = getVolumeMetric(model);
 	listOfLocations = toList(methods(model));
 	linesOfCode = volume["Actual Lines of Code"];
@@ -135,5 +139,9 @@ void analyseSmallSQL() {
 	println("|      Duplication                 |");
 	println("+----------------------------------+");
 
-	}
-
+	println("+----------------------------------+");
+	println("|         Unit Coverage            |");
+	println("+----------------------------------+");
+	formatOverallStatistics(smallSQLLocation.unitCoverageReportLocation);
+	formatClassStatistics(smallSQLLocation.unitCoverageReportLocation);
+}
