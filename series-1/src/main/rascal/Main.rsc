@@ -21,15 +21,8 @@ import Set;
 import util::Math;
 import Ratings::Analyzability;
 import Ratings::Changeability;
+import Ratings::Testability;
 import Ranking::Ranking;
-
-public Ranking getTestabilityRanking(UnitSizeRiskRanking unitSizeRanking, ComplexityRanking complexityRanking) {
-    println("Im here");
-    list[Ranking] metricRankings = [unitSizeRanking.rankingType, complexityRanking.rankingType];
-
-    println("before averging");
-    return averageRanking(metricRankings);
-}
 
 alias ProjectLocation = tuple[loc projectFolderLocation, loc unitCoverageReportLocation];
 
@@ -150,11 +143,10 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	println("+----------------------------------+");
 	println("|      Analyzability               |");
 	println("+----------------------------------+");
-	// TODO Don't know, fix the type issue.
-	//println(getAnalyzabilityRating(manYearsRanking,duplicationRanking,unitSizeRanking));
+	println(getAnalyzabilityRating(manYearsRanking.rankingType, duplicationRanking.rankingType, unitSizeRanking.rankingType));
 
 
-	changeabilityRating = getChangabilityRating(duplicationRanking, cyclomaticRanking);
+	changeabilityRating = getChangabilityRating(duplicationRanking.rankingType, cyclomaticRanking.rankingType);
 	println("+----------------------------------+");
 	println("|      Changeability               |");
 	println("+----------------------------------+");
@@ -163,8 +155,7 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	println("+----------------------------------+");
 	println("|      Testability                 |");
 	println("+----------------------------------+");
-	// TODO Fix the code, cause the call is somehow failing...
-	//testabilityRating = getTestabilityRanking(unitSizeRanking,cyclomaticRanking);
+	testabilityRating = getTestabilityRanking(unitSizeRanking.rankingType, cyclomaticRanking.rankingType);
 	testClasses = getTestFilesOfProject(listOfLocations);
 	moreTest = getTestClasses(testClasses);
 	println("testability ranking");
@@ -174,9 +165,9 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 		assertions = assertions + getAssertionForMethod(testClass);
 	}
 
-	println("sum assertions");
+	println("Sum of Assertions");
 	println(assertions);
-	println("amount of methods in project");
+	println("Amount of methods in project");
 	println(size(listOfLocations));
 
 	if(testUnitCoverage) {

@@ -3,8 +3,6 @@ module Ratings::Changeability
 import lang::java::m3::Core;
 import lang::java::m3::AST;
 
-import Duplication::Duplication;
-import CyclomaticComplexity::CyclomaticComplexityRanking;
 import Ranking::Ranking;
 import UnitSize::UnitSize;
 
@@ -16,8 +14,8 @@ import UnitSize::UnitSize;
 //     return getChangabilityRating(duplicationRanking, complexityRanking);
 // }
 
-public Ranking getChangabilityRating(DuplicationRanking duplicationRanking, ComplexityRanking complexityRanking) {
-    list[Ranking] metricRankings = [duplicationRanking.rankingType, complexityRanking.rankingType];
+public Ranking getChangabilityRating(Ranking duplicationRanking, Ranking complexityRanking) {
+    list[Ranking] metricRankings = [duplicationRanking, complexityRanking];
 
     return averageRanking(metricRankings);
 }
