@@ -143,7 +143,8 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	println("+----------------------------------+");
 	println("|      Analyzability               |");
 	println("+----------------------------------+");
-	println(getAnalyzabilityRating(manYearsRanking.rankingType, duplicationRanking.rankingType, unitSizeRanking.rankingType));
+	analyzabilityRating = getAnalyzabilityRating(manYearsRanking.rankingType, duplicationRanking.rankingType, unitSizeRanking.rankingType);
+	println(analyzabilityRating);
 
 
 	changeabilityRating = getChangabilityRating(duplicationRanking.rankingType, cyclomaticRanking.rankingType);
@@ -169,6 +170,17 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	println(assertions);
 	println("Amount of methods in project");
 	println(size(listOfLocations));
+
+
+	println("+----------------------------------+");
+	println("|      Overall Maintainability     |");
+	println("+----------------------------------+");
+	println("TestabilityRanking + ChangeabilityRanking + Analyzability Ranking / 3");
+	overallMaintainability = ((testabilityRating.val
+							+ changeabilityRating.val
+							+ analyzabilityRating.val) / 3);
+	overallMaintainabilityRankingName = [finalRanking| finalRanking <- allRankings, finalRanking.val == overallMaintainability];
+	println(overallMaintainabilityRankingName[0].name);
 
 	if(testUnitCoverage) {
 		println("+----------------------------------+");

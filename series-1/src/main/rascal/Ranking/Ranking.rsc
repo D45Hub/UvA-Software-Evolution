@@ -25,6 +25,8 @@ public Ranking neutral = <"o", 2>;
 public Ranking negative = <"-", 1>;
 public Ranking veryNegative = <"--", 0>;
 
+public list[Ranking] allRankings = [excellent, good, neutral, negative, veryNegative];
+
 Ranking averageRanking(list[Ranking] rankings){
 	if(rankings == []){
 		return neutral;
