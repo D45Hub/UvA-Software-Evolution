@@ -54,20 +54,12 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	listOfLocations = toList(methods(model));
 	linesOfCode = volume["Actual Lines of Code"];
 
-
 	list[Declaration] declarations = [ createAstFromFile(file, true) | file <- toList(files(model))]; 
-	
 	list[Declaration] methods = [];
 
 	for(int i <- [0 .. size(declarations)]) {
 		methods = methods + [dec | /Declaration dec := declarations[i], dec is method || dec is constructor || dec is initializer];
 	}
-
-	allUnitSizes = getAllUnitSizesOfProject(model);
-	UnitSizeDistribution absoluteUnitSizes = getAbsoluteUnitSizeDistribution(allUnitSizes);
-	UnitSizeDistribution relativeUnitSizes = getRelativeUnitSizeDistribution(absoluteUnitSizes, volume["Actual Lines of Code"]);
-	UnitSizeRankingValues unitSizeRanking = getUnitSizeRanking(relativeUnitSizes);
-
 	
     complexityTuple = getCyclomaticRiskOverview(methods);  
 	cyclomaticOverview = getCyclomaticRiskRating(linesOfCode, complexityTuple );
@@ -104,15 +96,13 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	println("+----------------------------------+");
 	println("|         Unit Size                |");
 	println("+----------------------------------+");
-	println("|      Low  Risk Unit Size         |");
-	println("|      Moderate  Risk Unit Size    |");
-	println("| " + toString(absoluteUnitSizes.moderateRisk) + " lines (" + toString(relativeUnitSizes.moderateRisk) + " %) |");
-	println("|      High  Risk Unit Size        |");
-	println("| " + toString(absoluteUnitSizes.highRisk) + " lines (" + toString(relativeUnitSizes.highRisk) + " %) |");
-	println("|      Very High Risk Unit Size    |");
-	println("| " + toString(absoluteUnitSizes.veryHighRisk) + " lines (" + toString(relativeUnitSizes.veryHighRisk) + " %) |");
-	println("|      Overall Ranking             |");
-	println(unitSizeRanking.rankingType.name);
+	map[str, UnitAmountPercentage] unitSizeRankingValues = calculateUnitSizeRankingValues(model, linesOfCode);
+	println("Low risk lines: " + toString(unitSizeRankingValues["low"].absoluteAmount) + " (" + toString(unitSizeRankingValues["low"].relativeAmount) + "%)");
+    println("Moderate risk lines: " + toString(unitSizeRankingValues["moderate"].absoluteAmount) + " (" + toString(unitSizeRankingValues["moderate"].relativeAmount) + "%)");
+    println("High risk lines: " + toString(unitSizeRankingValues["high"].absoluteAmount) + " (" + toString(unitSizeRankingValues["high"].relativeAmount) + "%)");
+    println("Very high risk lines: " + toString(unitSizeRankingValues["veryHigh"].absoluteAmount) + " (" + toString(unitSizeRankingValues["veryHigh"].relativeAmount) + "%)");
+	UnitSizeRankingValues unitSizeRanking = getUnitSizeRankings(unitSizeRankingValues);
+	println(unitSizeRanking);
 
 	println("+----------------------------------+");
 	println("|      Unit Complexity             |");
@@ -137,9 +127,9 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	println("|      High  Risk Units            |");
 	println("|      Very High  Risk Units       |");
 	println("+----------------------------------+");
-	println("overall interfacing");
+	println("Overall Interfacing");
 	println(unitInterfaceRanking);
-	println("relative amound");
+	println("Relative Amount");
 	println(absoluteLinesOfCodePerCategorie);
 	println(relativeUnitAmounts);
 
@@ -156,7 +146,7 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	println("• Duplication Ranking ");
 	duplicationRanking = getDuplicationRanking(duplicationPercentage);
 	println(duplicationRanking.rankingType.name);
-
+	
 	println("+----------------------------------+");
 	println("|      Analyzability               |");
 	println("+----------------------------------+");

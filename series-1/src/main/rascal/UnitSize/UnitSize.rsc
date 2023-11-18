@@ -5,6 +5,7 @@ import Volume::LOCVolume;
 import lang::java::m3::Core;
 import lang::java::m3::AST;
 import Ranking::Ranking;
+import UnitSize::UnitSizeRanking;
 import List;
 import IO;
 import String;
@@ -20,24 +21,28 @@ alias UnitLengthTuple = tuple[loc method, int methodLOC];
 alias UnitSizeValue = tuple[UnitSizeRanking unitSizeRanking, int averageUnitSizeLOC];
 
 alias UnitRiskCategory = tuple[int min, int max];
-alias UnitSizeDistribution =  tuple[num moderateRisk,
-                                num highRisk,
-                                num veryHighRisk];
+
 /* How many lines are in which category*/ 
 alias UnitSizeRiskRanking = tuple[Ranking rankingType,
                                 UnitSizeDistribution unitSizeDistribution];
 
+alias UnitSizeDistribution =  tuple[num moderateRisk,
+                                num highRisk,
+                                num veryHighRisk];
 
 UnitRiskCategory unitRiskLow = <1,15>;
 UnitRiskCategory unitRiskModerate = <16,30>;
 UnitRiskCategory unitRiskHigh = <30,60>;
 UnitRiskCategory unitRiskVeryHigh = <61,-1>;
 
+// TODO find paper or standard on how long a method has to be in Java
 UnitSizeRanking excellentUnitSizeRanking = <excellent, 1, 15>;
 UnitSizeRanking goodUnitSizeRanking = <good, 16, 40>;
 UnitSizeRanking neutralUnitSizeRanking = <neutral, 21, 30>;
 UnitSizeRanking negativeUnitSizeRanking = <negative, 30, 50>;
 UnitSizeRanking veryNegativeUnitSizeRanking = <veryNegative, 50, -1>;
+
+alias UnitAmountPercentage = tuple[num absoluteAmount, num relativeAmount];
 
 list[UnitSizeRanking] allUnitSizeRankings = [excellentUnitSizeRanking,
                                             goodUnitSizeRanking,
@@ -106,9 +111,9 @@ UnitSizeDistribution getAbsoluteUnitSizeDistribution(list[UnitLengthTuple] allSi
 }
 
 public UnitSizeDistribution getRelativeUnitSizeDistribution(UnitSizeDistribution distribution, int linesOfCode) {
-    int percentageVeryHighRisk =  round(( toReal(distribution.veryHighRisk) / toReal(linesOfCode) ) * 100);
-    int percentageHighRisk =  round(toReal(distribution.highRisk) / (toReal(linesOfCode)) * 100);
-    int percentageModerateRisk =  round(toReal(distribution.moderateRisk) /(toReal(linesOfCode)  ) * 100);
+    int percentageVeryHighRisk = round(( toReal(distribution.veryHighRisk) / toReal(linesOfCode) ) * 100);
+    int percentageHighRisk = round(toReal(distribution.highRisk) / (toReal(linesOfCode)) * 100);
+    int percentageModerateRisk = round(toReal(distribution.moderateRisk) /(toReal(linesOfCode)  ) * 100);
 
     return <percentageModerateRisk, percentageHighRisk, percentageVeryHighRisk>;
 }
@@ -131,4 +136,27 @@ public UnitSizeValue calculateUnitSizeRankingValues(M3 projectModel) {
 public void formatUnitSizeRanking(M3 projectModel) {
     UnitSizeValue rankingValue = calculateUnitSizeRankingValues(projectModel);
     println(rankingValue);
+}
+
+public map[str, UnitAmountPercentage] calculateUnitSizeRankingValues(M3 projectModel, int linesOfCode) {
+    list[UnitLengthTuple] unitSizes = getAllUnitSizesOfProject(projectModel);
+    UnitSizeDistribution unitDistributions = getAbsoluteUnitSizeDistribution(unitSizes);
+    UnitSizeDistribution relativeDistributions = getRelativeUnitSizeDistribution(unitDistributions, linesOfCode);
+
+    UnitSizeRankingValues unitSizeRanking = getUnitSizeRanking(relativeDistributions);
+
+    num lowRiskLines = linesOfCode - unitDistributions.moderateRisk - unitDistributions.highRisk - unitDistributions.veryHighRisk; 
+    num lowRiskLinesPercentage = 100.0 - relativeDistributions.moderateRisk - relativeDistributions.highRisk - relativeDistributions.veryHighRisk; 
+    
+    UnitAmountPercentage lowAmountPercentage = <lowRiskLines, lowRiskLinesPercentage>;
+    UnitAmountPercentage moderateAmountPercentage = <unitDistributions.moderateRisk, relativeDistributions.moderateRisk>;
+    UnitAmountPercentage highAmountPercentage =  <unitDistributions.highRisk, relativeDistributions.highRisk>;
+    UnitAmountPercentage veryHighAmountPercentage = <unitDistributions.veryHighRisk, relativeDistributions.veryHighRisk>;
+
+    return (
+        "low": lowAmountPercentage,
+        "moderate" : moderateAmountPercentage,
+        "high" : highAmountPercentage,
+        "veryHigh" : veryHighAmountPercentage
+    );
 }

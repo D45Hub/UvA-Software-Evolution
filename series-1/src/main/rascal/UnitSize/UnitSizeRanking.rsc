@@ -8,7 +8,6 @@ alias UnitSizeRankingValues = tuple[Ranking rankingType,
                                 num highRisk,
                                 num veryHighRisk];
 
-
 // TODO Fill out with better metrics... Good = SIG Paper, 4 Star Rating.
 UnitSizeRankingValues excellentUnitSizeRanking = <excellent, 50, 15, 3>;
 UnitSizeRankingValues goodUnitSizeRanking = <good, 44.5, 20.3, 6.7>;
@@ -22,25 +21,30 @@ list[UnitSizeRankingValues] allUnitSizeRankings = [excellentUnitSizeRanking,
                                                 negativeUnitSizeRanking, 
                                                 veryNegativeUnitSizeRanking];
 
-
 public UnitSizeRankingValues getUnitSizeRanking(UnitSizeDistribution relativeDistribution) {
 
     num moderatePercentage = relativeDistribution.moderateRisk;
     num highPercentage = relativeDistribution.highRisk;
     num veryHighPercentage = relativeDistribution.veryHighRisk;
 
-    if (veryHighPercentage <= excellentUnitSizeRanking.moderateRisk && highPercentage <= excellentUnitSizeRanking.highRisk && moderatePercentage <= excellentUnitSizeRanking.moderateRisk) {
+    if (veryHighPercentage <= excellentUnitSizeRanking.veryHighRisk && highPercentage <= excellentUnitSizeRanking.highRisk && moderatePercentage <= excellentUnitSizeRanking.moderateRisk) {
         return excellentUnitSizeRanking;
     }
-    if (veryHighPercentage <= goodUnitSizeRanking.moderateRisk && highPercentage <= goodUnitSizeRanking.highRisk && moderatePercentage <= goodUnitSizeRanking.moderateRisk) {
+    if (veryHighPercentage <= goodUnitSizeRanking.veryHighRisk && highPercentage <= goodUnitSizeRanking.highRisk && moderatePercentage <= goodUnitSizeRanking.moderateRisk) {
         return goodUnitSizeRanking;
     }
-    if (veryHighPercentage <= neutralUnitSizeRanking.moderateRisk && highPercentage <= neutralUnitSizeRanking.highRisk && moderatePercentage <= neutralUnitSizeRanking.moderateRisk) {
+    if (veryHighPercentage <= neutralUnitSizeRanking.veryHighRisk && highPercentage <= neutralUnitSizeRanking.highRisk && moderatePercentage <= neutralUnitSizeRanking.moderateRisk) {
         return neutralUnitSizeRanking;
     }
-    if (veryHighPercentage <= negativeUnitSizeRanking.moderateRisk && highPercentage <= negativeUnitSizeRanking.highRisk && moderatePercentage <= negativeUnitSizeRanking.moderateRisk) {
+    if (veryHighPercentage <= negativeUnitSizeRanking.veryHighRisk && highPercentage <= negativeUnitSizeRanking.highRisk && moderatePercentage <= negativeUnitSizeRanking.moderateRisk) {
         return negativeUnitSizeRanking;
     }
     
     return veryNegativeUnitSizeRanking;
+}
+
+public UnitSizeRankingValues getUnitSizeRankings(map[str, UnitAmountPercentage] unitDistribution) {
+    UnitSizeDistribution relativeDistribution = <unitDistribution["moderate"].relativeAmount, unitDistribution["high"].relativeAmount, unitDistribution["veryHigh"].relativeAmount>;
+
+    return getUnitSizeRanking(relativeDistribution);
 }
