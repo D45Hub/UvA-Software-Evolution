@@ -116,7 +116,7 @@ int getDuplicatedLines(M3 projectModel) {
     int amountOfDuplicatedLines = 0;
 
     for(duplEntry <- duplicationMap) {
-        amountOfDuplicatedLines += duplicationMap[duplEntry] * 6;
+        amountOfDuplicatedLines += duplicationMap[duplEntry];
     }
 
     return amountOfDuplicatedLines;
