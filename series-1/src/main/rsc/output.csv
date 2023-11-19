@@ -1,28 +1,38 @@
 metric,rating,result
+Benchmark end time,,1700422498031
 Duplication Ranking,-,
-Amount of methods in the project,,2415
-Unit Size Rating,-,"50%, 25%, 5%"
-Very high risk lines,,1255 lines (5 %)
+Unit Size Rating,-,"30%, 30%, 15%"
 Overall Maintainability,-,
 Amount of Assertions,,14696
-Low risk lines in units,,15909 lines (66 %)
-Unit Interfacing Percentages,,"89%, 10%, 1%, 0"
+Benchmark start time,,1700422154235
+High complexity lines in units,,2481 lines (10 %)
 Changeability Ranking,-,
-Moderate risk lines in units,,1747 lines (7 %)
+Benchmark start time,,1700422453439
+Duplication Lines,,2563
+Low complexity lines in units,,15909 lines (66 %)
+Unit Size Rating,-,"50%,
+				25%,
+				5%"
 Duplication Percentage,,10.65696466000
 Unit Interfacing Ranking,++,
 Man Years,++,
-Unit Size Rating,-,"30%, 30%, 15%"
-High risk lines,,2481 lines (10 %)
-Blank Lines,,5508
+Blank Lines,,5509
+Amount of methods in the project,,2415
+High unit interface risk lines,,162
+Very complexity risk lines in units,,1255 lines (5 %)
 Moderate risk lines in units,,4604 (19%)
+Moderate complexity lines in units,,1747 lines (7 %)
+Very high risk lines in units,,3253 (14%)
 Testability Ranking,-,
 Comment Lines,,8979
 Analyzability Ranking,o,
 Low risk lines in units,,12283 (51.0%)
-High risk lines,,3910 (16%)
-Overall Lines of Code,,38537
-Very high risk lines,,3253 (14%)
-Duplication Lines,,2563
+Unit Interfacing Percentages,,"89%, 10%, 1%, 0%"
+Very high unit interface risk lines,,35
+Overall Lines of Code,,38538
+High risk lines in units,,3910 (16%)
+Low unit interface risk lines,,18926
+Benchmark end time,,1700422199106
+Moderate unit interface risk lines,,2069
 Actual Lines of Code,,24050
 Number of Methods,,2415

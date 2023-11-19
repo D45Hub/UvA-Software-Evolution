@@ -25,11 +25,13 @@ import Ratings::Changeability;
 import Ratings::Testability;
 import Ranking::Ranking;
 
-alias ProjectLocation = tuple[loc projectFolderLocation, loc unitCoverageReportLocation];
+alias ProjectLocation = tuple[loc projectFolderLocation,
+							loc unitCoverageReportLocation];
 
-ProjectLocation smallSQLLocation = <|project://series-1/smallsql|, |project://nothing|>;
+ProjectLocation smallSQLLocation = <|file:///Users/ekletsko/Downloads/smallsql0.21_src|, |project://nothing|>;
 ProjectLocation hSQLDBLocation = <|project://series-1/hsqldb|, |project://nothing|>;
-ProjectLocation smallEncryptorLocation = <|project://series-1/simpleencryptor|, |project://series-1/src/main/rsc/jacoco_simpleencryptor.csv|>;
+ProjectLocation smallEncryptorLocation = <|project://series-1/simpleencryptor|,
+ 										|project://series-1/src/main/rsc/jacoco_simpleencryptor.csv|>;
 
 void analyseSmallSQL() {
 	analyseProject(smallSQLLocation, false);
@@ -45,12 +47,10 @@ void analyseEncryptorProject() {
 
 void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	println("+----------------------------------+");
-	println("|         Start measuring time     |");
-	println("+----------------------------------+");
-	str benchmarkStartTime = startBenchmark("Overall Analyse Time");
-	println("+----------------------------------+");
 	println("|         Setting up Project       |");
 	println("+----------------------------------+");
+	str benchmarkStartTime = startBenchmark("Overall Analyse Time");
+
 
 	M3 model = createM3FromMavenProject(projectLocation.projectFolderLocation);
 	volume = getVolumeMetric(model);
@@ -61,7 +61,10 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	list[Declaration] methods = [];
 
 	for(int i <- [0 .. size(declarations)]) {
-		methods = methods + [dec | /Declaration dec := declarations[i], dec is method || dec is constructor || dec is initializer];
+		methods = methods + [dec | /Declaration dec := declarations[i],
+								dec is method ||
+								dec is constructor 
+								|| dec is initializer];
 	}
 	
     complexityTuple = getCyclomaticRiskOverview(methods);  
@@ -78,32 +81,15 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	unitInterfaceRanking = getUnitInterfacingRanking(relativeUnitAmounts);
 
 	println("+----------------------------------+");
-	println("|         𝐕𝐎𝐋𝐔𝐌𝐄 𝐌𝐄𝐓𝐑𝐈𝐂          |");
+	println("|         Volume Metric            |");
 	println("+----------------------------------+");
-	println("|         Overall Lines            |");
-	println("+----------------------------------+");
-	println(volume["Overall lines"]);
-	println("+----------------------------------+");
-	println("|         Blank Lines              |");
-	println("+----------------------------------+");
-	println(volume["Blank Lines"]);
-	println("+----------------------------------+");
-	println("|         Comment Lines            |");
-	println("+----------------------------------+");
-	println(volume["Comment Lines of Code"]);
-	println("+----------------------------------+");
-	println("|       Actual Lines of Code       |");
-	println("+----------------------------------+");
-	println(linesOfCode);
-	println("+----------------------------------+");
-	println("|       Number of Methods          |");
-	println("+----------------------------------+");
-	println(size(listOfLocations));
-	println("+----------------------------------+");
-	println("|      Ranking With Man Years      |");
-	println("+----------------------------------+");
+	println("Overall Lines " + toString(volume["Overall lines"]));
+	println("Blank Lines: " + toString(volume["Blank Lines"]));
+	println("Comment Lines: " + toString(volume["Comment Lines of Code"]));
+	println("Actual Lines of Code: " + toString(linesOfCode));
+	println("Number of Methods: " + toString(size(listOfLocations)));
 	manYearsRanking = getManYearsRanking(linesOfCode);
-	println(manYearsRanking.rankingType.name);
+	println("Man Years Ranking: " + manYearsRanking.rankingType.name);
 	println("+----------------------------------+");
 	addToReport("Overall Lines of Code", "", toString(volume["Overall lines"]));
 	addToReport("Blank Lines", "", toString(volume["Blank Lines"]));
@@ -116,129 +102,144 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	println("|         Unit Size                |");
 	println("+----------------------------------+");
 	map[str, UnitAmountPercentage] unitSizeRankingValues = calculateUnitSizeRankingValues(model, linesOfCode);
-	str lowRiskUnitLinesString = toString(unitSizeRankingValues["low"].absoluteAmount) + " (" + toString(unitSizeRankingValues["low"].relativeAmount) + "%)";
-	str moderateRiskUnitLinesString = toString(unitSizeRankingValues["moderate"].absoluteAmount) + " (" + toString(unitSizeRankingValues["moderate"].relativeAmount) + "%)";
-	str highRiskUnitLinesString = toString(unitSizeRankingValues["high"].absoluteAmount) + " (" + toString(unitSizeRankingValues["high"].relativeAmount) + "%)";
-	str veryHighUnitLinesString = toString(unitSizeRankingValues["veryHigh"].absoluteAmount) + " (" + toString(unitSizeRankingValues["veryHigh"].relativeAmount) + "%)";
-	println("+----------------------------------+");
-	println("|      Low  Risk Lines             |");
-	println("+----------------------------------+");
-	println(lowRiskUnitLinesString);
-	println("+----------------------------------+");
-	println("|      Moderate  Risk Lines        |");
-	println("+----------------------------------+");
+	str lowRiskUnitLinesString = toString(unitSizeRankingValues["low"].absoluteAmount)
+								+ " (" + toString(unitSizeRankingValues["low"].relativeAmount)
+								+ "%)";
+	str moderateRiskUnitLinesString = toString(unitSizeRankingValues["moderate"].absoluteAmount) 
+									+ " (" + toString(unitSizeRankingValues["moderate"].relativeAmount)
+									+ "%)";
+	str highRiskUnitLinesString = toString(unitSizeRankingValues["high"].absoluteAmount)
+									+ " (" + toString(unitSizeRankingValues["high"].relativeAmount) 
+									+ "%)";
+	str veryHighUnitLinesString = toString(unitSizeRankingValues["veryHigh"].absoluteAmount)
+									+ " (" + toString(unitSizeRankingValues["veryHigh"].relativeAmount)
+									+ "%)";
+
+	println("Low risk lines: " + lowRiskUnitLinesString);
     println("Moderate risk lines: " + moderateRiskUnitLinesString);
-    println("+----------------------------------+");
-	println("|      High  Risk Lines            |");
-	println("+----------------------------------+");
-    println(highRiskUnitLinesString);
-	println("+----------------------------------+");
-	println("|      Very High Risk Lines        |");
-	println("+----------------------------------+");
+    println("High Risk unit lines: " + highRiskUnitLinesString);
     println("Very high risk lines: " + veryHighUnitLinesString);
-	println("+----------------------------------+");
-	println("|      Overall Ranking             |");
-	println("+----------------------------------+");
 	UnitSizeRankingValues unitSizeRanking = getUnitSizeRankings(unitSizeRankingValues);
-	println(unitSizeRanking.rankingType.name);
+	println("Overall Unit Size Ranking: " +unitSizeRanking.rankingType.name);
 	println("+----------------------------------+");
 
 	addToReport("Low risk lines in units", "", lowRiskUnitLinesString);
 	addToReport("Moderate risk lines in units", "", moderateRiskUnitLinesString);
 	addToReport("High risk lines in units", "", highRiskUnitLinesString);
 	addToReport("Very high risk lines in units", "", veryHighUnitLinesString);
-	addToReport("Unit Size Rating", unitSizeRanking.rankingType, toString(unitSizeRanking.moderateRisk) + "%, " + toString(unitSizeRanking.highRisk) + "%, " + toString(unitSizeRanking.veryHighRisk) + "%");
+	addToReport("Unit Size Rating",
+				unitSizeRanking.rankingType,
+	 			toString(unitSizeRanking.moderateRisk)
+				+ "%, " + toString(unitSizeRanking.highRisk)
+				+ "%, " + toString(unitSizeRanking.veryHighRisk)
+				+ "%");
 
 	println("+----------------------------------+");
 	println("|      Unit Complexity             |");
 	println("+----------------------------------+");
 
-	str lowRiskComplexityLinesString = toString(complexityTuple.low) + " lines (" + toString(cyclomaticOverview["low"]) + " %)";
-	str moderateComplexityUnitLinesString = toString(complexityTuple.moderate) + " lines (" + toString(cyclomaticOverview["moderate"]) + " %)";
-	str highRiskComplexityLinesString = toString(complexityTuple.high) + " lines (" + toString(cyclomaticOverview["high"]) + " %)";
-	str veryHighComplexityLinesString = toString(complexityTuple.veryHigh) + " lines (" + toString(cyclomaticOverview["veryHigh"]) + " %)";
+	str lowRiskComplexityLinesString = toString(complexityTuple.low)
+	 									+ " lines (" 
+										+ toString(cyclomaticOverview["low"])
+										+ " %)";
+	str moderateComplexityUnitLinesString = toString(complexityTuple.moderate)
+									 	+ " lines (" 
+										+ toString(cyclomaticOverview["moderate"])
+										+ " %)";
+	str highRiskComplexityLinesString = toString(complexityTuple.high)
+										+ " lines ("
+										+ toString(cyclomaticOverview["high"])
+										+ " %)";
+	str veryHighComplexityLinesString = toString(complexityTuple.veryHigh)
+										+ " lines ("
+										+ toString(cyclomaticOverview["veryHigh"]) 
+										+ " %)";
 
-	println("+----------------------------------+");
-	println("|      Low  Risk Units             |");
-	println("+----------------------------------+");
-	println(lowRiskComplexityLinesString);
-	println("+----------------------------------+");
-	println("|      Moderate  Risk Units        |");
-	println("+----------------------------------+");
-	println(moderateComplexityUnitLinesString);
-	println("+----------------------------------+");
-	println("|      High  Risk Units            |");
-	println("+----------------------------------+");
-	println(highRiskComplexityLinesString);
-	println("+----------------------------------+");
-	println("|      Very High Risk Units        |");
-	println("+----------------------------------+");
-	println(veryHighComplexityLinesString);
-	println("+----------------------------------+");
-	println("|      Overall Ranking             |");
-	println("+----------------------------------+");
-	println(cyclomaticRanking.rankingType.name);
+	getLinesAndPercentagesPrint("Low Risk Units:",
+								complexityTuple.low,
+								cyclomaticOverview["low"]);
 
-	addToReport("Low complexity lines in units", "", lowRiskComplexityLinesString);
-	addToReport("Moderate complexity lines in units", "", moderateComplexityUnitLinesString);
-	addToReport("High complexity lines in units", "", highRiskComplexityLinesString);
-	addToReport("Very complexity risk lines in units", "", veryHighComplexityLinesString);
-	addToReport("Unit Size Rating", cyclomaticRanking.rankingType, toString(cyclomaticRanking.moderateRisk) + "%, " + toString(cyclomaticRanking.highRisk) + "%, " + toString(cyclomaticRanking.veryHighRisk) + "%");
+	getLinesAndPercentagesPrint("Moderate Risk Units:",
+								complexityTuple.moderate,
+								cyclomaticOverview["moderate"]);
+	getLinesAndPercentagesPrint("High Risk Units:",
+								complexityTuple.high,
+								cyclomaticOverview["high"]);
+	getLinesAndPercentagesPrint("High Risk Units:",
+								complexityTuple.veryHigh,
+								cyclomaticOverview["veryHigh"]);
+	println("Overall Complexity Ranking: " +cyclomaticRanking.rankingType.name);
+	println("+----------------------------------+");
+
+	addToReport("Low complexity lines in units",
+	 			"",
+				lowRiskComplexityLinesString);
+	addToReport("Moderate complexity lines in units",
+				"",
+				moderateComplexityUnitLinesString);
+	addToReport("High complexity lines in units",
+	 			"",
+				highRiskComplexityLinesString);
+	addToReport("Very complexity risk lines in units",
+				"",
+				veryHighComplexityLinesString);
+	addToReport("Unit Size Rating",
+	 			cyclomaticRanking.rankingType,
+				toString(cyclomaticRanking.moderateRisk) + "%,
+				" + toString(cyclomaticRanking.highRisk) + "%,
+				" + toString(cyclomaticRanking.veryHighRisk) + "%");
 
 
 	println("+----------------------------------+");
 	println("|      Unit Interfacing            |");
 	println("+----------------------------------+");
-	println("|      Low  Risk Units             |");
-	println("+----------------------------------+");
-	println(toString(absoluteLinesOfCodePerCategorie["lowRisk"]) + " " + toString(relativeUnitAmounts["lowRisk"]) + "%");
+	getLinesAndPercentagesPrint("Low Risk Units:",
+								absoluteLinesOfCodePerCategorie["lowRisk"],
+								relativeUnitAmounts["lowRisk"]);
 
-	println("+----------------------------------+");
-	println("|      Moderate  Risk Units        |");
-	println("+----------------------------------+");
-	println(toString(absoluteLinesOfCodePerCategorie["moderateRisk"]) + " " + toString(relativeUnitAmounts["moderateRisk"]) + "%");
-	println("+----------------------------------+");
-	println("|      High  Risk Units            |");
-	println("+----------------------------------+");
-	println(toString(absoluteLinesOfCodePerCategorie["highRisk"]) + " " + toString(relativeUnitAmounts["highRisk"]) + "%");
-	println("+----------------------------------+");
-	println("|      Very High  Risk Units       |");
-	println("+----------------------------------+");
-	println(toString(absoluteLinesOfCodePerCategorie["veryHighRisk"]) + " " + toString(relativeUnitAmounts["veryHighRisk"]) + "%");
-	println("+----------------------------------+");
-	println("|   Overall Interfacing Ranking    |");
-	println("+----------------------------------+");
-	println(unitInterfaceRanking.rankingType.name);
-	println("+----------------------------------+");
-	println("Relative Amount");
-	println(absoluteLinesOfCodePerCategorie);
-	println(relativeUnitAmounts);
+	getLinesAndPercentagesPrint("Moderate Risk Units:",
+								absoluteLinesOfCodePerCategorie["moderateRisk"],
+								relativeUnitAmounts["moderateRisk"]);
 
-	addToReport("Low unit interface risk lines", "", toString(absoluteLinesOfCodePerCategorie["lowRisk"]));
-	addToReport("Moderate unit interface risk lines", "", toString(absoluteLinesOfCodePerCategorie["moderateRisk"]));
-	addToReport("High unit interface risk lines", "", toString(absoluteLinesOfCodePerCategorie["highRisk"]));
-	addToReport("Very high unit interface risk lines", "", toString(absoluteLinesOfCodePerCategorie["veryHighRisk"]));
+	getLinesAndPercentagesPrint("High Risk Units:",
+								absoluteLinesOfCodePerCategorie["highRisk"],
+								relativeUnitAmounts["highRisk"]);
 
-	addToReport("Unit Interfacing Percentages", "", toString(relativeUnitAmounts["lowRisk"]) + "%, " + toString(relativeUnitAmounts["moderateRisk"]) + "%, " + toString(relativeUnitAmounts["highRisk"]) + "%, " + toString(relativeUnitAmounts["veryHighRisk"]) + "%");
+	getLinesAndPercentagesPrint("Very High Risk Units:",
+								absoluteLinesOfCodePerCategorie["veryHighRisk"],
+								relativeUnitAmounts["veryHighRisk"]);
+
+	println(" Overall Interfacing Ranking "
+	 		+ unitInterfaceRanking.rankingType.name);
+	println("+----------------------------------+");
+
+	addToReport("Low unit interface risk lines", "",
+				toString(absoluteLinesOfCodePerCategorie["lowRisk"]));
+	addToReport("Moderate unit interface risk lines", "",
+				toString(absoluteLinesOfCodePerCategorie["moderateRisk"]));
+	addToReport("High unit interface risk lines", "",
+				toString(absoluteLinesOfCodePerCategorie["highRisk"]));
+	addToReport("Very high unit interface risk lines", "",
+	 			toString(absoluteLinesOfCodePerCategorie["veryHighRisk"]));
+
+	addToReport("Unit Interfacing Percentages",
+				"",
+				toString(relativeUnitAmounts["lowRisk"]) + "%, " + 
+				toString(relativeUnitAmounts["moderateRisk"]) + "%, " +
+				toString(relativeUnitAmounts["highRisk"]) + "%, " +
+				toString(relativeUnitAmounts["veryHighRisk"]) + "%");
 	addToReport("Unit Interfacing Ranking", unitInterfaceRanking.rankingType);
 
 	println("+----------------------------------+");
 	println("|      Duplication                 |");
 	println("+----------------------------------+");
-	println("|      Duplicated Lines            |");
-	println("+----------------------------------+");
 	int duplicatedLines = getDuplicatedLines(model);
-	println(duplicatedLines);
-	println("+----------------------------------+");
-	println("|      Duplication Percentage      |");
-	println("+----------------------------------+");
-	real duplicationPercentage = getDuplicationPercentage(duplicatedLines, volume["Actual Lines of Code"]);
-	println(duplicationPercentage);
-	println("+----------------------------------+");
-	println("|      Duplication Ranking         |");
-	println("+----------------------------------+");
+	println("Duplicated Lines: " + toString(duplicatedLines));
+	real duplicationPercentage = getDuplicationPercentage(duplicatedLines, 
+								volume["Actual Lines of Code"]);
+	println("Duplication Percentage: " + toString(duplicationPercentage));
 	duplicationRanking = getDuplicationRanking(duplicationPercentage);
-	println(duplicationRanking.rankingType.name);
+	println("Duplication Ranking: " + duplicationRanking.rankingType.name);
 	println("+----------------------------------+");
 
 	addToReport("Duplication Lines", "", toString(duplicatedLines));
@@ -246,34 +247,41 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	addToReport("Duplication Ranking", duplicationRanking.rankingType);
 	
 	println("+----------------------------------+");
-	println("|      Analyzability               |");
+	println("|      Overall Ratings             |");
 	println("+----------------------------------+");
-	analyzabilityRating = getAnalyzabilityRating(manYearsRanking.rankingType, duplicationRanking.rankingType, unitSizeRanking.rankingType);
-	println("Analyzability Ranking" + analyzabilityRating.name);
-	println("+----------------------------------+");
+	analyzabilityRating = getAnalyzabilityRating(manYearsRanking.rankingType,
+												duplicationRanking.rankingType,
+												unitSizeRanking.rankingType);
+	println("Analyzability Ranking " + analyzabilityRating.name);
 	addToReport("Analyzability Ranking", analyzabilityRating);
 
-	changeabilityRating = getChangabilityRating(duplicationRanking.rankingType, cyclomaticRanking.rankingType);
-	println("+----------------------------------+");
-	println("|      Changeability               |");
-	println("+----------------------------------+");
+	changeabilityRating = getChangabilityRating(duplicationRanking.rankingType,
+												cyclomaticRanking.rankingType);
 	println("Changability Ranking: " + changeabilityRating.name);
-	println("+----------------------------------+");
 	addToReport("Changeability Ranking", changeabilityRating);
-
-	println("+----------------------------------+");
-	println("|      Testability                 |");
-	println("+----------------------------------+");
-	testabilityRating = getTestabilityRanking(unitSizeRanking.rankingType, cyclomaticRanking.rankingType);
+	testabilityRating = getTestabilityRanking(unitSizeRanking.rankingType,
+											cyclomaticRanking.rankingType);
 	testClasses = getTestFilesOfProject(listOfLocations);
 	moreTest = getTestClasses(testClasses);
 	println("+----------------------------------+");
 	println("Testability Ranking: " + testabilityRating.name);
+	println("Overall Maintainability = (TestabilityRanking + ChangeabilityRanking + Analyzability Ranking) / 3");
+	overallMaintainability = ((testabilityRating.val
+							+ changeabilityRating.val
+							+ analyzabilityRating.val) / 3);
+	overallMaintainabilityRankingName = [finalRanking| finalRanking <- allRankings,
+										finalRanking.val == overallMaintainability];
+	println(overallMaintainabilityRankingName[0].name);
+
+
 	assertions = 0;
 	for (testClass <- moreTest) {
 		assertions = assertions + getAssertionForMethod(testClass);
 	}
 
+	println("+----------------------------------+");
+	println("|      Numbers for Test Quality    |");
+	println("+----------------------------------+");
 	println("Sum of Assertions");
 	println(assertions);
 	println("Amount of methods in project");
@@ -282,16 +290,6 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	addToReport("Testability Ranking", testabilityRating);
 	addToReport("Amount of Assertions", "", toString(assertions));
 	addToReport("Amount of methods in the project", "", toString(size(listOfLocations)));
-
-	println("+----------------------------------+");
-	println("|      Overall Maintainability     |");
-	println("+----------------------------------+");
-	println("TestabilityRanking + ChangeabilityRanking + Analyzability Ranking / 3");
-	overallMaintainability = ((testabilityRating.val
-							+ changeabilityRating.val
-							+ analyzabilityRating.val) / 3);
-	overallMaintainabilityRankingName = [finalRanking| finalRanking <- allRankings, finalRanking.val == overallMaintainability];
-	println(overallMaintainabilityRankingName[0].name);
 	addToReport("Overall Maintainability", overallMaintainabilityRankingName[0]);
 
 	if(testUnitCoverage) {
