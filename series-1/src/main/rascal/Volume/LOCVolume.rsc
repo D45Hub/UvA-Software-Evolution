@@ -3,6 +3,8 @@ module Volume::LOCVolume
 import String;
 import Configuration;
 
+// Filtering functions for the different types of irrelevant lines of code.
+
 bool isLineOneLineComment(str rawLine) {
 	str trimmedLine = trim(rawLine);
     return startsWith(trimmedLine, "//");
@@ -17,21 +19,30 @@ bool isLineCurlyBracket(str rawLine){
 	return trimmedLine == "{" || trimmedLine == "}";
 }
 
-/*
- * Removes all multi line comments from a source code string.
- *
- * After experimenting with multiple regular expressions we decided to use:
- * \/\*[\s\S]*?\*\/
- * (Compare with: https://blog.ostermiller.org/find-comment)
- *
+/** 
+	We prune the initial raw source code from multi-line comments first.
+	This is due to the fact that we could include all other possible comment or non comment patterns
+	inside multi-line comments. So therefore we need to remove them to do further analysis.
+
+	We use regex to filter multi-line comments out, since this proved to be the (for us) 
+	easiest and most intuitive method.
+
+	This doesn't allow us to track the amount of multi-line comments though. 
+
+ 	(Reference: https://blog.ostermiller.org/find-comment)
+ 
  */
-str replaceMultiLineComments(str source) {
+str pruneMultiLineComments(str source) {
     
 	return visit(source){
    		case /\/\*[\s\S]*?\*\// => ""  
 	};
+
 /**
-This not work...
+	Alternative non-regex based approach, we couldn't get to work.
+	This would allow us to track the amount of multi-line comments though,
+	with tracking the amount of loop iterations.
+
     while (contains(source, "/\\*") && contains(source, "*\\")) {
         int startIndex = indexOf(chars("/\\*"), source);
         int endIndex = indexOf(chars("*\\"), source) + 2;
@@ -41,31 +52,38 @@ This not work...
 }
 
 /**
- * Replace strings with "S"
- *
- * Example of a problematic code without this replace string options:
- * System.out.println("Hello wolrd \/*"
- *		+ "asdasd"
- *		+ "asd*\/asdsdasd"
-);	"Hello world \/*" --> "Hello world COMMENT_START_TOKEN"
+	Replace strings with "S", to remove problematic scenarios with multi-line string concatenation
+	and (multi-line) comment inclusion.
+
+	Example:
+
+	System.out.println("Hello you \/*"
+		+ "blablabla"
+		+ "bla*\/ye"
+	);	
+
+	This gets replaced with:
+	"Hello world \/*" --> "Hello world COMMENT_START_TOKEN"
  */
-str replaceStringEdgeCase(str source){	
+str replaceMultiLineStringComments(str source){	
 	return visit(source){
-   		case /"<match:.*>"/ => "<replaceStringContent(match)>"
+   		case /"<match:.*>"/ => "<replaceStringTokenContent(match)>"
 	};
 }
 
 /**
-* replaceStringContent use this construct instead of replacing a string directly with 
-* regex since its much faster.
-* 
-* Slow regex alternative would be: 
-* return visit(source){
+	We replace the corresponding edge-case with a specialized comment token.
+	With this token, we can then normally go through the rest of our "empty line" pruning.
+ 
+	Slower regex-based alternative could be: 
+	
+ 	return visit(source){
    		case /"<stringstart:.*><commentstart:\/\*><stringend:.*>"/ => "\"<stringstart><COMMENT_START_TOKEN><stringend>\""
    		case /"<stringstart:.*><commentend:\*\/><stringend:.*>"/ => "\"<stringstart><COMMENT_END_TOKEN><stringend>\""
 	};
-**/
-str replaceStringContent(str stringContent){
+
+*/
+str replaceStringTokenContent(str stringContent){
 	if(contains(stringContent, "/*") || contains(stringContent, "*/")){
 		return visit(stringContent){
 			case /<stringstart:.*><commentstart:\/\*><stringend:.*>/ => "\"<stringstart><COMMENT_START_TOKEN><stringend>\""
@@ -76,6 +94,7 @@ str replaceStringContent(str stringContent){
 	return stringContent;
 }
 
+// Line filtering.
 bool isLineCodeLine(str line, bool areCurlyBracketsAreCode){
 	if(isLineEmpty(line)){
 		return false;
@@ -92,6 +111,8 @@ bool isLineCodeLine(str line, bool areCurlyBracketsAreCode){
 	return true;
 }
 
+// Functions to calculate the amount of code lines.
+// With the corresponding distinctions, whether singular curly brackets can be considered as LOC.
 list[str] getLOC(str source) = getLOC(source, CURLY_BRACKETS_ARE_CODE);
 
 list[str] getAllLOC(str source) {
@@ -102,8 +123,8 @@ list[str] getAllLOC(str source) {
 }
 list[str] getLOC(str source, bool areCurlyBracketsAreCode){
 	source = "\n" + source + "\n";
-	source = replaceStringEdgeCase(source);
-	source = replaceMultiLineComments(source);
+	source = replaceMultiLineStringComments(source);
+	source = pruneMultiLineComments(source);
 	
   	list[str] codeLines = split("\n", source);
   	return [trim(l) | str l <- codeLines, isLineCodeLine(l, areCurlyBracketsAreCode)];
