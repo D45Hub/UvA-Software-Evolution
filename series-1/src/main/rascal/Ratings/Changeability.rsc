@@ -7,13 +7,6 @@ import Ranking::Ranking;
 import UnitSize::UnitSize;
 
 // Duplication, Unit Complexity 
-
-// public Ranking getChangabilityRating(DuplicationRanking duplicationRanking,
-//                                     ComplexityRanking complexityRanking) {
-
-//     return getChangabilityRating(duplicationRanking, complexityRanking);
-// }
-
 public Ranking getChangabilityRating(Ranking duplicationRanking, Ranking complexityRanking) {
     list[Ranking] metricRankings = [duplicationRanking, complexityRanking];
 
