@@ -26,16 +26,24 @@ public UnitSizeRankingValues getUnitSizeRanking(UnitSizeDistribution relativeDis
     num highPercentage = relativeDistribution.highRisk;
     num veryHighPercentage = relativeDistribution.veryHighRisk;
 
-    if (veryHighPercentage <= excellentUnitSizeRanking.veryHighRisk && highPercentage <= excellentUnitSizeRanking.highRisk && moderatePercentage <= excellentUnitSizeRanking.moderateRisk) {
+    if (veryHighPercentage <= excellentUnitSizeRanking.veryHighRisk
+        && highPercentage <= excellentUnitSizeRanking.highRisk
+        && moderatePercentage <= excellentUnitSizeRanking.moderateRisk) {
         return excellentUnitSizeRanking;
     }
-    if (veryHighPercentage <= goodUnitSizeRanking.veryHighRisk && highPercentage <= goodUnitSizeRanking.highRisk && moderatePercentage <= goodUnitSizeRanking.moderateRisk) {
+    if (veryHighPercentage <= goodUnitSizeRanking.veryHighRisk
+        && highPercentage <= goodUnitSizeRanking.highRisk
+        && moderatePercentage <= goodUnitSizeRanking.moderateRisk) {
         return goodUnitSizeRanking;
     }
-    if (veryHighPercentage <= neutralUnitSizeRanking.veryHighRisk && highPercentage <= neutralUnitSizeRanking.highRisk && moderatePercentage <= neutralUnitSizeRanking.moderateRisk) {
+    if (veryHighPercentage <= neutralUnitSizeRanking.veryHighRisk
+        && highPercentage <= neutralUnitSizeRanking.highRisk
+        && moderatePercentage <= neutralUnitSizeRanking.moderateRisk) {
         return neutralUnitSizeRanking;
     }
-    if (veryHighPercentage <= negativeUnitSizeRanking.veryHighRisk && highPercentage <= negativeUnitSizeRanking.highRisk && moderatePercentage <= negativeUnitSizeRanking.moderateRisk) {
+    if (veryHighPercentage <= negativeUnitSizeRanking.veryHighRisk
+        && highPercentage <= negativeUnitSizeRanking.highRisk
+        && moderatePercentage <= negativeUnitSizeRanking.moderateRisk) {
         return negativeUnitSizeRanking;
     }
     
@@ -43,7 +51,10 @@ public UnitSizeRankingValues getUnitSizeRanking(UnitSizeDistribution relativeDis
 }
 
 public UnitSizeRankingValues getUnitSizeRankings(map[str, UnitAmountPercentage] unitDistribution) {
-    UnitSizeDistribution relativeDistribution = <unitDistribution["moderate"].relativeAmount, unitDistribution["high"].relativeAmount, unitDistribution["veryHigh"].relativeAmount>;
+    UnitSizeDistribution relativeDistribution =
+    <unitDistribution["moderate"].relativeAmount,
+    unitDistribution["high"].relativeAmount,
+    unitDistribution["veryHigh"].relativeAmount>;
 
     return getUnitSizeRanking(relativeDistribution);
 }
