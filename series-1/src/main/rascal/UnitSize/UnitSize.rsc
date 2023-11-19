@@ -80,6 +80,10 @@ public void getUnitSizeDistribution(list[UnitLengthTuple] allSizes, int linesOfC
 
 public map[str, UnitAmountPercentage] calculateUnitSizeRankingValues(M3 projectModel, int linesOfCode) {
     list[UnitLengthTuple] unitSizes = getAllUnitSizesOfProject(projectModel);
+    return calculateUnitSizeRankingValues(unitSizes, linesOfCode);
+}
+
+public map[str, UnitAmountPercentage] calculateUnitSizeRankingValues(list[UnitLengthTuple] unitSizes, int linesOfCode) {
     UnitSizeDistribution unitDistributions = getAbsoluteUnitSizeDistribution(unitSizes);
     UnitSizeDistribution relativeDistributions = getRelativeUnitSizeDistribution(unitDistributions, linesOfCode);
 
@@ -87,7 +91,7 @@ public map[str, UnitAmountPercentage] calculateUnitSizeRankingValues(M3 projectM
 
     num lowRiskLines = linesOfCode - unitDistributions.moderateRisk - unitDistributions.highRisk - unitDistributions.veryHighRisk; 
     num lowRiskLinesPercentage = 100.0 - relativeDistributions.moderateRisk - relativeDistributions.highRisk - relativeDistributions.veryHighRisk; 
-    
+
     UnitAmountPercentage lowAmountPercentage = <lowRiskLines, lowRiskLinesPercentage>;
     UnitAmountPercentage moderateAmountPercentage = <unitDistributions.moderateRisk, relativeDistributions.moderateRisk>;
     UnitAmountPercentage highAmountPercentage =  <unitDistributions.highRisk, relativeDistributions.highRisk>;
