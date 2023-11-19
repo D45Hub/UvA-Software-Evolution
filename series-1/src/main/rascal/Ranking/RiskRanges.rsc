@@ -11,8 +11,3 @@ alias RiskOverviewFloat = tuple[num low, num moderate, num high, num veryHigh];
 alias RiskThreshold = tuple[Ranking rankLevel, int low, int moderate, int high, int veryHigh];
 alias RiskThresholdFloat = tuple[Ranking rankLevel, num low, num moderate, num high, num veryHigh];
 
-/** This function is used to get the risk name of a particular function 
-important for Unit Sizing, Unit Interfacing and Cyclomatic complexity. 
-
-*/
-

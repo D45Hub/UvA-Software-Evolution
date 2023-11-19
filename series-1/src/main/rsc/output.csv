@@ -5,6 +5,7 @@ Unit Size Rating,-,"30%, 30%, 15%"
 Overall Maintainability,-,
 Amount of Assertions,,14696
 Benchmark start time,,1700422154235
+Benchmark end time,,1700422638504
 High complexity lines in units,,2481 lines (10 %)
 Changeability Ranking,-,
 Benchmark start time,,1700422453439
@@ -30,6 +31,7 @@ Low risk lines in units,,12283 (51.0%)
 Unit Interfacing Percentages,,"89%, 10%, 1%, 0%"
 Very high unit interface risk lines,,35
 Overall Lines of Code,,38538
+Benchmark start time,,1700422596562
 High risk lines in units,,3910 (16%)
 Low unit interface risk lines,,18926
 Benchmark end time,,1700422199106
