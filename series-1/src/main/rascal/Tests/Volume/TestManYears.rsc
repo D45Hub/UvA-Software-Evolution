@@ -1,7 +1,6 @@
 module Tests::Volume::TestManYears
 
 import Volume::ManYears;
-import Ranking::Ranking;
 
 bool assertMY(int lines, MYRanking expectedRanking){
 	return getManYearsRanking(lines).rankingType == expectedRanking.rankingType;
