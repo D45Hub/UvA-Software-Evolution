@@ -28,10 +28,15 @@ import Ranking::Ranking;
 alias ProjectLocation = tuple[loc projectFolderLocation, loc unitCoverageReportLocation];
 
 ProjectLocation smallSQLLocation = <|project://series-1/smallsql|, |project://nothing|>;
+ProjectLocation hSQLDBLocation = <|project://series-1/hsqldb|, |project://nothing|>;
 ProjectLocation smallEncryptorLocation = <|project://series-1/simpleencryptor|, |project://series-1/src/main/rsc/jacoco_simpleencryptor.csv|>;
 
 void analyseSmallSQL() {
 	analyseProject(smallSQLLocation, false);
+}
+
+void analyseHSQLDB() {
+	analyseProject(hSQLDBLocation, false);
 }
 
 void analyseEncryptorProject() {
