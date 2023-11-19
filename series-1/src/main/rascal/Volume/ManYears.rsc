@@ -27,11 +27,11 @@ num convertLOCtoKLOC (num linesOfCode) = toReal(linesOfCode / 1000.0);
 
 /* Mapping of the Man Years */
 
-MYRanking excellentMYRanking = <excellent, 0, 8, 0, 66>;
-MYRanking goodMYRanking = <good, 8, 30, 66, 246>;
-MYRanking neutralMYRanking = <neutral, 30, 80, 246, 665>;
-MYRanking negativeMYRanking = <negative, 80, 160, 655, 1310>;
-MYRanking veryNegativeMYRanking = <veryNegative, 160, -1 , 1310, -1>;
+public MYRanking excellentMYRanking = <excellent, 0, 8, 0, 66>;
+public MYRanking goodMYRanking = <good, 8, 30, 66, 246>;
+public MYRanking neutralMYRanking = <neutral, 30, 80, 246, 665>;
+public MYRanking negativeMYRanking = <negative, 80, 160, 655, 1310>;
+public MYRanking veryNegativeMYRanking = <veryNegative, 160, -1 , 1310, -1>;
 
 list[MYRanking] allMYRankings = [excellentMYRanking, goodMYRanking,
                                 neutralMYRanking, negativeMYRanking,
