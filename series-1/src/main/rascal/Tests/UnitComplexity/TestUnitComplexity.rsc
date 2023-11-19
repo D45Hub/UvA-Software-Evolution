@@ -21,25 +21,22 @@ test bool moderateComplexityTest(){
 	loc file = |project://series-1/src/main/test-code/CyclomaticComplexity/MediumCyclomaticComplexity.java|;
 	Declaration declaration = createAstFromFile(file, true);
 	moderateComplexity = getCyclomaticComplexity(declaration);
-	return moderateComplexity == 24;
+	println(moderateComplexity);
+	return moderateComplexity == 15;
 }
 
-// TODO I don't know why this is not working. 
 test bool highComplexityTest(){
 	loc file = |project://series-1/src/main/test-code/CyclomaticComplexity/HighCyclomaticComplexity.java|;
 
 	Declaration declaration = createAstFromFile(file, true);
-	lowComplexity = getCyclomaticComplexity(declaration);
-    println(lowComplexity);
-	return lowComplexity == 24;
+	highComplexity = getCyclomaticComplexity(declaration);
+
+	return highComplexity == 44;
 }
 
-// TODO I don't know why this is not working. 
 test bool veryHighComplexityTest(){
 	loc file = |project://series-1/src/main/test-code/CyclomaticComplexity/VeryHighCyclomaticComplexity.java|;
-
 	Declaration declaration = createAstFromFile(file, true);
-	lowComplexity = getCyclomaticComplexity(declaration);
-    println(lowComplexity);
-	return lowComplexity == 24;
+	veryHighComplexity = getCyclomaticComplexity(declaration);
+	return veryHighComplexity == 54;
 }

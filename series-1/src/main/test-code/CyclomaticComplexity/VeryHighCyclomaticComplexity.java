@@ -1,93 +1,13 @@
 public class VeryHighCyclomaticComplexity {
 	
-	void veryHighCyclomaticComplexity(String[] args)
+	void highCyclomaticComplexity(String[] args)
     {        
-
-        if  (args[0] = "test") {
-            return;
-        } else if (args[0] = "test1") {
-
-        }
-        else if (args[0] = "test2") {
-            
-        }
-        else if (args[0] = "test3") {
-            
-        }
-        else if (args[0] = "test4") {
-            
-        }
-        else if (args[0] = "test5") {
-            
-        }else if (args[0] = "test6") {
-            
-        }else if (args[0] = "test7") {
-            
-        }else if (args[0] = "test8") {
-            
-        }else if (args[0] = "test9") {
-            
-        }else if (args[0] = "test10") {
-            
-        }else if (args[0] = "test11") {
-            
-        }else if (args[0] = "test12") {
-            
-        }else if (args[0] = "test13") {
-            
-        }else if (args[0] = "test14") {
-            
-        }else if (args[0] = "test15") {
-            
-        }else if (args[0] = "test16") {
-            
-        }else if (args[0] = "test17") {
-            
-        }else if (args[0] = "test18") {
-            
-        }else if (args[0] = "test19") {
-            
-        }else if (args[0] = "test20") {
-            
-        }else if (args[0] = "test21") {
-            
-        }else if (args[0] = "test22") {
-            
-        }else if (args[0] = "test23") {
-            
-        } 
-        else if (args[0] = "test24") {
-            
-        } 
-                else if (args[0] = "test25") {
-            
-        } 
-        else if (args[0] = "test26") {
-            
-        } 
-        else if (args[0] = "test27") {
-            
-        } 
-        else if (args[0] = "test28") {
-            
-        } 
-        else if (args[0] = "test29") {
-            
-        } 
-        else if (args[0] = "test30") {
-            
-        } 
-        else if (args[0] = "test31") {
-            
-        } 
-
-
         switch (args[0])
         {
              case "0":
-            	args[0] += "0";
+            	 args[0] += "0";
                 break;
-             ase "1":
+             case "1":
             	args[0] += "1";
                 break;
              case "2":
@@ -108,56 +28,141 @@ public class VeryHighCyclomaticComplexity {
              case "7":
             	args[0] += "1";
                 break;
-            case "8":
-            	args[0] += "1";
-                break;             
-            case "9":
-            	args[0] += "1";
-                break;             
-            case "10":
-            	args[0] += "1";
-                break;             
-            case "11":
-            	args[0] += "1";
-                break;             
-            case "12":
-            	args[0] += "1";
-                break;            
-            case "13":
+                      case "0":
+            	 args[0] += "0";
+                break;
+             case "8":
             	args[0] += "1";
                 break;
-            case "14":
+             case "9":
+            	args[0] += "1";
+                break;
+             case "10":
+            	args[0] += "1";
+                break;
+             case "11":
+            	args[0] += "1";
+                break;
+             case "12":
+            	args[0] += "1";
+                break;
+             case "13":
+            	args[0] += "1";
+                break;
+             case "14":
             	args[0] += "1";
                 break;
             case "15":
             	args[0] += "1";
-                break;            
-            case "16":
+                break;
+             case "16":
             	args[0] += "1";
                 break;
-            case "11":
-            	args[0] += "1";
-                break;             
-            case "17":
-            	args[0] += "1";
-                break;             
-            case "18":
-            	args[0] += "1";
-                break;            
-            case "19":
+             case "17":
             	args[0] += "1";
                 break;
-            case "20":
+             case "18":
+            	args[0] += "1";
+                break;
+             case "19":
+            	args[0] += "1";
+                break;
+             case "20":
             	args[0] += "1";
                 break;
             case "21":
             	args[0] += "1";
-                break;            
-            case "22":
+                break;
+             case "22":
             	args[0] += "1";
                 break;
-            
+             case "23":
+            	args[0] += "1";
+                break;
+             case "24":
+            	args[0] += "1";
+                break;
+             case "25":
+            	args[0] += "1";
+                break;
+             case "26":
+            	args[0] += "1";
+                break;
+             case "27":
+            	args[0] += "1";
+                break;
+            case "28":
+            	 args[0] += "0";
+                break;
+             case "29":
+            	args[0] += "1";
+                break;
+             case "30":
+            	args[0] += "1";
+                break;
+             case "31":
+            	args[0] += "1";
+                break;
+             case "32":
+            	args[0] += "1";
+                break;
+             case "33":
+            	args[0] += "1";
+                break;
+             case "34":
+            	args[0] += "1";
+                break;
+             case "35":
+            	args[0] += "1";
+                break;
+            case "36":
+            	args[0] += "1";
+                break;
+             case "37":
+            	args[0] += "1";
+                break;
+             case "38":
+            	args[0] += "1";
+                break;
+             case "39":
+            	args[0] += "1";
+                break;
+             case "40":
+            	args[0] += "1";
+                break;
+             case "41":
+            	args[0] += "1";
+                break;
+            case "42":
+            	args[0] += "1";
+                break;
+            case "43":
+            	args[0] += "1";
+                break;
+            case "44":
+            	args[0] += "1";
+                break;
+            case "45":
+            	args[0] += "1";
+                break;
+             case "46":
+            	args[0] += "1";
+                break;
+            case "47":
+            	args[0] += "1";
+                break;
+            case "48":
+            	args[0] += "1";
+                break;
+            case "49":
+            	args[0] += "1";
+                break;
+            case "50":
+            	args[0] += "1";
+                break;
+            case "51":
+            	args[0] += "1";
+                break;
         }
     }
-	
 }
