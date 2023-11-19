@@ -44,16 +44,24 @@ ComplexityRanking getCyclomaticRanking(RiskOverview riskRating, int linesOfCode)
         int highPercentage = round(toReal(riskRating.high) / toReal(linesOfCode) * 100);
         int veryHighPercentage = round(toReal(riskRating.veryHigh) / toReal(linesOfCode) * 100);
 
-        if (veryHighPercentage <= 5 && highPercentage <= 15 && moderatePercentage <= 50) {
+        if (veryHighPercentage <= negativeComplexityRanking.veryHighRisk
+            && highPercentage <= negativeComplexityRanking.highRisk
+            && moderatePercentage <= negativeComplexityRanking.moderateRisk) {
             return negativeComplexityRanking;
         }
-        if (veryHighPercentage <= 0 && highPercentage <= 10 && moderatePercentage <= 40) {
+        if (veryHighPercentage <= neutralComplexityRanking.veryHighRisk
+            && highPercentage <= neutralComplexityRanking.highRisk
+            && moderatePercentage <= neutralComplexityRanking.moderateRisk) {
             return neutralComplexityRanking;
         }
-        if (veryHighPercentage <= 0 && highPercentage <= 5 && moderatePercentage <= 30) {
+        if (veryHighPercentage <= goodComplexityRanking.veryHighRisk
+            && highPercentage <= goodComplexityRanking.highRisk
+            && moderatePercentage <= goodComplexityRanking.moderateRisk) {
             return goodComplexityRanking;
         }
-        if (veryHighPercentage <= 0 && highPercentage <= 0 && moderatePercentage <= 25) {
+        if (veryHighPercentage <= excellentComplexityRanking.veryHighRisk
+            && highPercentage <= excellentComplexityRanking.highRisk
+            && moderatePercentage <= excellentComplexityRanking.moderateRisk) {
             return excellentComplexityRanking;
         }
         return veryNegativeComplexityRanking;
