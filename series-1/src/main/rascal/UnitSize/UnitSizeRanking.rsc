@@ -8,14 +8,13 @@ alias UnitSizeRankingValues = tuple[Ranking rankingType,
                                 num highRisk,
                                 num veryHighRisk];
 
-// TODO Fill out with better metrics... Good = SIG Paper, 4 Star Rating.
 UnitSizeRankingValues excellentUnitSizeRanking = <excellent, 50, 15, 3>;
 UnitSizeRankingValues goodUnitSizeRanking = <good, 44.5, 20.3, 6.7>;
 UnitSizeRankingValues neutralUnitSizeRanking = <neutral, 35, 25, 10>;
 UnitSizeRankingValues negativeUnitSizeRanking = <negative, 30, 30, 15>;
 UnitSizeRankingValues veryNegativeUnitSizeRanking = <veryNegative, -1, -1, -1>;
 
-list[UnitSizeRankingValues] allUnitSizeRankings = [excellentUnitSizeRanking, 
+public list[UnitSizeRankingValues] allUnitSizeRankings = [excellentUnitSizeRanking, 
                                                 goodUnitSizeRanking, 
                                                 neutralUnitSizeRanking, 
                                                 negativeUnitSizeRanking, 
