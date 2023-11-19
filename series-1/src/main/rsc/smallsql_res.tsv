@@ -1,0 +1,32 @@
+metric	rating	result
+Duplication Ranking	-	
+Unit Size Rating	-	30%, 30%, 15%
+Unit Size Rating	-	50%, 25%, 5%
+Overall Maintainability	-	
+Amount of Assertions		14696
+High complexity lines in units		2481 lines (10 %)
+Overall Lines of Code		38537
+Changeability Ranking	-	
+Duplication Lines		2563
+Moderate unit interface risk lines		2069
+Low complexity lines in units		15909 lines (66 %)
+Duplication Percentage		10.65696466000
+Unit Interfacing Ranking	++	
+Man Years	++	
+Amount of methods in the project		2415
+High unit interface risk lines		162
+Very complexity risk lines in units		1255 lines (5 %)
+Blank Lines		5508
+Moderate risk lines in units		4604 (19%)
+Moderate complexity lines in units		1747 lines (7 %)
+Very high risk lines in units		3253 (14%)
+Testability Ranking	-	
+Comment Lines		8979
+Analyzability Ranking	o	
+Low risk lines in units		12283 (51.0%)
+Unit Interfacing Percentages		89%, 10%, 1%, 0%
+Very high unit interface risk lines		35
+High risk lines in units		3910 (16%)
+Low unit interface risk lines		18926
+Actual Lines of Code		24050
+Number of Methods		2415

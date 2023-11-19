@@ -1,0 +1,62 @@
+metric,rating,result
+Duplication Ranking,-,
+Unit Size Rating,-,"50%, 25%, 5%"
+Duplication Percentage,,17.06747079000
+High complexity lines in units,,2481 lines (10 %)
+Actual Lines of Code,,172445
+Man Years,+,
+Low complexity lines in units,,15909 lines (66 %)
+Overall Maintainability,--,
+Overall Lines of Code,,304674
+Testability Ranking,--,
+Analyzability Ranking,-,
+Benchmark end time,,1700409821403
+Duplication Percentage,,10.65696466000
+Unit Interfacing Ranking,++,
+Man Years,++,
+Very high unit interface risk lines,,1382
+Benchmark start time,,1700409751873
+Very high risk lines in units,,51165 (30%)
+Unit Size Rating,-,"30%, 30%, 15%"
+High unit interface risk lines,,4565
+Amount of methods in the project,,2415
+High unit interface risk lines,,162
+Number of Methods,,10933
+Unit Interfacing Percentages,,"83%, 14%, 3%, 1%"
+Very complexity risk lines in units,,1255 lines (5 %)
+Blank Lines,,5508
+Moderate risk lines in units,,4604 (19%)
+Moderate complexity lines in units,,1747 lines (7 %)
+Very high risk lines in units,,3253 (14%)
+Testability Ranking,-,
+Comment Lines,,8979
+High risk lines in units,,30944 (18%)
+Comment Lines,,74853
+Unit Size Rating,--,"-1%, -1%, -1%"
+Moderate risk lines in units,,29284 (17%)
+Low complexity lines in units,,100915 lines (59 %)
+Overall Maintainability,-,
+Very complexity risk lines in units,,14545 lines (8 %)
+Amount of Assertions,,14696
+Analyzability Ranking,o,
+Amount of Assertions,,0
+Low risk lines in units,,12283 (51.0%)
+Moderate unit interface risk lines,,21152
+Duplication Lines,,29432
+Low risk lines in units,,61052 (35.0%)
+Overall Lines of Code,,38537
+Low unit interface risk lines,,129019
+Unit Interfacing Percentages,,"89%, 10%, 1%, 0%"
+Very high unit interface risk lines,,35
+High risk lines in units,,3910 (16%)
+Moderate complexity lines in units,,21738 lines (13 %)
+Low unit interface risk lines,,18926
+High complexity lines in units,,17724 lines (10 %)
+Changeability Ranking,-,
+Unit Interfacing Ranking,o,
+Duplication Lines,,2563
+Blank Lines,,57376
+Moderate unit interface risk lines,,2069
+Amount of methods in the project,,10933
+Actual Lines of Code,,24050
+Number of Methods,,2415

@@ -11,12 +11,13 @@ void printDebug(value arg){
 	iprintln(arg);
 }
 
-void startBenchmark(str benchmarkKey){
+str startBenchmark(str benchmarkKey){
 	measures[benchmarkKey] = realTime(); 
 	printDebug("START: <benchmarkKey>");
+	return toString(measures[benchmarkKey]);
 }
 
-void stopBenchmark(str benchmarkKey){
+str stopBenchmark(str benchmarkKey){
 	if(benchmarkKey in measures == false){
 		printDebug("Measure key not in storage.");
 		return;
@@ -26,4 +27,5 @@ void stopBenchmark(str benchmarkKey){
 	num seconds = toReal( realTime() - measure) / toReal(1000);
 	
 	printDebug("FINISHED: <benchmarkKey> after <seconds>s");
+	return toString(realTime());
 }

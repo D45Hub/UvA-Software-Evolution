@@ -47,7 +47,7 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	println("+----------------------------------+");
 	println("|         Start measuring time     |");
 	println("+----------------------------------+");
-	startBenchmark("Overall Analyse Time");
+	str benchmarkStartTime = startBenchmark("Overall Analyse Time");
 	println("+----------------------------------+");
 	println("|         Setting up Project       |");
 	println("+----------------------------------+");
@@ -145,8 +145,8 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 
 	addToReport("Low risk lines in units", "", lowRiskUnitLinesString);
 	addToReport("Moderate risk lines in units", "", moderateRiskUnitLinesString);
-	addToReport("High risk lines", "", highRiskUnitLinesString);
-	addToReport("Very high risk lines", "", veryHighUnitLinesString);
+	addToReport("High risk lines in units", "", highRiskUnitLinesString);
+	addToReport("Very high risk lines in units", "", veryHighUnitLinesString);
 	addToReport("Unit Size Rating", unitSizeRanking.rankingType, toString(unitSizeRanking.moderateRisk) + "%, " + toString(unitSizeRanking.highRisk) + "%, " + toString(unitSizeRanking.veryHighRisk) + "%");
 
 	println("+----------------------------------+");
@@ -179,10 +179,10 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	println("+----------------------------------+");
 	println(cyclomaticRanking.rankingType.name);
 
-	addToReport("Low risk lines in units", "", lowRiskComplexityLinesString);
-	addToReport("Moderate risk lines in units", "", moderateComplexityUnitLinesString);
-	addToReport("High risk lines", "", highRiskComplexityLinesString);
-	addToReport("Very high risk lines", "", veryHighComplexityLinesString);
+	addToReport("Low complexity lines in units", "", lowRiskComplexityLinesString);
+	addToReport("Moderate complexity lines in units", "", moderateComplexityUnitLinesString);
+	addToReport("High complexity lines in units", "", highRiskComplexityLinesString);
+	addToReport("Very complexity risk lines in units", "", veryHighComplexityLinesString);
 	addToReport("Unit Size Rating", cyclomaticRanking.rankingType, toString(cyclomaticRanking.moderateRisk) + "%, " + toString(cyclomaticRanking.highRisk) + "%, " + toString(cyclomaticRanking.veryHighRisk) + "%");
 
 
@@ -214,7 +214,12 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	println(absoluteLinesOfCodePerCategorie);
 	println(relativeUnitAmounts);
 
-	addToReport("Unit Interfacing Percentages", "", toString(relativeUnitAmounts["lowRisk"]) + "%, " + toString(relativeUnitAmounts["moderateRisk"]) + "%, " + toString(relativeUnitAmounts["highRisk"]) + "%, " + toString(relativeUnitAmounts["veryHighRisk"]));
+	addToReport("Low unit interface risk lines", "", toString(absoluteLinesOfCodePerCategorie["lowRisk"]));
+	addToReport("Moderate unit interface risk lines", "", toString(absoluteLinesOfCodePerCategorie["moderateRisk"]));
+	addToReport("High unit interface risk lines", "", toString(absoluteLinesOfCodePerCategorie["highRisk"]));
+	addToReport("Very high unit interface risk lines", "", toString(absoluteLinesOfCodePerCategorie["veryHighRisk"]));
+
+	addToReport("Unit Interfacing Percentages", "", toString(relativeUnitAmounts["lowRisk"]) + "%, " + toString(relativeUnitAmounts["moderateRisk"]) + "%, " + toString(relativeUnitAmounts["highRisk"]) + "%, " + toString(relativeUnitAmounts["veryHighRisk"]) + "%");
 	addToReport("Unit Interfacing Ranking", unitInterfaceRanking.rankingType);
 
 	println("+----------------------------------+");
@@ -300,7 +305,10 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	println("+----------------------------------+");
 	println("|         End measuring time       |");
 	println("+----------------------------------+");
-	stopBenchmark("Overall Analyse Time");
+	str benchmarkEndTime = stopBenchmark("Overall Analyse Time");
+
+	addToReport("Benchmark start time", "", benchmarkStartTime);
+	addToReport("Benchmark end time", "", benchmarkEndTime);
 
 	writeCSVReport();
 }
