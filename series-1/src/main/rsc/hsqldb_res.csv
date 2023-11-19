@@ -1,0 +1,27 @@
+ metric,rating,result
+High risk lines,,17724 lines (10 %)
+Duplication Ranking,-,
+Moderate risk lines in units,,29284 (17%)
+Duplication Percentage,,17.06747079000
+Very high risk lines,,51165 (30%)
+Actual Lines of Code,,172445
+Man Years,+,
+Changeability Ranking,-,
+Unit Interfacing Ranking,o,
+Amount of methods in the project,,10933
+Overall Maintainability,--,
+Overall Lines of Code,,304674
+Testability Ranking,--,
+Analyzability Ranking,-,
+Very high risk lines,,14545 lines (8 %)
+Moderate risk lines in units,,21738 lines (13 %)
+Number of Methods,,10933
+Comment Lines,,74853
+Unit Size Rating,--,"-1%, -1%, -1%"
+High risk lines,,30944 (18%)
+Amount of Assertions,,0
+Duplication Lines,,29432
+Unit Interfacing Percentages,,"83%, 14%, 3%, 1"
+Low risk lines in units,,61052 (35.0%)
+Blank Lines,,57376
+Low risk lines in units,,100915 lines (59 %)
