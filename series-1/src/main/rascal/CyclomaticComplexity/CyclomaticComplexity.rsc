@@ -9,6 +9,7 @@ import util::Math;
 import Ranking::RiskRanges;
 import Volume::LOCVolume;
 import UnitSize::UnitSize;
+
 ComplexityThreshholds mid = <11,21>;
 ComplexityThreshholds high = <21,50>;
 ComplexityThreshholds veryHigh = <50,-1>;
@@ -49,16 +50,15 @@ public RiskOverview getCyclomaticRiskOverview(list[Declaration] methods) {
 
 		int linesOfMethod = size(getLOC(readFile(m.src)));
 
-		if(result >= 1 && result <= 10) {
+		if(result > 0 && result < mid.min) {
 
             complexity.low += linesOfMethod;
-        } else if(result >= 11 && result <= 20) {
+        } else if(result >= mid.min && result < high.min) {
 
              complexity.moderate += linesOfMethod;
-        } else if(result >= 21 && result <= 50) {
-
+        } else if(result >= high.min && result < veryHigh.min) {
              complexity.high += linesOfMethod;
-        } else if(result > 51) {
+        } else if(result >= veryHigh.min) {
 
              complexity.veryHigh += linesOfMethod;
         }
