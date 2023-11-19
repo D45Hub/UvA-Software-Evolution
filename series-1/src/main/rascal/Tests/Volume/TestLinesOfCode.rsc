@@ -8,7 +8,6 @@ import Helper::ProjectHelper;
 import IO;
 import List;
 import String;
-import List;
 
 test bool commentsOnlyLocTest(){
 	loc file = |project://series-1/src/main/test-code/Volume/CommentsOnlyFile.java|;
