@@ -1,15 +1,13 @@
 module Duplication::Duplication
 
-import lang::java::m3::Core;
-import lang::java::m3::AST;
-
-
-import IO;
-
-import String;
-import util::Math;
 import Ranking::Ranking;
 import Volume::LOCVolume;
+
+import lang::java::m3::Core;
+import lang::java::m3::AST;
+import IO;
+import String;
+import util::Math;
 import List;
 
 alias Size = int;
@@ -17,7 +15,8 @@ alias DuplicationRanking =  tuple[Ranking rankingType,
                                 Size minDuplicationOfUnit,
                                 Size maxDuplicationOfUnit];
 
-alias DuplicationValue = tuple[DuplicationRanking duplicationRanking, real duplicationPercentage];
+alias DuplicationValue = tuple[DuplicationRanking duplicationRanking,
+                                real duplicationPercentage];
 
 DuplicationRanking excellentDuplicationRanking = <excellent, 0, 3>;
 DuplicationRanking goodDuplicationRanking = <good, 3, 5>;
@@ -31,61 +30,6 @@ list[DuplicationRanking] allDuplicationRankings = [excellentDuplicationRanking,
                                             negativeDuplicationRanking,
                                             veryNegativeDuplicationRanking];
 
-
-/**
-
-    Write down the whole approach with hash comparison algorithm...
-
-*/
-
-/**
-
-    Elaborate more into different duplication types.
-    And language specific differences in sensibility of this metric and its evalution. I.e. Haskell.
-
-*/
-
-/**
-list[node] getDuplicateMatches(AST ast1, AST ast2) {
-
-    list[node] duplicateNodes = [];
-
-    top-down-break visit(ast2) {
-    case leaf(int n) => {
-        if (n in ast1) {
-            duplicateNodes += [n];
-        }
-    }
-}
-
-    top-down-break visit(ast2) {
-        case leaf(int n) := ast1 : duplicateNodes += [n];
-    }
-
-    return duplicateNodes;
-}
-
-
-list[node] filterNodesByDuplicationSize(list[node] nodeList) {
-    return [n | n <- nodeList, hasNExperssionSubnodes(n, 6)];
-}
-
-
-list[node] hasNExperssionSubnodes(node mainNode, int amount) {
-    list[node] nodeChildren = getChildren(mainNode);
-    
-    int nodeExpressionAmount = 0;
-
-    for (node child <- nodeChildren) {
-        if(\expression := child) {
-            nodeExpressionAmount += 1;
-        }
-    }
-
-    return (nodeExpressionAmount >= amount);
-} 
-*/
-
 str genStringHashCode(str input) {
     int hashCode = 7;
     list[int] inputCharacters = chars(input);
@@ -97,9 +41,12 @@ str genStringHashCode(str input) {
     return toString(hashCode);
 }
 
+/* With this it could happen that say a 3 line code block from the end of one 
+unit and a 3 line block from the beginning of another unit could form a false 
+duplication block with a "real" block somewhere else.
+This case is so improbable though, that we decided to omit it to preserve 
+relative simplicity. */
 
-// With this it could happen that say a 3 line code block from the end of one unit and a 3 line block from the beginning of another unit could form a false duplication block with a "real" block somewhere else.
-// This case is so improbable though, that we decided to omit it to preserve relative simplicity. 
 list[str] getListOfHashes(M3 projectModel) {
 
     list[str] hashCodeLines = [];
@@ -164,11 +111,12 @@ public DuplicationValue getDuplicationRankingValue(real percentageOfDuplication)
 
 int getDuplicatedLines(M3 projectModel) {
     list[str] listOfHashes = getListOfHashes(projectModel);
+
     map[str, int] duplicationMap = getDuplicatesOfProgram(listOfHashes);
     int amountOfDuplicatedLines = 0;
 
     for(duplEntry <- duplicationMap) {
-        amountOfDuplicatedLines += duplicationMap[duplEntry];
+        amountOfDuplicatedLines += duplicationMap[duplEntry] * 6;
     }
 
     return amountOfDuplicatedLines;
