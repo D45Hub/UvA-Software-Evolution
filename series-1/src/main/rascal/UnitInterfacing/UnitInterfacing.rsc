@@ -99,9 +99,9 @@ list[UnitInterfaceRiskProfile] getAbsolutRiskValues(list[UnitInterfacingComplexi
 
 			With this we arrive at the following risk ratings for Java unit interfacing.
 
-			Low risk: 0 and 1 method parameters.
-			Moderate risk: 2 and 3 method parameters.
-			High risk: 4 to 6 method parameters.
+			Low risk: 0 - 2 method parameters.
+			Moderate risk: 3 - 4 method parameters.
+			High risk: 5 - 6 method parameters.
 			Very high risk: 7 or more method parameters. 
 		*/
 		/* From SIG Paper .*/ 
@@ -128,7 +128,7 @@ map[str, int] calculateAbsoluteRiskAmount(list[UnitInterfaceRiskProfile] riskPro
 	for(profile <- riskProfiles) {
 		loc rawMethodLoc = profile.method.src;
         str rawMethod = readFile(rawMethodLoc);
-		int methodLOC =size(getLOC(rawMethod));
+		int methodLOC = size(getLOC(rawMethod));
 
 		riskOverview[profile.risk] += methodLOC;
 	}
@@ -146,7 +146,7 @@ UnitInterfaceRiskOverview calculateRelativeRiskAmount(map[str, int] absoluteRisk
 						+ absoluteRiskAmount["veryHighRisk"]));
 	
 	for(riskKey <- absoluteRiskAmount) {
-		real riskPercentage = toReal((absoluteRiskAmount[riskKey] / overallLines) * 100.0);
+		real riskPercentage = toReal(toReal((absoluteRiskAmount[riskKey]) / toReal(overallLines)) * 100.0);
 		int riskPercentageValue = round(riskPercentage);
 
 		relativeRiskOverview[riskKey] += riskPercentageValue;

@@ -27,7 +27,7 @@ import Ranking::Ranking;
 
 alias ProjectLocation = tuple[loc projectFolderLocation, loc unitCoverageReportLocation];
 
-ProjectLocation smallSQLLocation = <|file:///Users/ekletsko/Downloads/smallsql0.21_src|, |project://nothing|>;
+ProjectLocation smallSQLLocation = <|project://series-1/smallsql|, |project://nothing|>;
 ProjectLocation smallEncryptorLocation = <|project://series-1/simpleencryptor|, |project://series-1/src/main/rsc/jacoco_simpleencryptor.csv|>;
 
 void analyseSmallSQL() {
@@ -169,9 +169,12 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	println("+----------------------------------+");
 	println("|      Very High Risk Units        |");
 	println("+----------------------------------+");
-	println("| " + veryHighComplexityLinesString + " |");
+	println(veryHighComplexityLinesString);
+	println("+----------------------------------+");
 	println("|      Overall Ranking             |");
+	println("+----------------------------------+");
 	println(cyclomaticRanking.rankingType.name);
+
 
 	addToReport("Low risk lines in units", " ", lowRiskComplexityLinesString);
 	addToReport("Moderate risk lines in units", " ", moderateComplexityUnitLinesString);
@@ -185,20 +188,20 @@ void analyseProject(ProjectLocation projectLocation, bool testUnitCoverage) {
 	println("+----------------------------------+");
 	println("|      Low  Risk Units             |");
 	println("+----------------------------------+");
-	println(toString(absoluteLinesOfCodePerCategorie["lowRisk"]) + toString(absoluteLinesOfCodePerCategorie["lowRisk"]));
+	println(toString(absoluteLinesOfCodePerCategorie["lowRisk"]) + " " + toString(relativeUnitAmounts["lowRisk"]) + "%");
 
 	println("+----------------------------------+");
 	println("|      Moderate  Risk Units        |");
 	println("+----------------------------------+");
-	println(toString(absoluteLinesOfCodePerCategorie["moderateRisk"]) + toString(absoluteLinesOfCodePerCategorie["moderateRisk"]));
+	println(toString(absoluteLinesOfCodePerCategorie["moderateRisk"]) + " " + toString(relativeUnitAmounts["moderateRisk"]) + "%");
 	println("+----------------------------------+");
 	println("|      High  Risk Units            |");
 	println("+----------------------------------+");
-	println(toString(absoluteLinesOfCodePerCategorie["highRisk"]) + toString(absoluteLinesOfCodePerCategorie["highRisk"]));
+	println(toString(absoluteLinesOfCodePerCategorie["highRisk"]) + " " + toString(relativeUnitAmounts["highRisk"]) + "%");
 	println("+----------------------------------+");
 	println("|      Very High  Risk Units       |");
 	println("+----------------------------------+");
-	println(toString(absoluteLinesOfCodePerCategorie["veryHighRisk"]) + toString(absoluteLinesOfCodePerCategorie["veryHighRisk"]));
+	println(toString(absoluteLinesOfCodePerCategorie["veryHighRisk"]) + " " + toString(relativeUnitAmounts["veryHighRisk"]) + "%");
 	println("+----------------------------------+");
 	println("|   Overall Interfacing Ranking    |");
 	println("+----------------------------------+");
