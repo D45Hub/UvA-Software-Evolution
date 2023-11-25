@@ -13,8 +13,7 @@ public int nodeSize(node subtree) {
 }
 
 public list[node] getSubNodesList(node rootNode) {
-	list[node] subNodeList = getChildren(rootNode);
-	subNodeList += [rootNode];
+	list[node] subNodeList = [n | n <- getChildren(rootNode), n is Node] + [rootNode];
 	return subNodeList;
 }
 
