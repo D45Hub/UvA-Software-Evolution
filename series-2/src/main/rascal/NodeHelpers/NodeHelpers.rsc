@@ -1,5 +1,6 @@
 module NodeHelpers::NodeHelpers
 
+import Node;
 import HashingHelper::HashingHelper;
 
 /* A module to have some helpers for node ttypes*/
@@ -8,20 +9,12 @@ alias NodeHash = tuple[str nodeHash, node n];
 
 /* Determining the size of a subtree, needed for the mass threshold */ 
 public int nodeSize(node subtree) {
-	int size = 0;
-	visit (subtree) {
-		case node _ : size += 1;
-	}
-	return size;
+	return arity(subtree) + 1;
 }
 
 public list[node] getSubNodesList(node rootNode) {
-	list[node] subNodeList = [];
-	visit (rootNode) {
-		case node n: {
-			subNodeList += n;
-		}
-	}
+	list[node] subNodeList = getChildren(rootNode);
+	subNodeList += [rootNode];
 	return subNodeList;
 }
 
