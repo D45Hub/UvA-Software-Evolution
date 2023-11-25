@@ -1,6 +1,7 @@
 module TreeComparison::SubtreeComparator
 
 import List;
+import NodeHelpers::NodeHelpers;
 //import Real;
 
 /* 
@@ -15,7 +16,7 @@ Step 4) If the similarity is above a predefined threshold, add a new clone pair
 the clone list. 
 */ 
 
-alias ClonePair = tuple[node nodeA, node nodeB];
+alias ClonePair = tuple[NodeHash nodeA, NodeHash nodeB];
 
 /* 
 Referring to Step 2 & 3 where we create hash buckets. 
@@ -57,16 +58,49 @@ public bool checkIfSubTreeIsInClone(ast, massOfNodes) {
 }
 
 
-public list[ClonePair] getSubtreeClonePairs(node mainTree) {
+public list[ClonePair] getSubtreeClonePairs(node mainTree, int massThreshold, num similarityThreshold) {
     list[ClonePair] clonePairs = [];
+    list[NodeHash] clones = [];
+
+    list[NodeHash] hashedSubtrees = getNSizedHashedSubtrees(mainTree, massThreshold);
+
+    for(NodeHash i <- hashedSubtrees) {
+        for(NodeHash j <- hashedSubtrees) {
+            num similarity = nodeSimilarity(i.n, j.n);
+
+            if(similarity > similarityThreshold) {
+                list[NodeHash] subtreesI = getNSizedHashedSubtrees(i, massThreshold);
+                list[NodeHash] subtreesJ = getNSizedHashedSubtrees(j, massThreshold);
+
+                // Unsure about if this is a correct approach for handling clone removal. (See paper...)
+                clonePairs = filterSubtreeHashInClonePairs(subtreesI, subtreesJ, clonePairs);
+
+                clonePairs += [<i, j>];
+            }
+        }
+    }
 
 // TODO HIER NOCH WEITER DAS MIT DEM GROßEN LOOP REIN...
+/*
     top-down-break visit(mainTree) {
         case leaf(int n)  => {
             if (n in ast1) {
                 duplicateNodes += [n];
             }
         }
+*/
 
     return clonePairs;
 }
+
+list[ClonePair] filterSubtreeHashInClonePairs(list[NodeHash] nodeHashesA, list[NodeHash] nodeHashesB, list[ClonePair] clonePairs) {
+    list[ClonePair] filteredClonePairs = [];
+
+    for(pair <- clonePairs) {
+        if((pair notin nodeHashesA) || (pair notin nodeHashesB)) {
+            filteredClonePairs += [pair];
+        }
+    }
+
+    return filteredClonePairs;
+} 
