@@ -27,8 +27,8 @@ public map[string, node] placingSubTreesInBuckets(ast, massOfNodes) {
 
 /* Referring to step 3*/ 
 public num nodeSimilarity(node comparedNodeA, node comparedNodeB) {
-    list[node] nodeListA = []; //Get all subnodes here...
-    list[node] nodeListB = []; // Here as well... :D
+    list[node] nodeListA = getSubNodesList(comparedNodeA);
+    list[node] nodeListB = getSubNodesList(comparedNodeB);
 
     list[node] sharedSubnodes = nodeListA & nodeListB;
     int sharedSubnodeAmount = size(sharedSubnodes);

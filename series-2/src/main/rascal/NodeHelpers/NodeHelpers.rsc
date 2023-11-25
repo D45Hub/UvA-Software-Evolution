@@ -10,3 +10,13 @@ public int nodeSize(node subtree) {
 	}
 	return size;
 }
+
+public list[node] getSubNodesList(node rootNode) {
+	list[node] subNodeList = [];
+	visit (rootNode) {
+		case node n: {
+			subNodeList += n;
+		}
+	}
+	return subNodeList;
+}
