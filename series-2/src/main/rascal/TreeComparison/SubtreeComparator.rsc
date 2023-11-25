@@ -2,7 +2,8 @@ module TreeComparison::SubtreeComparator
 
 import List;
 import NodeHelpers::NodeHelpers;
-//import Real;
+import util::Math;
+import IO;
 
 /* 
 Algorithm according to the Bexter Paper
@@ -22,7 +23,7 @@ alias ClonePair = tuple[NodeHash nodeA, NodeHash nodeB];
 Referring to Step 2 & 3 where we create hash buckets. 
 We also need to define the mass of nodes to create equally sized thingies.
 */ 
-public map[string, node] placingSubTreesInBuckets(ast, massOfNodes) {
+public map[str, node] placingSubTreesInBuckets(ast, massOfNodes) {
         // TODO Implement
 }
 
@@ -37,13 +38,13 @@ public num nodeSimilarity(node comparedNodeA, node comparedNodeB) {
     // TODO GUCK MAL OB NE LISTSUBTRACTION MACHBAR IST...
     // Dann könnt man sowas wie... nodeListA - sharedSubnodes, und auch für B machen...
     list[node] nonSharedSubnodesA = [n | n <- nodeListA, !(n in sharedSubnodes)];
-    list[node] nonSharedSubnodesB = [n | n <- nodeListB, !(n in nonSharedSubnodesB)];
+    list[node] nonSharedSubnodesB = [n | n <- nodeListB, !(n in sharedSubnodes)];
 
     int amountNonSharedSubnodesA = size(nonSharedSubnodesA);
     int amountNonSharedSubnodesB = size(nonSharedSubnodesB);
 
     num similarityScore = toReal((2*sharedSubnodeAmount) / (2*sharedSubnodeAmount + amountNonSharedSubnodesA + amountNonSharedSubnodesB));
-
+    println(similarityScore);
     return similarityScore;
 }
 
@@ -58,11 +59,11 @@ public bool checkIfSubTreeIsInClone(ast, massOfNodes) {
 }
 
 
-public list[ClonePair] getSubtreeClonePairs(node mainTree, int massThreshold, num similarityThreshold) {
+public list[ClonePair] getSubtreeClonePairs(ast, int massThreshold, num similarityThreshold) {
     list[ClonePair] clonePairs = [];
     list[NodeHash] clones = [];
 
-    list[NodeHash] hashedSubtrees = getNSizedHashedSubtrees(mainTree, massThreshold);
+    list[NodeHash] hashedSubtrees = getNSizedHashedSubtrees(ast, massThreshold);
 
     for(NodeHash i <- hashedSubtrees) {
         for(NodeHash j <- hashedSubtrees) {

@@ -1,5 +1,8 @@
 module NodeHelpers::NodeHelpers
 
+import lang::java::m3::Core;
+import lang::java::m3::AST;
+
 import Node;
 import HashingHelper::HashingHelper;
 
@@ -13,11 +16,16 @@ public int nodeSize(node subtree) {
 }
 
 public list[node] getSubNodesList(node rootNode) {
-	list[node] subNodeList = [n | n <- getChildren(rootNode), n is Node] + [rootNode];
+	list[node] subNodeList = [];
+	visit (rootNode) {
+		case node n: {
+			subNodeList += n;
+		}
+	}
 	return subNodeList;
 }
 
-public list[NodeHash] getNSizedHashedSubtrees(node rootNode, int minSubtreeSize) {
+public list[NodeHash] getNSizedHashedSubtrees(rootNode, int minSubtreeSize) {
 	list[NodeHash] subNodeList = [];
 
 	bottom-up visit (rootNode) {
