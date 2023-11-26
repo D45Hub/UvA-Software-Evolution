@@ -1,7 +1,7 @@
 module TreeComparison::SubtreeComparator
 
-import List;
-import NodeHelpers::NodeHelpers;
+import Helper::Helper;
+import Prelude;
 //import Real;
 
 /* 
@@ -22,7 +22,7 @@ alias ClonePair = tuple[NodeHash nodeA, NodeHash nodeB];
 Referring to Step 2 & 3 where we create hash buckets. 
 We also need to define the mass of nodes to create equally sized thingies.
 */ 
-public map[string, node] placingSubTreesInBuckets(ast, massOfNodes) {
+public map[str, node] placingSubTreesInBuckets(ast, massOfNodes) {
         // TODO Implement
 }
 
@@ -55,6 +55,16 @@ In the end we need to add the new clone pair of i and j
 */ 
 public bool checkIfSubTreeIsInClone(ast, massOfNodes) {
         // TODO Implement
+}
+
+set[str] listToSet(list[str] myList) {
+    return toSet(myList);
+}
+
+public bool isSubClone(node subtree, node clone) {
+    subtreeStr = toString(subtree);
+    cloneStr = toString(clone);
+    return contains(cloneStr, subtreeStr);
 }
 
 
