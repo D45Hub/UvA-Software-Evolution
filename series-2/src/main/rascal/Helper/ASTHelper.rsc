@@ -16,12 +16,13 @@ list[Declaration] getASTs(M3 projectModel) {
 }
 
 /* Ignoring the fact that we need a mass threshold for now and ignore leaves parameter*/ 
-list[node] getNodesFromAST(list[Declaration] astToParse) {
+list[node] getNodesFromAST(list[Declaration] astToParse, int massThreshold) {
     list[node] visitedNodes = [];
-    
     bottom-up visit (astToParse) {
         case node n : {
-            visitedNodes += n;
+            if(size(getChildren(n)) >= massThreshold) {
+                visitedNodes  += n;
+            }
         }
         
     }

@@ -9,7 +9,7 @@ ProjectLocation smallEncryptor = |project://series-2/src/main/rascal/simpleencry
 
 void main() {
     encryptorAST = getASTs(smallEncryptor);
-    encryptorNodes = getNodesFromAST(encryptorAST);
-    test1 = hashSubtree(encryptorNodes[0], false);
+    encryptorNodes = getNodesFromAST(encryptorAST,5);
+    //test1 = hashSubtree(encryptorNodes[0], false);
 }
 
