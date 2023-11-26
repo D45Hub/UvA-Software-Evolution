@@ -26,8 +26,6 @@ list[node] getNodesFromAST(list[Declaration] astToParse, int massThreshold) {
         }
         
     }
-    println("visitednodes <visitedNodes>");
-    println("size of nodes <size(visitedNodes)>");
     return visitedNodes;
 }
 
@@ -42,7 +40,5 @@ list[node] getNodesFromAST(node rootNode, int massThreshold) {
         }
         
     }
-    println("visitednodes <visitedNodes>");
-    println("size of nodes <size(visitedNodes)>");
     return visitedNodes;
 }

@@ -1,8 +1,8 @@
 module Helper::HashingHelper
 
 import Prelude;
-import Helper::NodeHelpers;
-import Helper::Types;
+import util::Math;
+
 /* 
 Helper Function to generate a bad hash. But not too bad, because then we would 
 have _everything_ in one bucket.
@@ -27,10 +27,11 @@ The parameter "ignoreLeaves" is added in order to be able to distinguish between
 type 1 (exact clones) and type 2 (near miss clones). Leaves are considered to be
 identifiers according to the Baxter Paper. 
 
+TODO: Momentan gibt er nur einen Hashwert für die ganze Liste aus, das ist vlt etwas dumm.
 */ 
-public str hashSubtree(node subtree, bool ignoreLeaves) {
+public str hashSubtree(list[node] subtree, bool ignoreLeaves) {
     elementsToHash = [];
-    for (element <- getChildren(subtree)) {
+    for (element <- subtree) {
         if(ignoreLeaves == false) {
             elementsToHash += element;
         }
@@ -38,12 +39,5 @@ public str hashSubtree(node subtree, bool ignoreLeaves) {
             elementsToHash += element;
         } 
     }
-    println("elements to hash");
-    println(elementsToHash);
     return genStringHashCode(toString(elementsToHash));
-}
-
-list[node] directChildren(node root) {
-    list[node] children = [n | node n <- getChildren(root)];
-    return children;
 }
