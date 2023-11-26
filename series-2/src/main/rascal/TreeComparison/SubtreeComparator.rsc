@@ -2,6 +2,7 @@ module TreeComparison::SubtreeComparator
 
 import Helper::Helper;
 import Prelude;
+import util::Math;
 //import Real;
 
 /* 
@@ -22,22 +23,32 @@ alias ClonePair = tuple[NodeHash nodeA, NodeHash nodeB];
 Referring to Step 2 & 3 where we create hash buckets. 
 We also need to define the mass of nodes to create equally sized thingies.
 */ 
-public map[str, node] placingSubTreesInBuckets(ast, massOfNodes) {
-        // TODO Implement
+public map[str, list[node]] placingSubTreesInBuckets(list[NodeHash] nodeHashList) {
+        set[str] nodeHashes = toSet([nodeHash.nodeHash | nodeHash <- nodeHashList, true]);
+        map[str, list[node]] hashBuckets = ();
+
+        for(hash <- nodeHashes) {
+            list[NodeHash] nodesHashesWithSameHashes = [h | h <- nodeHashList, h.nodeHash == hash];
+            //println(nodesHashesWithSameHashes);
+            list[node] nodesWithSameHashes = [i.hashedNode | i <- nodesHashesWithSameHashes, true];
+            hashBuckets = hashBuckets + (hash: nodesWithSameHashes);
+        }
+
+        return hashBuckets;
 }
 
 /* Referring to step 3*/ 
 public num nodeSimilarity(node comparedNodeA, node comparedNodeB) {
-    list[node] nodeListA = getSubNodesList(comparedNodeA);
-    list[node] nodeListB = getSubNodesList(comparedNodeB);
+    nodeListA = getSubNodesList(comparedNodeA);
+    nodeListB = getSubNodesList(comparedNodeB);
 
-    list[node] sharedSubnodes = nodeListA & nodeListB;
+    sharedSubnodes = nodeListA & nodeListB;
     int sharedSubnodeAmount = size(sharedSubnodes);
 
     // TODO GUCK MAL OB NE LISTSUBTRACTION MACHBAR IST...
     // Dann könnt man sowas wie... nodeListA - sharedSubnodes, und auch für B machen...
-    list[node] nonSharedSubnodesA = [n | n <- nodeListA, !(n in sharedSubnodes)];
-    list[node] nonSharedSubnodesB = [n | n <- nodeListB, !(n in nonSharedSubnodesB)];
+    nonSharedSubnodesA = [n | n <- nodeListA, !(n in sharedSubnodes)];
+    nonSharedSubnodesB = [n | n <- nodeListB, !(n in sharedSubnodes)];
 
     int amountNonSharedSubnodesA = size(nonSharedSubnodesA);
     int amountNonSharedSubnodesB = size(nonSharedSubnodesB);
@@ -64,16 +75,21 @@ public bool isSubClone(node subtree, node clone) {
 }
 
 
-public list[ClonePair] getSubtreeClonePairs(node mainTree, int massThreshold, num similarityThreshold) {
+public list[ClonePair] getSubtreeClonePairs(mainTree, int massThreshold, num similarityThreshold) {
     list[ClonePair] clonePairs = [];
     list[NodeHash] clones = [];
 
     list[NodeHash] hashedSubtrees = getNSizedHashedSubtrees(mainTree, massThreshold);
+    map[str, list[node]] hashBuckets = placingSubTreesInBuckets(hashedSubtrees);
 
     for(NodeHash i <- hashedSubtrees) {
-        for(NodeHash j <- hashedSubtrees) {
-            num similarity = nodeSimilarity(i.n, j.n);
 
+        list[node] sameNodeHashElements = [bucket | bucket <- hashBuckets[i.nodeHash], toString(bucket) != toString(i.hashedNode)];
+
+        for(node j <- sameNodeHashElements) {
+            num similarity = nodeSimilarity(i.hashedNode, j);
+            println(similarity);
+            /**
             if(similarity > similarityThreshold) {
                 list[NodeHash] subtreesI = getNSizedHashedSubtrees(i, massThreshold);
                 list[NodeHash] subtreesJ = getNSizedHashedSubtrees(j, massThreshold);
@@ -83,6 +99,7 @@ public list[ClonePair] getSubtreeClonePairs(node mainTree, int massThreshold, nu
 
                 clonePairs += [<i, j>];
             }
+            **/
         }
     }
 
