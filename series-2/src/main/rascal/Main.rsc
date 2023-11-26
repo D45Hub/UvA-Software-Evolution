@@ -1,8 +1,15 @@
 module Main
 
-import IO;
+import Helper::Helper;
+import Prelude;
 
-int main(int testArgument=0) {
-    println("argument: <testArgument>");
-    return testArgument;
+ProjectLocation smallEncryptor = |project://series-2/src/main/rascal/simpleencryptor|;
+
+
+
+void main() {
+    encryptorAST = getASTs(smallEncryptor);
+    encryptorNodes = getNodesFromAST(encryptorAST);
+    test1 = hashSubtree(encryptorNodes[0], false);
 }
+
