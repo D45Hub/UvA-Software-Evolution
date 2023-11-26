@@ -57,10 +57,6 @@ public bool checkIfSubTreeIsInClone(ast, massOfNodes) {
         // TODO Implement
 }
 
-set[str] listToSet(list[str] myList) {
-    return toSet(myList);
-}
-
 public bool isSubClone(node subtree, node clone) {
     subtreeStr = toString(subtree);
     cloneStr = toString(clone);
