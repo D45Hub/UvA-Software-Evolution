@@ -1,7 +1,7 @@
-module NodeHelpers::NodeHelpers
+module Helper::NodeHelpers
 
 import Node;
-import HashingHelper::HashingHelper;
+import Helper::HashingHelper;
 import List;
 
 /* A module to have some helpers for node ttypes*/

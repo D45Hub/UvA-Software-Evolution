@@ -1,12 +1,8 @@
-module HashingHelper::HashingHelper
+module Helper::HashingHelper
 
-import Node;
-import NodeHelpers::NodeHelpers;
-import String;
-import util::Math;
-import List;
-import IO;
-import Type;
+import Prelude;
+import Helper::NodeHelpers;
+import Helper::Types;
 /* 
 Helper Function to generate a bad hash. But not too bad, because then we would 
 have _everything_ in one bucket.
