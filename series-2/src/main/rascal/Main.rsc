@@ -8,15 +8,15 @@ ProjectLocation smallEncryptor = |project://series-2/src/main/rascal/simpleencry
 
 void main() {
     encryptorAST = getASTs(smallEncryptor);
-    encryptorNodes = getNodesFromAST(encryptorAST,5);
+    encryptorNodes = getNodesFromAST(encryptorAST,4);
     println("size of encryptorNodes <size(encryptorNodes)>");
     hashedNodes = [];
     for (n <- encryptorNodes) {
-        hashedNodes += hashSubtree(n, true);
+        hashedNodes += hashSubtree(n, false);
     }
 
     hashedNodeSet = listToSet(hashedNodes);
-    println("Clone groups: <size(hashedNodeSet)>");
+    println("Hash Buckets: <size(hashedNodeSet)>");
 
     //println("hashed value of nodes in ast <hashedNodes>");
     println("size of hashedNodes <size(hashedNodes)>");
