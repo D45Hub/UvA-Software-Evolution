@@ -29,7 +29,7 @@ identifiers according to the Baxter Paper.
 
 TODO: Momentan gibt er nur einen Hashwert für die ganze Liste aus, das ist vlt etwas dumm.
 */ 
-public str hashSubtree(list[node] subtree, bool ignoreLeaves) {
+public str hashSubtree( subtree, bool ignoreLeaves) {
     elementsToHash = [];
     for (element <- subtree) {
         if(ignoreLeaves == false) {
