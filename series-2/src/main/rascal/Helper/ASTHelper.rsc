@@ -30,3 +30,19 @@ list[node] getNodesFromAST(list[Declaration] astToParse, int massThreshold) {
     println("size of nodes <size(visitedNodes)>");
     return visitedNodes;
 }
+
+/* Ignoring the fact that we need a mass threshold for now and ignore leaves parameter*/ 
+list[node] getNodesFromAST(node rootNode, int massThreshold) {
+    list[node] visitedNodes = [];
+    bottom-up visit (rootNode) {
+        case node n : {
+            if(size(getChildren(n)) >= massThreshold) {
+                visitedNodes  += n;
+            }
+        }
+        
+    }
+    println("visitednodes <visitedNodes>");
+    println("size of nodes <size(visitedNodes)>");
+    return visitedNodes;
+}
