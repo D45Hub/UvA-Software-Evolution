@@ -2,6 +2,8 @@ module Helper::HashingHelper
 
 import Prelude;
 import util::Math;
+import Node;
+import Helper::NodeHelpers;
 
 /* 
 Helper Function to generate a bad hash. But not too bad, because then we would 
@@ -29,13 +31,13 @@ identifiers according to the Baxter Paper.
 
 TODO: Momentan gibt er nur einen Hashwert für die ganze Liste aus, das ist vlt etwas dumm.
 */ 
-public str hashSubtree( subtree, bool ignoreLeaves) {
+public str hashSubtree(node subtree, bool ignoreLeaves) {
     elementsToHash = [];
-    for (element <- subtree) {
+    for (node element <- subtree) {
         if(ignoreLeaves == false) {
             elementsToHash += element;
         }
-        if ((ignoreLeaves && size(getChildren(element)) > 0)) {
+        if (ignoreLeaves && !isLeaf(element)) {
             elementsToHash += element;
         } 
     }
