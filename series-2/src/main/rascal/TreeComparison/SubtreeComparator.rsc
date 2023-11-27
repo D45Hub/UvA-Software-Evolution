@@ -17,8 +17,6 @@ Step 4) If the similarity is above a predefined threshold, add a new clone pair
 the clone list. 
 */ 
 
-alias ClonePair = tuple[NodeHash nodeA, NodeHash nodeB];
-
 /* 
 Referring to Step 2 & 3 where we create hash buckets. 
 We also need to define the mass of nodes to create equally sized thingies.

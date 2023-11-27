@@ -1,13 +1,8 @@
 module Helper::NodeHelpers
 
 import Node;
-import Helper::HashingHelper;
+import Helper::Helper;
 import List;
-
-/* A module to have some helpers for node ttypes*/
-
-alias NodeHash = tuple[str nodeHash, node hashedNode];
-
 /* Determining the size of a subtree, needed for the mass threshold */ 
 public int nodeSize(node subtree) {
 	return arity(subtree) + 1;
