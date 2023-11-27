@@ -31,7 +31,6 @@ public map[str, list[node]] placingSubTreesInBuckets(list[NodeHash] nodeHashList
             list[node] nodesWithSameHashes = [i.hashedNode | i <- nodesHashesWithSameHashes, true];
             hashBuckets = hashBuckets + (hash: nodesWithSameHashes);
         }
-
         return hashBuckets;
 }
 
@@ -90,7 +89,7 @@ public list[ClonePair] getSubtreeClonePairs(mainTree, int massThreshold, num sim
 
     list[NodeHash] hashedSubtrees = getNSizedHashedSubtrees(mainTree, massThreshold);
     map[str, list[node]] hashBuckets = placingSubTreesInBuckets(hashedSubtrees);
-
+    iprint(hashBuckets);
     for(NodeHash i <- hashedSubtrees) {
 
         list[node] sameNodeHashElements = [bucket | bucket <- hashBuckets[i.nodeHash], toString(bucket) != toString(i.hashedNode)];
@@ -100,8 +99,9 @@ public list[ClonePair] getSubtreeClonePairs(mainTree, int massThreshold, num sim
 
             if(similarity > similarityThreshold) {
 
-                list[NodeHash] subtreesI = getNSizedHashedSubtrees(i, massThreshold);
-                list[NodeHash] subtreesJ = getNSizedHashedSubtrees(j, massThreshold);
+
+                list[NodeHash] subtreesI = [ possibleTree | possibleTree <- hashedSubtrees, possibleTree.nodeHash == i.nodeHash ];
+                list[NodeHash] subtreesJ = [ possibleTree | possibleTree <- hashedSubtrees, possibleTree.nodeHash == j.nodeHash ];
 
                 for(NodeHash s <- subtreesI) {
                     bool isNodeMember = isMember(clonePairs, s);
@@ -121,7 +121,7 @@ public list[ClonePair] getSubtreeClonePairs(mainTree, int massThreshold, num sim
 
                 // Unsure about if this is a correct approach for handling clone removal. (See paper...)
                 //clonePairs = filterSubtreeHashInClonePairs(subtreesI, subtreesJ, clonePairs);
-
+                iprint(clonePairs);
                 clonePairs += [<i, <i.nodeHash, j>>];
             }
         }

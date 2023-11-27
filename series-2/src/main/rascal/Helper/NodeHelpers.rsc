@@ -22,7 +22,8 @@ public list[value] getSubNodesList(node rootNode) {
 public list[NodeHash] getNSizedHashedSubtrees(rootNode, int minSubtreeSize) {
 	list[NodeHash] subNodeList = [];
 
-	bottom-up visit (rootNode) {
+	rootNodeWithoutKeywords = unsetRec(rootNode);
+	bottom-up visit (rootNodeWithoutKeywords) {
         case node n: {
             if(nodeSize(n) >= minSubtreeSize) {
 				subNodeList += [<hashSubtree(n, false), n>];
