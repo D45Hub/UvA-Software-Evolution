@@ -71,6 +71,12 @@ public bool isSubClone(node subtree, node clone) {
     return contains(cloneStr, subtreeStr);
 }
 
+public bool isMember(list[ClonePair] clonePairs, NodeHash subtree) {
+    list[ClonePair] clonePairMembers = [pair | pair <- clonePairs, pair.nodeA == subtree.hashedNode || pair.nodeB == subtree.hashedNode];
+    int clonePairMembersAmount = size(clonePairMembers);
+    return clonePairMembersAmount > 0;
+}
+
 /* If we detect that a subtree is smaller than the proposed clone, we need to 
 remove it rom the initial clone pair list (type nodehash node) */ 
 public list[ClonePair] removeClonePair(ClonePair clonePair, list[ClonePair] listOfClones) {
@@ -93,18 +99,33 @@ public list[ClonePair] getSubtreeClonePairs(mainTree, int massThreshold, num sim
 
         for(node j <- sameNodeHashElements) {
             num similarity = nodeSimilarity(i.hashedNode, j);
-            println(similarity);
-            /**
+
             if(similarity > similarityThreshold) {
+
                 list[NodeHash] subtreesI = getNSizedHashedSubtrees(i, massThreshold);
                 list[NodeHash] subtreesJ = getNSizedHashedSubtrees(j, massThreshold);
 
-                // Unsure about if this is a correct approach for handling clone removal. (See paper...)
-                clonePairs = filterSubtreeHashInClonePairs(subtreesI, subtreesJ, clonePairs);
+                for(NodeHash s <- subtreesI) {
+                    bool isNodeMember = isMember(clonePairs, s);
 
-                clonePairs += [<i, j>];
+                    if(isNodeMember) {
+                        clonePairs = removeClonePair(<i, <i.nodeHash, j>>, clonePairs);
+                    }
+                }
+
+                for(NodeHash s <- subtreesJ) {
+                    bool isNodeMember = isMember(clonePairs, s);
+
+                    if(isNodeMember) {
+                        clonePairs = removeClonePair(<i, <i.nodeHash, j>>, clonePairs);
+                    }
+                }
+
+                // Unsure about if this is a correct approach for handling clone removal. (See paper...)
+                //clonePairs = filterSubtreeHashInClonePairs(subtreesI, subtreesJ, clonePairs);
+
+                clonePairs += [<i, <i.nodeHash, j>>];
             }
-            **/
         }
     }
 

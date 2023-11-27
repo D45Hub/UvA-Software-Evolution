@@ -10,7 +10,7 @@ ProjectLocation smallEncryptor = |project://series-2/src/main/rascal/simpleencry
 void main() {
     encryptorAST = getASTs(smallEncryptor);
     encryptorNodes = getNodesFromAST(encryptorAST,4);
-    println(size(getSubtreeClonePairs(encryptorAST, 4, 5.0)));
+    println(size(getSubtreeClonePairs(encryptorAST, 4, 0.34)));
 
     //println("hashed value of nodes in ast <hashedNodes>");
     //println("size of hashedNodes <size(hashedNodes)>");
