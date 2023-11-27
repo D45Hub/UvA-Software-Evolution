@@ -6,7 +6,7 @@ import Prelude;
 import List;
 import TreeComparison::SubtreeComparator;
 
-ProjectLocation smallEncryptor = |file:///C:/Users/denis/Documents/Software-Evolution/UvA-Software-Evolution/series-1/smallsql/|;
+ProjectLocation smallEncryptor = |project://series-2/src/main/rascal/simpleencryptor|;
 
 void main() {
     str startBenchmarkTime = startBenchmark("benchmark");
