@@ -62,18 +62,22 @@ public num nodeSimilarity(node comparedNodeA, node comparedNodeB) {
 For each subtree of i we have to check if it is in the clone pair is already present
 if yes, remove it. Because we only want to keep the largest clones. 
 Same applies for the 2nd subtree. 
-In the end we need to add the new clone pair of i and j 
+In the end we need to add the new clone pair of i and j. This function refers to the
+"isMember" in the Paper. 
 */ 
-public bool checkIfSubTreeIsInClone(ast, massOfNodes) {
-        // TODO Implement
-}
-
 public bool isSubClone(node subtree, node clone) {
     subtreeStr = toString(subtree);
     cloneStr = toString(clone);
     return contains(cloneStr, subtreeStr);
 }
 
+/* If we detect that a subtree is smaller than the proposed clone, we need to 
+remove it rom the initial clone pair list (type nodehash node) */ 
+public list[ClonePair] removeClonePair(ClonePair clonePair, list[ClonePair] listOfClones) {
+    clone = [element | element <- listOfClones, clonePair.nodeA.nodeHash == clonePair.nodeA.nodeHash][0];
+    updatedList = delete(listOfClones, indexOf(listOfClones, clone ));
+    return updatedList;
+}
 
 public list[ClonePair] getSubtreeClonePairs(mainTree, int massThreshold, num similarityThreshold) {
     list[ClonePair] clonePairs = [];

@@ -12,10 +12,11 @@ test bool checkIsCloneSubset(){
     return (testFunc == true);
 }
 
-test bool checkIsCloneSubset(){
+test bool returnsListWithLessElements() {
     testNode = "YlgJ"("M"("abc"(1)));
     testSubTree = "abc"(1);
-    testFunc =  isSubClone(testNode,testSubTree );
-    
-    return (testFunc == false);
+    exampleClonePair = <<"exampleHash", testNode>,<"exampleHash3", testSubTree>>;
+    exampleClonePairs = [<<"exampleHash", testNode>, <"exampleHash2", testSubTree>>];
+    cloneList = removeClonePair(exampleClonePair,exampleClonePairs);
+    return (size(cloneList) == 0);
 }
