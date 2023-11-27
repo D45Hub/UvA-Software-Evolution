@@ -43,15 +43,15 @@ public num nodeSimilarity(node comparedNodeA, node comparedNodeB) {
     nodeListB = getSubNodesList(comparedNodeB);
 
     sharedSubnodes = nodeListA & nodeListB;
-    int sharedSubnodeAmount = size(sharedSubnodes);
+    real sharedSubnodeAmount = toReal(size(sharedSubnodes));
 
     // TODO GUCK MAL OB NE LISTSUBTRACTION MACHBAR IST...
     // Dann könnt man sowas wie... nodeListA - sharedSubnodes, und auch für B machen...
     nonSharedSubnodesA = [n | n <- nodeListA, !(n in sharedSubnodes)];
     nonSharedSubnodesB = [n | n <- nodeListB, !(n in sharedSubnodes)];
 
-    int amountNonSharedSubnodesA = size(nonSharedSubnodesA);
-    int amountNonSharedSubnodesB = size(nonSharedSubnodesB);
+    real amountNonSharedSubnodesA = toReal(size(nonSharedSubnodesA));
+    real amountNonSharedSubnodesB = toReal(size(nonSharedSubnodesB));
 
     num similarityScore = toReal((2*sharedSubnodeAmount) / (2*sharedSubnodeAmount + amountNonSharedSubnodesA + amountNonSharedSubnodesB));
 
