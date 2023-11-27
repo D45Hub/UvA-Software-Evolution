@@ -74,8 +74,9 @@ public bool isSubClone(node subtree, node clone) {
 /* If we detect that a subtree is smaller than the proposed clone, we need to 
 remove it rom the initial clone pair list (type nodehash node) */ 
 public list[ClonePair] removeClonePair(ClonePair clonePair, list[ClonePair] listOfClones) {
-    clone = [element | element <- listOfClones, clonePair.nodeA.nodeHash == clonePair.nodeA.nodeHash][0];
-    updatedList = delete(listOfClones, indexOf(listOfClones, clone ));
+    matchingCloneList = [element | element <- listOfClones, clonePair.nodeA.nodeHash == clonePair.nodeA.nodeHash];
+    assert size(matchingCloneList) == 1;
+    updatedList = delete(listOfClones, indexOf(listOfClones, matchingCloneList[0] ));
     return updatedList;
 }
 
