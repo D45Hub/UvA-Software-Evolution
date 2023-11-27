@@ -1,7 +1,8 @@
 module Helper::NodeHelpers
 
 import Node;
-import Helper::Helper;
+import Helper::HashingHelper;
+import Helper::Types;
 import List;
 /* Determining the size of a subtree, needed for the mass threshold */ 
 public int nodeSize(node subtree) {

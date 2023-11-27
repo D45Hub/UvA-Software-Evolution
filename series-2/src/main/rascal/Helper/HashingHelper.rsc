@@ -4,6 +4,7 @@ import Prelude;
 import util::Math;
 import Node;
 import Helper::NodeHelpers;
+import Helper::Types;
 
 /* 
 Helper Function to generate a bad hash. But not too bad, because then we would 
