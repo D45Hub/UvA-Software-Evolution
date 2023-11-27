@@ -28,8 +28,6 @@ a "weak" hashing function in order to put similar nodes into a bucket.
 The parameter "ignoreLeaves" is added in order to be able to distinguish between
 type 1 (exact clones) and type 2 (near miss clones). Leaves are considered to be
 identifiers according to the Baxter Paper. 
-
-TODO: Momentan gibt er nur einen Hashwert für die ganze Liste aus, das ist vlt etwas dumm.
 */ 
 public str hashSubtree(node subtree, bool ignoreLeaves) {
     elementsToHash = [];
