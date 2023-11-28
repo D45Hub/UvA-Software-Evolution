@@ -42,3 +42,15 @@ public str hashSubtree(node subtree, bool ignoreLeaves) {
     }
     return genStringHashCode(toString(elementsToHash));
 }
+
+public map[str, list[NodeLoc]] placingSubTreesInBuckets(list[NodeHashLoc] nodeHashList) {
+        set[str] nodeHashes = toSet([nodeHash.nHash.nodeHash | nodeHash <- nodeHashList, true]);
+        map[str, list[NodeLoc]] hashBuckets = ();
+
+        for(hash <- nodeHashes) {
+            list[NodeHashLoc] nodesHashesWithSameHashes = [h | h <- nodeHashList, h.nHash.nodeHash == hash];
+            list[NodeLoc] nodesWithSameHashes = [<i.nHash.hashedNode, i.nodeLoc> | i <- nodesHashesWithSameHashes, true];
+            hashBuckets = hashBuckets + (hash: nodesWithSameHashes);
+        }
+        return hashBuckets;
+}

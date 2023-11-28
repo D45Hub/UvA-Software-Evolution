@@ -7,7 +7,7 @@ import List;
 
 public loc noLocation = |unresolved:///|;
 
-alias NodeLoc = tuple[node nodeLocNode, loc l];
+private list[CloneTuple] _clonePairs = [];
 
 /* Determining the size of a subtree, needed for the mass threshold */ 
 public int nodeSize(node subtree) {
@@ -58,4 +58,48 @@ public loc nodeFileLocation(node n) {
 	}
 	
 	return location;
+}
+
+
+/**
+This function determines the Hash of node / subtree and its location.
+It returns a tuple of nodeContent  (without any keywords) – location – hash
+*/ 
+
+public list[NodeHashLoc] prepareASTNodesForAnalysis(list[node] projectNodes, int massThreshold) {
+    list[NodeHashLoc] nodeHashLocations = [];
+
+    for(projectNode <- projectNodes) {
+        loc projectNodeLocation = nodeFileLocation(projectNode);
+
+        if(projectNodeLocation != noLocation) {
+            node unsetRecNode = unsetRec(projectNode);
+            str hashedProjectNode = hashSubtree(unsetRecNode, false);
+
+            int nodeLineDifference = projectNodeLocation.end.line - projectNodeLocation.begin.line + 1;
+
+            // TODO Find out if this is relevant or not...
+            bool areNodeLinesInThreshold = nodeLineDifference >= massThreshold;
+            bool isNodeSizeInThreshold = nodeSize(projectNode) >= massThreshold;
+            
+            if(areNodeLinesInThreshold && isNodeSizeInThreshold) {
+                nodeHashLocations += <<hashedProjectNode, unsetRecNode>, projectNodeLocation>;
+            }
+        }
+    }
+
+    return nodeHashLocations;
+}
+
+
+/* Is tree2 contained in tree1 –> Is tree2 a subnode of tree1 */ 
+public bool isNodeSubset(node tree1, node tree2) {
+	nodeString1 = toString(tree1);
+	nodeString2 = toString(tree2);
+
+	if(nodeString1 ==  nodeString2) {
+		return false;
+	}
+
+    return contains(nodeString1, nodeString2);
 }
