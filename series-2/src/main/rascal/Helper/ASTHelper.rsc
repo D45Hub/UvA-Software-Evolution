@@ -2,7 +2,7 @@ module Helper::ASTHelper
 
 import lang::java::m3::Core;
 import lang::java::m3::AST;
-import Helper::NodeHelper;
+import Helper::NodeHelpers;
 import Prelude;
 
 list[Declaration] getASTs(loc projectLocation) {

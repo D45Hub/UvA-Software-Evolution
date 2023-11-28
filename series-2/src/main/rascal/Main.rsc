@@ -8,7 +8,7 @@ import TreeComparison::SubtreeComparator;
 import lang::java::m3::Core;
 import lang::java::m3::AST;
 import util::Math;
-ProjectLocation project = |project://series-2/src/main/rascal/simpleencryptor/|;
+ProjectLocation project = |file:///Users/ekletsko/Downloads/smallsql0.21_src|;
 
 private list[CloneTuple] _clonePairs = [];
 private int count = 0;
@@ -23,15 +23,16 @@ void main() {
     list[node] projectNodes = getNodesFromAST(projectAST);
 
 	printDebug("Adding node details");
+	int massThreshold = 6;
 	list[tuple[int id, node n]] nodeWId = zip2([1..(size(projectNodes) + 1)], projectNodes);
 	list[nodeDetailed] nodeWLocs = [ <id, nodeIc, nLoc, size> |
 									<id,nodeI> <- nodeWId,
                                     nodeIc := (nodeI),
 									nLoc := nodeFileLocation(nodeI),
 									size := nodeSize(nodeI),
-									size >= 6,
+									size >= massThreshold,
 									nLoc != noLocation,
-									(nLoc.end.line - nLoc.begin.line + 1) >= 6 ];
+									(nLoc.end.line - nLoc.begin.line + 1) >= massThreshold ];
 
     list[NodeHashLoc] nodes = [<<hashSubtree(unsetRec(nodeWLoc.d), false), unsetRec(nodeWLoc.d)>, nodeWLoc.l> | nodeWLoc <- nodeWLocs, true];
 	println("Nodes Finished lel");
@@ -99,7 +100,7 @@ void main() {
  	//Determine what lines are duplicates
 	//results.duplicateLines = getDuplicateLinesPerFile(model,results); 
     */
-    list[CloneTuple] results = getClonePairs(nodes, 0.9);//getSubtreeClonePairs(nodes, 5, 1.0);
+    list[CloneTuple] results = getClonePairs(nodes, 1.0);//getSubtreeClonePairs(nodes, 5, 1.0);
 
 	println(size(results));
 
@@ -161,9 +162,7 @@ public bool locationIsValid(loc location){
 public list[CloneTuple] getClonePairs(list[NodeHashLoc] hashedSubtrees, num similarityThreshold) {
     list[ClonePair] clonePairs = [];
     map[str, list[NodeLoc]] hashBuckets = placingSubTreesInBuckets(hashedSubtrees);
-	println(size(hashBuckets));
-
-	findClones(hashBuckets, 1.0);
+	findClones(hashBuckets, similarityThreshold);
 
     return _clonePairs;
 }
@@ -172,7 +171,6 @@ void findClones(map[str, list[NodeLoc]] subtrees, real similarityThreshold,
                 bool print=false, bool type2=false) {
     int counter = 0;
     int sizeS = size(subtrees);
-
     for (hash <- subtrees) {
         counter += 1;
         if (print) {
@@ -180,8 +178,7 @@ void findClones(map[str, list[NodeLoc]] subtrees, real similarityThreshold,
         }
 
         list[NodeLoc] nodes = subtrees[hash];
-		//println(nodes);
-
+		println("size of nodes <size(nodes)>");
         for (i <- nodes) {
 			//iprintln(i);
             for (j <- nodes) {
@@ -234,7 +231,14 @@ public void addClone(CloneTuple newPair, bool print=false) {
 }
 
 bool isSubset(node tree1, node tree2) {
-    return contains(toString(tree1), toString(tree2));
+	nodeString1 = toString(tree1);
+	nodeString2 = toString(tree2);
+
+	if(nodeString1 ==  nodeString2) {
+		return false;
+	}
+
+    return contains(nodeString1, nodeString2);
 }
 
 public map[str, list[NodeLoc]] placingSubTreesInBuckets(list[NodeHashLoc] nodeHashList) {
