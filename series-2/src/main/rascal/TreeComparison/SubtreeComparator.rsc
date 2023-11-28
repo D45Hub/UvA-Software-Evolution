@@ -85,22 +85,22 @@ public list[ClonePair] removeClonePair(ClonePair clonePair, list[ClonePair] list
 
 public list[ClonePair] getSubtreeClonePairs(list[node] mainTree, int massThreshold, num similarityThreshold) {
     list[ClonePair] clonePairs = [];
-    list[NodeHash] clones = [];
 
     list[NodeHash] hashedSubtrees = getNSizedHashedSubtrees(mainTree, massThreshold);
     map[str, list[node]] hashBuckets = placingSubTreesInBuckets(hashedSubtrees);
-    //iprint(hashBuckets);
+
     for(NodeHash i <- hashedSubtrees) {
 
         list[node] sameNodeHashElements = [bucket | bucket <- hashBuckets[i.nodeHash], toString(bucket) != toString(i.hashedNode)];
-
         for(node j <- sameNodeHashElements) {
             num similarity = nodeSimilarity(i.hashedNode, j);
 
-            if(similarity > similarityThreshold) {
+
+            if(similarity >= similarityThreshold) {
 
                 list[NodeHash] subtreesI = [ possibleTree | possibleTree <- hashedSubtrees, possibleTree.nodeHash == i.nodeHash ];
-                list[NodeHash] subtreesJ = [ possibleTree | possibleTree <- hashedSubtrees, possibleTree.nodeHash == j.nodeHash ];
+                list[NodeHash] subtreesJ = [ possibleTree | possibleTree <- hashedSubtrees, possibleTree.hashedNode == j ];
+
 
                 for(NodeHash s <- subtreesI) {
                     bool isNodeMember = isMember(clonePairs, s);
@@ -120,21 +120,12 @@ public list[ClonePair] getSubtreeClonePairs(list[node] mainTree, int massThresho
 
                 // Unsure about if this is a correct approach for handling clone removal. (See paper...)
                 //clonePairs = filterSubtreeHashInClonePairs(subtreesI, subtreesJ, clonePairs);
-                //iprint(clonePairs);
                 clonePairs += [<i, <i.nodeHash, j>>];
+
             }
         }
     }
-
-// TODO HIER NOCH WEITER DAS MIT DEM GROßEN LOOP REIN...
-/*
-    top-down-break visit(mainTree) {
-        case leaf(int n)  => {
-            if (n in ast1) {
-                duplicateNodes += [n];
-            }
-        }
-*/
+    iprint(size(clonePairs));
 
     return clonePairs;
 }

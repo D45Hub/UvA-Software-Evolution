@@ -5,7 +5,7 @@ import Helper::HashingHelper;
 import Helper::Types;
 import List;
 
-loc noLocation = |unresolved:///|;
+public loc noLocation = |unresolved:///|;
 
 alias NodeLoc = tuple[node nodeLocNode, loc l];
 
@@ -27,26 +27,15 @@ public list[value] getSubNodesList(node rootNode) {
 public list[NodeHash] getNSizedHashedSubtrees(list[node] rootNode, int minSubtreeSize) {
 	list[NodeHash] subNodeList = [];
 	list[NodeLoc] rootNodeWithoutKeywords = [<unsetRec(n), nodeFileLocation(n)> | n <- rootNode, true];
-	
+
 	for(NodeLoc rNode <- rootNodeWithoutKeywords) {
+		
 		loc rootNodeLoc = rNode.l;
 		if((rootNodeLoc.end.line - rootNodeLoc.begin.line + 1) >= minSubtreeSize) {
 			subNodeList += [<hashSubtree(rNode.nodeLocNode, false), rNode.nodeLocNode>];
 		}
 	}
 
-	/**
-	bottom-up visit (rootNodeWithoutKeywords) {
-        case node n: {
-			loc nodeLoc = nodeFileLocation(n);
-			iprintln(n);
-            if(nodeLoc != noLocation && nodeSize(n) >= minSubtreeSize && (nodeLoc.end.line - nodeLoc.begin.line + 1) >= minSubtreeSize) {
-				println((nodeLoc.end.line - nodeLoc.begin.line + 1));
-				subNodeList += [<hashSubtree(n, false), n>];
-			}
-        }
-    }
-	*/
     return subNodeList;
 }
 
