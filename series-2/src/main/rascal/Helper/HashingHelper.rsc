@@ -18,7 +18,7 @@ str genStringHashCode(str input) {
         hashCode = hashCode*31 + character;
     }
 
-    return toString(hashCode);
+    return toString(hashCode)[1..15];
 }
 
 /* 

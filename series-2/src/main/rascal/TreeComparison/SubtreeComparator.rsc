@@ -83,13 +83,13 @@ public list[ClonePair] removeClonePair(ClonePair clonePair, list[ClonePair] list
     return updatedList;
 }
 
-public list[ClonePair] getSubtreeClonePairs(mainTree, int massThreshold, num similarityThreshold) {
+public list[ClonePair] getSubtreeClonePairs(list[node] mainTree, int massThreshold, num similarityThreshold) {
     list[ClonePair] clonePairs = [];
     list[NodeHash] clones = [];
 
     list[NodeHash] hashedSubtrees = getNSizedHashedSubtrees(mainTree, massThreshold);
     map[str, list[node]] hashBuckets = placingSubTreesInBuckets(hashedSubtrees);
-    iprint(hashBuckets);
+    //iprint(hashBuckets);
     for(NodeHash i <- hashedSubtrees) {
 
         list[node] sameNodeHashElements = [bucket | bucket <- hashBuckets[i.nodeHash], toString(bucket) != toString(i.hashedNode)];
@@ -98,7 +98,6 @@ public list[ClonePair] getSubtreeClonePairs(mainTree, int massThreshold, num sim
             num similarity = nodeSimilarity(i.hashedNode, j);
 
             if(similarity > similarityThreshold) {
-
 
                 list[NodeHash] subtreesI = [ possibleTree | possibleTree <- hashedSubtrees, possibleTree.nodeHash == i.nodeHash ];
                 list[NodeHash] subtreesJ = [ possibleTree | possibleTree <- hashedSubtrees, possibleTree.nodeHash == j.nodeHash ];
@@ -121,7 +120,7 @@ public list[ClonePair] getSubtreeClonePairs(mainTree, int massThreshold, num sim
 
                 // Unsure about if this is a correct approach for handling clone removal. (See paper...)
                 //clonePairs = filterSubtreeHashInClonePairs(subtreesI, subtreesJ, clonePairs);
-                iprint(clonePairs);
+                //iprint(clonePairs);
                 clonePairs += [<i, <i.nodeHash, j>>];
             }
         }
