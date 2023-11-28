@@ -103,3 +103,31 @@ public bool isNodeSubset(node tree1, node tree2) {
 
     return contains(nodeString1, nodeString2);
 }
+
+bool isSubset(list[node] rootSequence, list[node] subSequence) {
+    // If the root sequence entails the sub-sequence, it is a subset.
+    if (isSubsequence(rootSequence, subSequence)) {
+        return true;
+    }
+
+    // For every sequence node in the root, visit the subtree. If this subtree
+    // has a sequence which entails our subsequence, it is a subset.
+    for (node n <- rootSequence) {
+        visit(n) {
+            // subsequence is contained in sequence of the current node.
+            case \block(statements): {
+                list[node] sequence = statements;
+                if (isSubsequence(statements, subSequence)) {
+                    return true;
+                }
+            }
+            // subsequence is contained in the current node
+            case node n: {
+                if (size(subSequence) == 1 && subSequence[0] == n) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
