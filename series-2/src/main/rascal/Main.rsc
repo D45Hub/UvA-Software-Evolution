@@ -8,7 +8,7 @@ import TreeComparison::SubtreeComparator;
 import lang::java::m3::Core;
 import lang::java::m3::AST;
 import util::Math;
-ProjectLocation project = |file:///Users/ekletsko/Downloads/smallsql0.21_src|;
+ProjectLocation project = |file:///C:/Users/denis/Documents/Software-Evolution/UvA-Software-Evolution/series-1/smallsql/|;
 
 private list[CloneTuple] _clonePairs = [];
 private int count = 0;
@@ -24,17 +24,8 @@ void main() {
 
 	printDebug("Adding node details");
 	int massThreshold = 6;
-	list[tuple[int id, node n]] nodeWId = zip2([1..(size(projectNodes) + 1)], projectNodes);
-	list[nodeDetailed] nodeWLocs = [ <id, nodeIc, nLoc, size> |
-									<id,nodeI> <- nodeWId,
-                                    nodeIc := (nodeI),
-									nLoc := nodeFileLocation(nodeI),
-									size := nodeSize(nodeI),
-									size >= massThreshold,
-									nLoc != noLocation,
-									(nLoc.end.line - nLoc.begin.line + 1) >= massThreshold ];
 
-    list[NodeHashLoc] nodes = [<<hashSubtree(unsetRec(nodeWLoc.d), false), unsetRec(nodeWLoc.d)>, nodeWLoc.l> | nodeWLoc <- nodeWLocs, true];
+    list[NodeHashLoc] nodes = [<<hashSubtree(unsetRec(projectNode), false), unsetRec(projectNode)>, nodeFileLocation(projectNode)> | projectNode <- projectNodes, nodeSize(projectNode) >= massThreshold && (nodeFileLocation(projectNode).end.line - nodeFileLocation(projectNode).begin.line + 1) >= massThreshold];
 	println("Nodes Finished lel");
     list[CloneTuple] results = getClonePairs(nodes, 1.0);
 
