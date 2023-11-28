@@ -21,7 +21,7 @@ ProjectLocation project = denisProject;
 void main() {
     str startBenchmarkTime = startBenchmark("benchmark");
     println(startBenchmarkTime);
-    /**
+    
     list[node] projectNodes = prepareProjectForAnalysis(encryptorProject);
 
 	printDebug("Adding node details");
@@ -30,14 +30,15 @@ void main() {
 	println("Nodes Finished lel");
     list[CloneTuple] results = getClonePairs(nodes, SIMILARTY_THRESHOLD);
     println("Amount of Clone Pairs <size(results)>");
-    */
-    map[str hash, list[list[node]] sequenceRoots] sequences = getSequences(getASTs(encryptorProject), 6);
-    real sequenceThreshold = 6.0;
-    list[tuple[list[node], list[node]]] sequenceClones = findSequenceClones(sequences, sequenceThreshold);
+    
+    map[str hash, list[list[node]] sequenceRoots] sequences = getSequences(getASTs(encryptorProject), 4);
+    println("Sequences: <size(sequences)>");
 
-    print(size(sequenceClones));
+    real sequenceThreshold = 6.0;
+    list[CloneTuple] sequenceClones = findSequenceClones(sequences, sequenceThreshold, results);
+
+    println("Sequence Clones: <size(sequenceClones)>");
 
     str stopBenchmarkTime = stopBenchmark("benchmark");
     println(stopBenchmarkTime);
-
 }
