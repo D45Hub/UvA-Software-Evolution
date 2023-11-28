@@ -25,7 +25,7 @@ void main() {
 	printDebug("Adding node details");
 	int massThreshold = 6;
 
-    list[NodeHashLoc] nodes = [<<hashSubtree(unsetRec(projectNode), false), unsetRec(projectNode)>, nodeFileLocation(projectNode)> | projectNode <- projectNodes, nodeSize(projectNode) >= massThreshold && (nodeFileLocation(projectNode).end.line - nodeFileLocation(projectNode).begin.line + 1) >= massThreshold];
+    list[NodeHashLoc] nodes = generateNodeHashLocations(projectNodes, massThreshold);
 	println("Nodes Finished lel");
     list[CloneTuple] results = getClonePairs(nodes, 1.0);
 
@@ -35,6 +35,31 @@ void main() {
 
     println(stopBenchmarkTime);
 
+}
+
+public list[NodeHashLoc] generateNodeHashLocations(list[node] projectNodes, int massThreshold) {
+    list[NodeHashLoc] nodeHashLocations = [];
+
+    for(projectNode <- projectNodes) {
+        loc projectNodeLocation = nodeFileLocation(projectNode);
+
+        if(projectNodeLocation != noLocation) {
+            node unsetRecNode = unsetRec(projectNode);
+            str hashedProjectNode = hashSubtree(unsetRecNode, false);
+
+            int nodeLineDifference = projectNodeLocation.end.line - projectNodeLocation.begin.line + 1;
+
+            // TODO Find out if this is relevant or not...
+            bool areNodeLinesInThreshold = nodeLineDifference >= massThreshold;
+            bool isNodeSizeInThreshold = nodeSize(projectNode) >= massThreshold;
+            
+            if(areNodeLinesInThreshold && isNodeSizeInThreshold) {
+                nodeHashLocations += <<hashedProjectNode, unsetRecNode>, projectNodeLocation>;
+            }
+        }
+    }
+
+    return nodeHashLocations;
 }
 
 public bool locationIsValid(loc location){
