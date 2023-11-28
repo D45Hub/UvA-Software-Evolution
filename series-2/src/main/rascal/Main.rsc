@@ -8,7 +8,12 @@ import TreeComparison::SubtreeComparator;
 import lang::java::m3::Core;
 import lang::java::m3::AST;
 import util::Math;
-ProjectLocation project = |file:///Users/ekletsko/Downloads/smallsql0.21_src|;
+ProjectLocation project = |project://series-2/src/main/rascal/simpleencryptor/|;
+
+private list[CloneTuple] _clonePairs = [];
+private int count = 0;
+alias NodeHashLoc = tuple[NodeHash nHash, loc nodeLoc];
+alias CloneTuple = tuple[node nodeA, node nodeB];
 
 void main() {
     str startBenchmarkTime = startBenchmark("benchmark");
@@ -19,14 +24,18 @@ void main() {
 
 	printDebug("Adding node details");
 	list[tuple[int id, node n]] nodeWId = zip2([1..(size(projectNodes) + 1)], projectNodes);
-	list[nodeDetailed] nodeWLoc = [ <id, unsetRec(nodeIc), nLoc, size> |
+	list[nodeDetailed] nodeWLocs = [ <id, nodeIc, nLoc, size> |
 									<id,nodeI> <- nodeWId,
                                     nodeIc := (nodeI),
 									nLoc := nodeFileLocation(nodeI),
 									size := nodeSize(nodeI),
-									size >= 5,
+									size >= 6,
 									nLoc != noLocation,
-									(nLoc.end.line - nLoc.begin.line + 1) >= 5 ];
+									(nLoc.end.line - nLoc.begin.line + 1) >= 6 ];
+
+    list[NodeHashLoc] nodes = [<<hashSubtree(unsetRec(nodeWLoc.d), false), unsetRec(nodeWLoc.d)>, nodeWLoc.l> | nodeWLoc <- nodeWLocs, true];
+	println("Nodes Finished lel");
+    /**
     printDebug("Comparing nodes");
 	int nodeItems = size(nodeWLoc);
 	int counter = 0;
@@ -89,8 +98,10 @@ void main() {
 			
  	//Determine what lines are duplicates
 	//results.duplicateLines = getDuplicateLinesPerFile(model,results); 
+    */
+    list[CloneTuple] results = getClonePairs(nodes, 0.9);//getSubtreeClonePairs(nodes, 5, 1.0);
 
-	println(results);
+	println(size(results));
 
     str stopBenchmarkTime = stopBenchmark("benchmark");
 
@@ -145,4 +156,95 @@ public bool isIncludedInAny(nodeDetailed nodeA, map[nodeId, nodeDetailed] otherN
 
 public bool locationIsValid(loc location){
 	return location.scheme != "unresolved"; 
+}
+
+public list[CloneTuple] getClonePairs(list[NodeHashLoc] hashedSubtrees, num similarityThreshold) {
+    list[ClonePair] clonePairs = [];
+    map[str, list[NodeLoc]] hashBuckets = placingSubTreesInBuckets(hashedSubtrees);
+	println(size(hashBuckets));
+
+	findClones(hashBuckets, 1.0);
+
+    return _clonePairs;
+}
+
+void findClones(map[str, list[NodeLoc]] subtrees, real similarityThreshold,
+                bool print=false, bool type2=false) {
+    int counter = 0;
+    int sizeS = size(subtrees);
+
+    for (hash <- subtrees) {
+        counter += 1;
+        if (print) {
+            println("Hash <counter> / <sizeS>. <hash>");
+        }
+
+        list[NodeLoc] nodes = subtrees[hash];
+		//println(nodes);
+
+        for (i <- nodes) {
+			//iprintln(i);
+            for (j <- nodes) {
+				println("Similarity: <nodeSimilarity(i.nodeLocNode, j.nodeLocNode)>, Equal: <i.l != j.l>");
+                if (!type2 && i.l != j.l) {
+                    addClone(<i.nodeLocNode, j.nodeLocNode>, print=print);
+					println(size(_clonePairs));
+                }
+                else if (i.l != j.l && toReal(nodeSimilarity(i.nodeLocNode, j.nodeLocNode)) >= similarityThreshold) {
+					println("here");
+                    addClone(<i.nodeLocNode, j.nodeLocNode>, print=print);
+                }
+				//println(size(_clonePairs));
+            }
+        }
+    }
+    //return _clonePairs;
+}
+
+public void addClone(CloneTuple newPair, bool print=false) {
+    // Ignore the pair if one node is a subtree of another node
+    if (isSubset(newPair.nodeA, newPair.nodeB) || isSubset(newPair.nodeB, newPair.nodeA)) {
+        return;
+    }
+
+    list[node] children1 = [n | node n <- getChildren(newPair.nodeA)];
+    list[node] children2 = [n | node n <- getChildren(newPair.nodeB)];
+
+    for (oldPair <- _clonePairs) {
+		println(oldPair);
+		println(newPair);
+        // Check if the pair already exists in flipped form
+        if (oldPair == <newPair.nodeB, newPair.nodeA> || oldPair == newPair) {
+            return;
+        }
+
+        // Ignore the pair if it is a subset of an already existing pair
+        if ((isSubset(oldPair.nodeA, newPair.nodeA) && isSubset(oldPair.nodeB, newPair.nodeB)) || (isSubset(oldPair.nodeA, newPair.nodeB) && isSubset(oldPair.nodeB, newPair.nodeA))) {
+            return;
+        }
+
+        // If the current old pair is a subset of the current new pair. Remove it.
+        if ((isSubset(newPair.nodeA, oldPair.nodeA) && isSubset(newPair.nodeB, oldPair.nodeB)) || (isSubset(newPair.nodeA, oldPair.nodeB) && isSubset(newPair.nodeB, oldPair.nodeA))) {
+            _clonePairs -= oldPair;
+        }
+    }
+    _clonePairs += newPair;
+
+    return;
+}
+
+bool isSubset(node tree1, node tree2) {
+    return contains(toString(tree1), toString(tree2));
+}
+
+public map[str, list[NodeLoc]] placingSubTreesInBuckets(list[NodeHashLoc] nodeHashList) {
+        set[str] nodeHashes = toSet([nodeHash.nHash.nodeHash | nodeHash <- nodeHashList, true]);
+        map[str, list[NodeLoc]] hashBuckets = ();
+
+        for(hash <- nodeHashes) {
+            list[NodeHashLoc] nodesHashesWithSameHashes = [h | h <- nodeHashList, h.nHash.nodeHash == hash];
+            list[NodeLoc] nodesWithSameHashes = [<i.nHash.hashedNode, i.nodeLoc> | i <- nodesHashesWithSameHashes, true];
+            hashBuckets = hashBuckets + (hash: nodesWithSameHashes);
+        }
+        return hashBuckets;
 }

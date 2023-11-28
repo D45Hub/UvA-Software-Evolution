@@ -8,14 +8,28 @@ public class HashingAlgorithm implements IAlgorithm {
 
     @Override
     public String executeAlgorithm(String sourceString) {
-        int hashCode = 7;
-        char[] inputCharacters = sourceString.toCharArray();
-    
-        for(char character : inputCharacters) {
-            hashCode = hashCode*31 + ((int)character);
+        int shift = 42;
+
+        System.out.println("Hey");
+        System.out.println("Hey");
+        System.out.println("Hey");
+        System.out.println("Hey");
+        System.out.println("Hey");
+        System.out.println("Hey");
+        System.out.println("Hey");
+        System.out.println("Hey");
+        System.out.println("Hey");
+
+        StringBuilder encryptedText = new StringBuilder();
+        for (char c : sourceString.toCharArray()) {
+            if (Character.isLetter(c)) {
+                char base = Character.isLowerCase(c) ? 'a' : 'A';
+                encryptedText.append((char) (((c - base + shift) % 26) + base));
+            } else {
+                encryptedText.append(c);
+            }
         }
-    
-        return String.valueOf(hashCode);
+        return encryptedText.toString();
     }
 	
 	private void testMethod(String test1, String test2, String test3, String test4, String test5, String test6, String test7) {

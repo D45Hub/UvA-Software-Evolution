@@ -9,6 +9,17 @@ public class CaesarAlgorithm implements IAlgorithm {
     @Override
     public String executeAlgorithm(String sourceString) {
         int shift = 42;
+
+        System.out.println("Hey");
+        System.out.println("Hey");
+        System.out.println("Hey");
+        System.out.println("Hey");
+        System.out.println("Hey");
+        System.out.println("Hey");
+        System.out.println("Hey");
+        System.out.println("Hey");
+        System.out.println("Hey");
+
         StringBuilder encryptedText = new StringBuilder();
         for (char c : sourceString.toCharArray()) {
             if (Character.isLetter(c)) {
