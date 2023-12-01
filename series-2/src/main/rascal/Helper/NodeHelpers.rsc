@@ -131,3 +131,13 @@ bool isSubset(list[node] rootSequence, list[node] subSequence) {
     }
     return false;
 }
+
+bool isSubsequence(list[value] mainList, list[value] subList) {
+    for (i <- [0..size(mainList)]) {
+        int j = i + size(subList);
+        if (mainList[i..j] == subList) {
+            return true;
+        }
+    }
+    return false;
+}

@@ -2,150 +2,142 @@ module Helper::SubsequenceHelper
 
 import lang::java::m3::Core;
 import lang::java::m3::AST;
-
-import Helper::HashingHelper;
+import IO;
+import Node;
+import List;
+import util::Math;
 import Helper::Helper;
-import Helper::CloneHelper;
-
 import Type;
 
-import List;
-import Map;
-import IO;
-
-private list[CloneTuple] _sequenceClones = [];
-
-map[str hash, list[list[node]] sequenceRoots] getSequences(list[Declaration] ASTs, int sequenceThreshold) {
+map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, int minimumSequenceLengthThreshold, int cloneType) {
+    map[str, list[list[node]]] hashTable = ();
     list[list[node]] sequences = [];
-    visit(ASTs) {
+    visit (ast) {
         case \block(statements): {
             list[node] sequence = statements;
-
-            if (size(sequence) >= sequenceThreshold) {
+            if (size(sequence) >= minimumSequenceLengthThreshold) {
                 sequences += [sequence];
             }
         }
     }
-
-    // map[node, str] hashes = ();
-    map[str, list[list[node]]] subsequences = ();
-    println("Size sequences <size(sequences)>");
-    int idx = 0;
-    for (list[node] sequence <- sequences) {
-        idx += 1;
-        //println("Index: <idx>");
-        for (i <- [0..(size(sequence) + 1)]) {
-            for (j <- [0..(size(sequence) + 1)]) {
-                //println("I: <i>");
-                //println("J: <j>");
-                //println("Thes: <i + sequenceThreshold>");
-                if ((j >= i + sequenceThreshold)) {
-                    list[node] subsequence = sequence[i..j];
-                    
-                    hash = hashSequence(subsequence, false);
-                    //println("Subseq: <size(subsequence)>, I: <i>, J: <j>, Hash: <hash>");
-
-                    if (hash notin subsequences) {
-                        subsequences[hash] = [];
-                    }
-
-                    subsequences[hash] += [subsequence];
-                    //println(size(subsequences[hash]));
+    for (sequence <- sequences) {
+        for (i <- [0..(size(sequence) + 1)], j <- [0..(size(sequence) + 1)]) {
+            if ((j >= i + minimumSequenceLengthThreshold)) {
+                list[node] subsequence = sequence[i..j];
+                // hash every subsequence
+                str subsequenceHash = "";
+                for (n <- subsequence) {
+                    subsequenceHash += md5Hash(unsetRec(n));
+                }
+                str sequenceHash = md5Hash(subsequenceHash);
+                // println("<subsequence> <i> <j> <subsequenceHash> <sequenceHash>\n");
+                // if (cloneType == 2) {
+                //     n = normalizeIdentifiers(n);
+                // } else if (cloneType == 3) {
+                //     n = normalizeIdentifiers(n);
+                // }
+                if (sequenceHash in hashTable) {
+                    hashTable[sequenceHash] += [subsequence];
+                } else {
+                    hashTable[sequenceHash] = [subsequence];
                 }
             }
         }
     }
-
-    return subsequences;
+    return hashTable;
 }
 
-// Function to find sequence clones
-list[CloneTuple] findSequenceClones(map[str, list[list[node]]] sequences,
-                        real similarityThreshold, list[CloneTuple] clonePairs, 
-                        bool print=false,
-                        bool type2=false) {
 
-    int counter = 0;
-    //int sizeS = size(sequences);
+list[tuple[list[node], list[node]]] removeSequenceSubclones(list[tuple[list[node], list[node]]] clones, list[node] i, list[node] j) {
+    for(pair <- clones) {
+        for(s <- i, s2 <- j){
+            if (pair[0] == s && pair[1] == s2) {
+                clones -= <s, s2>;
+            } else if (pair[0] == s2 && pair[1] == s) {
+                clones -= <s2, s>;
+            }
+        }
+    }
+    return clones;   
+}
 
-    for (hash <- sequences) {
-        counter += 1;
+bool canAddSequence(list[tuple[list[node], list[node]]] clones, list[node] i, list[node] j) {
+    for(pair <- clones) {
+        if(isSubset(pair[0], i) || isSubset(pair[1], j)){
+            return false;
+        }
+    }
+    return true;
+}
 
-        list[list[node]] subsequences = sequences[hash];
-        //println("Subsequences amount: <typeOf(subsequences)>");
+list[tuple[list[node], list[node]]] addSequenceClone(list[tuple[list[node], list[node]]] clones, list[node] i, list[node] j) {
+    // if clones is empty, just add the pair
+    if (size(clones) == 0) {
+        clones = [<i, j>];
+    } else {
+        // check if the pair is already in clones, as is or as a subclone
+        if (<j,i> in clones) {
+            return clones;
+        }
+        clones = removeSequenceSubclones(clones, i, j);
+        if (canAddSequence(clones, i, j)) {
+            clones += <i, j>;
+        }
+    }
 
-        for (i <- subsequences) {
-            for (j <- subsequences) {
-                //println("Size I: <size(i)>");
-                //println("Size J: <size(j)>");
-                //println(i != j);
-                if (! type2 && i != j) {
-                    //println("Pair: <<i, j>>");
-                    println("ye");
-                    CloneTuple sequenceTuple = <i[0], j[0]>;
-                    addSequenceClone(sequenceTuple, clonePairs);
+    return clones;
+}
+
+list[tuple[list[node], list[node]]] findSequenceClonePairs(map[str, list[list[node]]] hashTable, real similarityThreshold, int cloneType) {
+    list[tuple[list[node], list[node]]] clones = [];
+    // for each sequence i and j in the same bucket
+	for (bucket <- hashTable) {	
+        for (i <- hashTable[bucket], j <- hashTable[bucket]) {
+            // ensure we are not comparing one thing with itself
+            if (i != j) {
+                real comparison = similarity(i, j);
+                // check if are clones
+                if (((cloneType == 1 && comparison == 1.0) || ((cloneType == 2 || cloneType == 3)) && (comparison >= similarityThreshold))) {
+                    clones = addSequenceClone(clones, i, j);
                 }
-                else if (i != j) {
-                    if (nodeSimilarity(i, j) >= similarityThreshold) {
-                        addSequenceClone(<i, j>, clonePairs);
-                    }
-                }
+            }
+        }	
+    }
+    return clones;
+}
+
+real similarity(list[node] subtrees1, list[node] subtrees2) {
+    list[real] SLR = [0.0, 0.0, 0.0];
+    for (i <- [0..size(subtrees1)]) {
+        tuple[int S, int L, int R] currentSLR = sharedUniqueNodes(subtrees1[i], subtrees2[i]);
+        SLR[0] += toReal(currentSLR[0]);
+        SLR[1] += toReal(currentSLR[1]);
+        SLR[2] += toReal(currentSLR[2]);
+    }
+
+    real similarity = 2.0 * SLR[0] / (2.0 * SLR[0] + SLR[1] + SLR[2]);
+    return similarity;
+}
+
+tuple[int S, int L, int R] sharedUniqueNodes(node subtree1, node subtree2) {
+    map[node, int] nodeCounter = ();
+    int shared = 0;
+    int unique = 0;
+
+    visit(subtree1) {
+        case node n: nodeCounter[unsetRec(n)]?0 += 1;
+    }
+    visit(subtree2) {
+        case node n: {
+            int a = nodeCounter[unsetRec(n)]?0;
+            if (a > 0) {
+                shared += 2;
+                nodeCounter[unsetRec(n)] -= 1;
+            } else {
+                unique += 1;
             }
         }
     }
 
-    return _sequenceClones;
-}
-
-// TODO LOOK AT NEFELI FURTHER...
-
-// Function to add sequence clones to our list of clone pairs. Also implements
-// subsumption in a similar way as is the case in addClone().
-// This function includes some optional print functionality for debugging purposes.
-public void addSequenceClone(CloneTuple newPair, list[CloneTuple] clonePairs) {
-    
-    // Ignore the pair if one node is a subtree of another node
-    if (isNodeSubset(newPair.nodeA, newPair.nodeB) || isNodeSubset(newPair.nodeB, newPair.nodeA)) {
-        return;
-    }
-
-
-
-    // Check the sequence pairs
-    for (oldPair <- _sequenceClones) {
-        // Check if the pair already exists in flipped form
-        if (oldPair == <newPair.nodeB, newPair.nodeA>) {
-            return;
-        }
-
-        // Ignore the pair if it is a subset of an already existing pair
-        if ((isNodeSubset(oldPair.nodeA, newPair.nodeA) && isNodeSubset(oldPair.nodeB, newPair.nodeB)) || (isNodeSubset(oldPair.nodeA, newPair.nodeB) && isNodeSubset(oldPair.nodeB, newPair.nodeA))) {
-            return;
-        }
-
-        // If the current old pair is a subset of the current new pair. Remove
-        // the old pair.
-        if ((isNodeSubset(newPair.nodeA, oldPair.nodeA) && isNodeSubset(newPair.nodeB, oldPair.nodeB)) || (isNodeSubset(newPair.nodeA, oldPair.nodeB) && isNodeSubset(newPair.nodeB, oldPair.nodeA))) {
-            _sequenceClones -= oldPair;
-        }
-    }
-
-    // Check the atomic pairs.
-    for (oldPair <- clonePairs) {
-        // Check if the new pair already exists as atomic pair(normal and flipped) (only for sequence length 1)
-
-        // Ignore the new sequence pair if it is a subset of an already existing atomic pair
-        if ((isNodeSubset(oldPair.nodeA, newPair.nodeA) && isNodeSubset(oldPair.nodeB, newPair.nodeB)) || (isNodeSubset(oldPair.nodeA, newPair.nodeB) && isNodeSubset(oldPair.nodeB, newPair.nodeA))) {
-            return;
-        }
-
-        // If the current atomic pair is a subset of the current new sequence pair. Remove it.
-        if ((isNodeSubset(newPair.nodeA, oldPair.nodeA) && isNodeSubset(newPair.nodeB, oldPair.nodeB)) || (isNodeSubset(newPair.nodeA, oldPair.nodeB) && isNodeSubset(newPair.nodeB, oldPair.nodeA))) {
-            clonePairs -= oldPair;
-        }
-    }
-
-    _sequenceClones += newPair;
-
-    return;
+    return <shared, unique, 0>;
 }

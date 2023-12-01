@@ -9,7 +9,6 @@ import lang::java::m3::Core;
 import lang::java::m3::AST;
 import util::Math;
 import Configuration;
-import Helper::CloneSequences;
 import Helper::SubsequenceHelper;
 import Helper::ProjectHelper;
 import Helper::OutputHelper;
@@ -32,14 +31,13 @@ void main() {
 	printDebug("Adding node details");
 
     list[NodeHashLoc] nodes = prepareASTNodesForAnalysis(projectNodes, MASS_THRESHOLD);
-	println("Nodes Finished lel");
     list[CloneTuple] results = getClonePairs(nodes, SIMILARTY_THRESHOLD);
     println("Amount of Clone Pairs <size(results)>");
 
     //map[str hash, list[list[node]] sequenceRoots] sequences = getSequences(asts, 15);
     //println("Sequences: <size(sequences)>");
-    map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, 6, 1);
-    println("Sequences2: <size(sequences2)>");
+    map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, 5, 1);
+    println("Sequences: <size(sequences2)>");
 /**
     real sequenceThreshold = SIMILARTY_THRESHOLD;
     list[CloneTuple] sequenceClones = findSequenceClones(sequences, sequenceThreshold, results);
@@ -102,7 +100,7 @@ void main() {
         duplicatedLinesAmount += maxFromLineA - maxToLineA;
 
     }
-    println(duplicatedLinesAmount);
+    println("Duplicated Lines: <duplicatedLinesAmount>");
     println("Duplicate Results: <size(duplicationResults)>");
     writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, duplicationResults);
     str stopBenchmarkTime = stopBenchmark("benchmark");
