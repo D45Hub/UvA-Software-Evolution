@@ -13,9 +13,15 @@ import Helper::SubsequenceHelper;
 import Helper::ProjectHelper;
 import Helper::OutputHelper;
 
-loc denisProject = |file:///C:/Users/denis/Documents/Software-Evolution/UvA-Software-Evolution/series-1/hsqldb/|;
+import lang::java::\syntax::Java15;
+import IO;
+import Set;
+import Location;
+import Map;
+
+loc denisProject = |file:///C:/Users/denis/Documents/Software-Evolution/UvA-Software-Evolution/series-1/smallsql/|;
 loc lisaProject = |file:///Users/ekletsko/Downloads/smallsql0.21_src|;
-loc encryptorProject = |project://series-2/src/main/rascal/simpleencryptor|;
+loc encryptorProject = denisProject;//|project://series-2/src/main/rascal/simpleencryptor|;
 
 ProjectLocation project = denisProject;
 
@@ -37,6 +43,7 @@ void main() {
     //map[str hash, list[list[node]] sequenceRoots] sequences = getSequences(asts, 15);
     //println("Sequences: <size(sequences)>");
     map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, 5, 1);
+
     println("Sequences: <size(sequences2)>");
 /**
     real sequenceThreshold = SIMILARTY_THRESHOLD;
@@ -47,6 +54,20 @@ void main() {
 
     int duplicatedLinesAmount = 0;
     list[DuplicationResult] duplicationResults = [];
+
+    M3 model = createM3FromMavenProject(encryptorProject);
+    methodObjects = methods(model);
+    map[loc fileLoc, loc method] mapLocs = ();
+    
+    for(m <- methodObjects) {
+        decl = getFirstFrom(model.declarations[m]);
+        int beginDecl = decl.begin.line;
+        int endDecl = decl.end.line;
+
+        if(endDecl - beginDecl >= 6) {
+            mapLocs += (decl: m);
+        }   
+    }
 
     for(c <- sequenceClones) {
 
@@ -92,16 +113,42 @@ void main() {
             }
         }
 
-        DuplicationLocation res1 = <nodeALoc.uri, "test", maxToLineA, maxFromLineA, "Type 1">;
-        DuplicationLocation res2 = <nodeBLoc.uri, "test", maxToLineB, maxFromLineB, "Type 1">;
+// TODO REFACTOR THIS RADIOACTIVE GLOWING SHIT... I DONT WANT ANYMORE... IT IS LATE...
+        str methodNameA = "";
+        str methodNameB = "";
+        for(k <- mapLoc) {
+            str nodeAFileName = split("///", nodeALoc.uri)[1];
+            str nodeBFileName = split("///", nodeBLoc.uri)[1];
+            str projectFileName = split("//", k.uri)[1];
+            if(contains(projectFileName, nodeAFileName) && nodeALoc.begin.line >= k.begin.line && nodeALoc.end.line <= k.end.line) {
+                methodNameA = mapLoc[k].path;
+
+                if(methodNameB != ""){
+                    break;
+                }
+            }
+
+            if(contains(projectFileName, nodeBFileName) && nodeBLoc.begin.line >= k.begin.line && nodeBLoc.end.line <= k.end.line) {
+                methodNameB = mapLoc[k].path;
+                if(methodNameA != ""){
+                    break;
+                }
+            }
+        }
+
+        DuplicationLocation res1 = <nodeALoc.path, methodNameA, maxToLineA, maxFromLineA, "Type 1">;
+        DuplicationLocation res2 = <nodeBLoc.path, methodNameB, maxToLineB, maxFromLineB, "Type 1">;
 
         duplicationResults += [<res1, res2>];
 
         duplicatedLinesAmount += maxFromLineA - maxToLineA;
 
-    }
+    }    
+    
     println("Duplicated Lines: <duplicatedLinesAmount>");
     println("Duplicate Results: <size(duplicationResults)>");
+
+
     writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, duplicationResults);
     str stopBenchmarkTime = stopBenchmark("benchmark");
     println(stopBenchmarkTime);
