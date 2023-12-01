@@ -12,6 +12,7 @@ import Configuration;
 import Helper::CloneSequences;
 import Helper::SubsequenceHelper;
 import Helper::ProjectHelper;
+import Helper::OutputHelper;
 
 loc denisProject = |file:///C:/Users/denis/Documents/Software-Evolution/UvA-Software-Evolution/series-1/hsqldb/|;
 loc lisaProject = |file:///Users/ekletsko/Downloads/smallsql0.21_src|;
@@ -47,6 +48,7 @@ void main() {
     println("Sequence Clones: <size(sequenceClones)>");
 
     int duplicatedLinesAmount = 0;
+    list[DuplicationResult] duplicationResults = [];
 
     for(c <- sequenceClones) {
 
@@ -90,22 +92,19 @@ void main() {
             if(nodeBLoc.end.line > maxToLineB) {
                 maxFromLineB = nodeBLoc.end.line;
             }
-
-            /**
-            //if(nodeALoc.end.line - nodeALoc.begin.line > 1 && nodeBLoc.end.line - nodeBLoc.begin.line > 1) {
-            println("--------------");
-            println("NodeA Lines: <nodeALoc.begin.line> until <nodeALoc.end.line> in <nodeALoc.uri>");
-            println("NodeB Lines: <nodeBLoc.begin.line> until <nodeBLoc.end.line> in <nodeBLoc.uri>");
-            println("--------------");
-            //}
-            */
         }
-        println("From: <maxFromLineA>, To: <maxToLineA>, File: <nodeALoc.uri>");
-        println("From: <maxFromLineB>, To: <maxToLineB>, File: <nodeBLoc.uri>");
+
+        DuplicationLocation res1 = <nodeALoc.uri, "test", maxToLineA, maxFromLineA, "Type 1">;
+        DuplicationLocation res2 = <nodeBLoc.uri, "test", maxToLineB, maxFromLineB, "Type 1">;
+
+        duplicationResults += [<res1, res2>];
+
         duplicatedLinesAmount += maxFromLineA - maxToLineA;
 
     }
     println(duplicatedLinesAmount);
+    println("Duplicate Results: <size(duplicationResults)>");
+    writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, duplicationResults);
     str stopBenchmarkTime = stopBenchmark("benchmark");
     println(stopBenchmarkTime);
 }
