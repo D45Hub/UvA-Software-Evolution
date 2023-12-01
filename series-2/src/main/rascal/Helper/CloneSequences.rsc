@@ -151,39 +151,25 @@ map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, int mi
 
 list[tuple[list[node], list[node]]] removeSequenceSubclones(list[tuple[list[node], list[node]]] clones, list[node] i, list[node] j) {
     for(pair <- clones) {
-        visit(i) {
-            case node s: {
-                visit(j) {
-                    case node s2: {
+        for(s <- i, s2 <- j){
                         if (pair[0] == s && pair[1] == s2) {
                             clones -= <s, s2>;
                         } else if (pair[0] == s2 && pair[1] == s) {
                             clones -= <s2, s>;
                         }
-                    }
-                }
-            }
         }
     }
-    return clones;    
+    return clones;   
 }
 
 bool canAddSequence(list[tuple[list[node], list[node]]] clones, list[node] i, list[node] j) {
     for(pair <- clones) {
-        for(member1 <- pair[0], member2 <- pair[1]) {
-            visit(member1) {
-                case node s: {
-                    visit(member2) {
-                        case node s2: {
-                            if (i <= s && j <= s2) {
-                                // println("cant add : <i> <j> <pair>\n");
-                                return false;
-                            }
-                        }
-                    }
-                }
+        //for(member1 <- pair[0], member2 <- pair[1]) {
+            //println(typeOf(member1));
+            if(isSubset(pair[0], i) || isSubset(pair[1], j)){
+                return false;
             }
-        }
+        //}
     }
     return true;
 }
@@ -260,7 +246,7 @@ list[tuple[list[node], list[node]]] findSequenceClonePairs(map[str, list[list[no
                 // check if are clones
                 if (((cloneType == 1 && comparison == 1.0) || ((cloneType == 2 || cloneType == 3)) && (comparison >= similarityThreshold))) {
                     //println("<i> <j>\n");
-                    println("Comparison: <comparison>, Idx: <buckedIdx>");
+                    //println("Comparison: <comparison>, Idx: <buckedIdx>");
                     clones = addSequenceClone(clones, i, j);
                 }
             }
