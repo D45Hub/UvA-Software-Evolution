@@ -11,10 +11,11 @@ import util::Math;
 import Configuration;
 import Helper::CloneSequences;
 import Helper::SubsequenceHelper;
+import Helper::ProjectHelper;
 
-loc denisProject = |file:///C:/Users/denis/Documents/Software-Evolution/UvA-Software-Evolution/series-1/smallsql/|;
+loc denisProject = |file:///C:/Users/denis/Documents/Software-Evolution/UvA-Software-Evolution/series-1/hsqldb/|;
 loc lisaProject = |file:///Users/ekletsko/Downloads/smallsql0.21_src|;
-loc encryptorProject = denisProject;//|project://series-2/src/main/rascal/simpleencryptor|;
+loc encryptorProject = |project://series-2/src/main/rascal/simpleencryptor|;
 
 ProjectLocation project = denisProject;
 
@@ -23,7 +24,9 @@ void main() {
     str startBenchmarkTime = startBenchmark("benchmark");
     println(startBenchmarkTime);
     
-    list[node] projectNodes = prepareProjectForAnalysis(encryptorProject);
+    list[Declaration] asts = getASTs(encryptorProject);
+
+    list[node] projectNodes = prepareProjectForAnalysis(asts);
 
 	printDebug("Adding node details");
 
@@ -32,7 +35,6 @@ void main() {
     list[CloneTuple] results = getClonePairs(nodes, SIMILARTY_THRESHOLD);
     println("Amount of Clone Pairs <size(results)>");
 
-    list[Declaration] asts = getASTs(encryptorProject);
     //map[str hash, list[list[node]] sequenceRoots] sequences = getSequences(asts, 15);
     //println("Sequences: <size(sequences)>");
     map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, 6, 1);
@@ -44,19 +46,21 @@ void main() {
     list[tuple[list[node], list[node]]] sequenceClones = findSequenceClonePairs(sequences2, 1.0, 1);
     println("Sequence Clones: <size(sequenceClones)>");
 
-    //int idx = 0;
+    int duplicatedLinesAmount = 0;
+
     for(c <- sequenceClones) {
-        //println("Sequence: <idx>");
 
         //set[tuple[int from, int to]] maxAmount = ();
         int maxFromLineA = -1;
         int maxToLineA = -1;
         int maxFromLineB = -1;
         int maxToLineB = -1;
+        loc nodeALoc = |test://unknown|;
+        loc nodeBLoc = |test://unknown|;
 
         for(nodeA <- c[0], nodeB <- c[1]) {
-            loc nodeALoc = nodeFileLocation(nodeA);
-            loc nodeBLoc = nodeFileLocation(nodeB);
+            nodeALoc = nodeFileLocation(nodeA);
+            nodeBLoc = nodeFileLocation(nodeB);
 
             if(maxFromLineA == -1 && maxToLineA == -1) {
                 maxFromLineA = nodeALoc.begin.line;
@@ -96,12 +100,12 @@ void main() {
             //}
             */
         }
-        //println("From: <maxFromLineA>, To: <maxToLineA>");
-        //println("From: <maxFromLineB>, To: <maxToLineB>");
+        println("From: <maxFromLineA>, To: <maxToLineA>, File: <nodeALoc.uri>");
+        println("From: <maxFromLineB>, To: <maxToLineB>, File: <nodeBLoc.uri>");
+        duplicatedLinesAmount += maxFromLineA - maxToLineA;
 
-        //idx += 1;
     }
-
+    println(duplicatedLinesAmount);
     str stopBenchmarkTime = stopBenchmark("benchmark");
     println(stopBenchmarkTime);
 }
