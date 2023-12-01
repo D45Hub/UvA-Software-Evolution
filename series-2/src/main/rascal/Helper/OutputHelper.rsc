@@ -5,14 +5,26 @@ import IO;
 import String;
 
 void writeJSONFile(loc outputFileLocation, list[DuplicationResult] results) {
-    str jsonContent = "{\"projectResults\": [";
+    str jsonContent = "{\"projectResults\": {
+    
+    \"projectName\": \"test\", 
+    \"projectLOC\": \"test\", 
+    \"duplicatedLines\": \"test\", 
+    \"duplicatedLinePercentage\": \"test\", 
+    \"numberOfCloneClasses\": \"test\", 
+    \"biggestCloneLocation\": \"test\", 
+    \"biggestCloneLOC\": \"test\", 
+    \"biggestCloneClass\": \"test\", 
+
+    \"clonePairs\": 
+     [";
 
     for(duplicationResult <- results) {
         jsonContent += getJSONContentOfResult(duplicationResult);
     }
 
     jsonContent = jsonContent[0..(size(jsonContent) - 1)];
-    jsonContent += "]}";
+    jsonContent += "]}}";
     writeFile(outputFileLocation, jsonContent);
 }
 
