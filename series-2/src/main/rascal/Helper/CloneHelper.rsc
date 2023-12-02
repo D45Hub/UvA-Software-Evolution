@@ -2,6 +2,8 @@ module Helper::CloneHelper
 import Helper::ProjectHelper;
 import Helper::Types;
 
+import util::UUID;
+
 public list[CloneTuple] getClonePairs(list[NodeHashLoc] hashedSubtrees, num similarityThreshold) {
     map[str, list[NodeLoc]] hashBuckets = placingSubTreesInBuckets(hashedSubtrees);
 	list[CloneTuple] clonePairs = findClones(hashBuckets, similarityThreshold);
@@ -152,3 +154,104 @@ bool isLocContainedInResultLoc(DuplicationLocation duplLoc1, DuplicationLocation
 
     return areD1D2FilePathsEqual && areD1D2MethodNamesEqual && areD1D2StartLinesEqual && areD1D2EndLinesEqual;
 }
+
+list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[node]]] sequenceClones, map[loc fileLoc, MethodLoc method] mapLocs) {
+    list[DuplicationResult] duplicationResults = [];
+    for(c <- sequenceClones) {
+
+        //set[tuple[int from, int to]] maxAmount = ();
+        int maxFromLineA = -1;
+        int maxToLineA = -1;
+        int maxFromLineB = -1;
+        int maxToLineB = -1;
+        loc nodeALoc = noLocation;
+        loc nodeBLoc = noLocation;
+
+        for(nodeA <- c[0], nodeB <- c[1]) {
+            nodeALoc = nodeFileLocation(nodeA);
+            nodeBLoc = nodeFileLocation(nodeB);
+
+            if(maxFromLineA == -1 && maxToLineA == -1) {
+                maxFromLineA = nodeALoc.begin.line;
+                maxToLineA = nodeALoc.end.line;
+            }
+            
+            if(nodeALoc.begin.line < maxFromLineA) {
+                maxFromLineA = nodeALoc.begin.line;
+            }
+
+            if(nodeALoc.end.line > maxToLineA) {
+                // WHY NOT MAXTOLINEB? THIS DOES NOT WORK OTHERWISE...
+                maxFromLineA = nodeALoc.end.line;
+            }
+
+            
+
+
+            if(maxFromLineB == -1 && maxToLineB == -1) {
+                maxFromLineB = nodeBLoc.begin.line;
+                maxToLineB = nodeBLoc.end.line;
+            }
+            
+            if(nodeBLoc.begin.line < maxFromLineA) {
+                maxFromLineB = nodeBLoc.begin.line;
+            }
+
+            if(nodeBLoc.end.line > maxToLineB) {
+                // WHY NOT MAXTOLINEB? THIS DOES NOT WORK OTHERWISE...
+                maxFromLineB = nodeBLoc.end.line;
+            }
+        }
+
+// TODO REFACTOR THIS RADIOACTIVE GLOWING SHIT... I DONT WANT ANYMORE... IT IS LATE...
+        MethodLoc methodA = <noLocation, -1>;
+        MethodLoc methodB = <noLocation, -1>;
+        for(k <- mapLocs) {
+            str nodeAFileName = split("///", nodeALoc.uri)[1];
+            str nodeBFileName = split("///", nodeBLoc.uri)[1];
+            str projectFileName = k.uri;
+            if(contains(projectFileName, nodeAFileName) && nodeALoc.begin.line >= k.begin.line && nodeALoc.end.line <= k.end.line) {
+                methodA = mapLocs[k];
+
+                if(methodB.methodLocation != noLocation && methodB.methodLoc != -1){
+                    break;
+                }
+            }
+
+            if(contains(projectFileName, nodeBFileName) && nodeBLoc.begin.line >= k.begin.line && nodeBLoc.end.line <= k.end.line) {
+                methodB = mapLocs[k];
+                if(methodA.methodLocation != noLocation && methodA.methodLoc != -1){
+                    break;
+                }
+            }
+        }
+
+        str duplicationUUID = toString(uuidi());
+        DuplicationLocation res1 = <duplicationUUID, nodeALoc.path, methodA<0>.path, methodA<1>, maxToLineA, maxFromLineA>;
+        duplicationUUID = toString(uuidi());
+        DuplicationLocation res2 = <duplicationUUID, nodeBLoc.path, methodB<0>.path, methodB<1>, maxToLineB, maxFromLineB>;
+        DuplicationResult dRes = [res1, res2];
+
+        duplicationResults += [dRes];
+    }  
+
+    return duplicationResults;
+}
+
+DuplicationResult getLargestDuplicationClass(list[DuplicationResult] cloneClasses) {
+    DuplicationResult biggestDuplicationClass = cloneClasses[0];
+    DuplicationLocation biggestDuplicationLoc = biggestDuplicationClass[0];
+    int biggestDuplLines = biggestDuplicationLoc.endLine - biggestDuplicationLoc.startLine;
+
+    for(itClass <- cloneClasses) {
+        DuplicationLocation itDuplicationLoc = itClass[0];
+        int itDuplicationLines = (itDuplicationLoc.endLine - itDuplicationLoc.startLine);
+        if(biggestDuplLines < itDuplicationLines) {
+            biggestDuplLines = itDuplicationLines;
+            biggestDuplicationLoc = itDuplicationLoc;
+            biggestDuplicationClass = itClass;
+        }
+    }
+
+    return biggestDuplicationClass;
+} 

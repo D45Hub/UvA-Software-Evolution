@@ -4,8 +4,13 @@ import Helper::ASTHelper;
 import lang::java::m3::Core;
 import lang::java::m3::AST;
 
+import Helper::Types;
+import Helper::LOCHelper;
+import Configuration;
+import Prelude;
+import Location;
 
-public list [node] prepareProjectForAnalysis(loc project) {
+public list[node] prepareProjectForAnalysis(loc project) {
     list[Declaration] projectAST = getASTs(project);
     return prepareASTNodesForAnalysis(projectAST);
 }
@@ -23,4 +28,21 @@ public bool locationIsValid(loc location){
 str getConcatenatedProjectFile(M3 model) {
     set[loc] sourceFileLocations = files(model);
     return ("" | it + "\n" + readFile(l) | loc l <- sourceFileLocations);
+}
+
+map[loc fileLoc, MethodLoc method] getMethodLocs(M3 model) {
+    methodObjects = methods(model);
+    map[loc fileLoc, MethodLoc method] mapLocs = ();
+    
+    for(m <- methodObjects) {
+        decl = getFirstFrom(model.declarations[m]);
+        int beginDecl = decl.begin.line;
+        int endDecl = decl.end.line;
+
+        if(endDecl - beginDecl >= MASS_THRESHOLD) {
+            int methodLoc = size(getLOC(readFile(m)));
+            mapLocs += (decl: <m, methodLoc>);
+        }   
+    }
+    return mapLocs;
 }
