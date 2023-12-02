@@ -23,7 +23,7 @@ import Map;
 
 loc denisProject = |file:///C:/Users/denis/Documents/Software-Evolution/UvA-Software-Evolution/series-1/smallsql/|;
 loc lisaProject = |file:///Users/ekletsko/Downloads/smallsql0.21_src|;
-loc encryptorProject = |project://series-2/src/main/rascal/simpleencryptor|;
+loc encryptorProject = denisProject;//|project://series-2/src/main/rascal/simpleencryptor|;
 
 ProjectLocation project = denisProject;
 
@@ -173,7 +173,7 @@ void main() {
     println("Duplicate Results: <size(duplicationResults)>");
 
     int projectLoc = size(getLOC(getConcatenatedProjectFile(model)));
-    writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, size(classes), duplicatedLinesAmount, biggestDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
+    writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
     str stopBenchmarkTime = stopBenchmark("benchmark");
     println(stopBenchmarkTime);
 }
