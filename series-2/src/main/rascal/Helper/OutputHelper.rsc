@@ -3,18 +3,23 @@ module Helper::OutputHelper
 import Helper::Types;
 import IO;
 import String;
+import util::Math;
 
-void writeJSONFile(loc outputFileLocation, list[DuplicationResult] results) {
-    str jsonContent = "{\"projectResults\": {
+void writeJSONFile(loc outputFileLocation, list[DuplicationResult] results, str projectName, int projectLOC, int duplicatedLines, int massThreshold, real similarityThreshold) {
+    real duplicatedLinePercentage = toReal(toReal(duplicatedLines) / toReal(projectLOC)) * 100.0;
     
-    \"projectName\": \"test\", 
-    \"projectLOC\": \"test\", 
-    \"duplicatedLines\": \"test\", 
-    \"duplicatedLinePercentage\": \"test\", 
+    str jsonContent = "{
+    
+    \"projectName\": \"<projectName>\", 
+    \"projectLOC\": <projectLOC>, 
+    \"duplicatedLines\": <duplicatedLines>, 
+    \"duplicatedLinePercentage\": <duplicatedLinePercentage>, 
     \"numberOfCloneClasses\": \"test\", 
     \"biggestCloneLocation\": \"test\", 
     \"biggestCloneLOC\": \"test\", 
     \"biggestCloneClass\": \"test\", 
+    \"massThreshold\": <massThreshold>,
+    \"similarityThreshold\": <similarityThreshold>,
 
     \"clonePairs\": 
      [";
@@ -24,19 +29,20 @@ void writeJSONFile(loc outputFileLocation, list[DuplicationResult] results) {
     }
 
     jsonContent = jsonContent[0..(size(jsonContent) - 1)];
-    jsonContent += "]}}";
+    jsonContent += "]}";
     writeFile(outputFileLocation, jsonContent);
 }
 
 str getJSONContentOfResult(DuplicationResult duplicationResult) {
-    str content = "{\"duplication\": [";
+    str content = "[";
 
-    content += getJSONContentOfLocation(duplicationResult[0]);
-    content += "<getJSONContentOfLocation(duplicationResult[1])>";
+    for(DuplicationLocation duplicationLocation <- duplicationResult) {
+        content += getJSONContentOfLocation(duplicationLocation);
+    }
 
     content = content[0..(size(content) - 1)];
 
-    content += "]},";
+    content += "],";
 
     return content;
 }
@@ -44,11 +50,11 @@ str getJSONContentOfResult(DuplicationResult duplicationResult) {
 str getJSONContentOfLocation(DuplicationLocation duplicationLocation) {
     str content = "{";
 
+    content += "\"id\": \"<duplicationLocation.uuid>\",";
     content += "\"filePath\": \"<duplicationLocation.filePath>\",";
     content += "\"methodName\": \"<duplicationLocation.methodName>\",";
     content += "\"startLine\": <duplicationLocation.startLine>,";
-    content += "\"endLine\": <duplicationLocation.endLine>,";
-    content += "\"cloneType\": \"<duplicationLocation.cloneType>\"},";
+    content += "\"endLine\": <duplicationLocation.endLine>},";
 
     return content;
 }

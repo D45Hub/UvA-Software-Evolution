@@ -7,5 +7,5 @@ public alias CloneTuple = tuple[node nodeA, node nodeB];
 public alias NodeLoc = tuple[node nodeLocNode, loc l];
 public alias NodeHashLoc = tuple[NodeHash nHash, loc nodeLoc];
 
-public alias DuplicationLocation = tuple[str filePath, str methodName, int startLine, int endLine, str cloneType];
-public alias DuplicationResult = tuple[DuplicationLocation loc1, DuplicationLocation loc2];
+public alias DuplicationLocation = tuple[str uuid, str filePath, str methodName, int startLine, int endLine];
+public alias DuplicationResult = list[DuplicationLocation];
