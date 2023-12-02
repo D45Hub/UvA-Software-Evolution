@@ -7,8 +7,6 @@ import List;
 
 public loc noLocation = |unresolved:///|;
 
-private list[CloneTuple] _clonePairs = [];
-
 /* Determining the size of a subtree, needed for the mass threshold */ 
 public int nodeSize(node subtree) {
 	return arity(subtree) + 1;
