@@ -11,25 +11,21 @@ public list[CloneTuple] getClonePairs(list[NodeHashLoc] hashedSubtrees, num simi
 
 list[CloneTuple] findClones(map[str, list[NodeLoc]] subtrees, real similarityThreshold bool type2=false) {
     list[CloneTuple] clonePairs = [];
-    int counter = 0;
-    int sizeS = size(subtrees);
     for (hash <- subtrees) {
-        counter += 1;
         list[NodeLoc] nodes = subtrees[hash];
         for (i <- nodes, j <- nodes) {
-                if (!type2 && i.l != j.l) {
-                    clonePairs = addClone(clonePairs, <i.nodeLocNode, j.nodeLocNode>);
-                }
-                else if (i.l != j.l && toReal(nodeSimilarity(i.nodeLocNode, j.nodeLocNode)) >= similarityThreshold) {
-                    clonePairs = addClone(clonePairs, <i.nodeLocNode, j.nodeLocNode>);
-                }
+            if (!type2 && i.l != j.l) {
+                clonePairs = addClone(clonePairs, <i.nodeLocNode, j.nodeLocNode>);
+            }
+            else if (i.l != j.l && toReal(nodeSimilarity(i.nodeLocNode, j.nodeLocNode)) >= similarityThreshold) {
+                clonePairs = addClone(clonePairs, <i.nodeLocNode, j.nodeLocNode>);
+            }
         }
     }
     return clonePairs;
 }
 
 public list[CloneTuple] addClone(list[CloneTuple] clonePairs, CloneTuple newPair) {
-
     // Ignore the pair if one node is a subtree of another node
     bool isNewNodeABSubset = isNodeSubset(newPair.nodeA, newPair.nodeB);
     bool isNewNodeBASubset = isNodeSubset(newPair.nodeB, newPair.nodeA);
