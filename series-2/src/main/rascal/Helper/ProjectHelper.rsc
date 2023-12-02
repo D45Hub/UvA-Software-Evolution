@@ -18,3 +18,9 @@ public list [node] prepareProjectForAnalysis(list[Declaration] projectAST) {
 public bool locationIsValid(loc location){
 	return location.scheme != "unresolved"; 
 }
+
+// Provides all project file contents inside of a single string concatenated together.
+str getConcatenatedProjectFile(M3 model) {
+    set[loc] sourceFileLocations = files(model);
+    return ("" | it + "\n" + readFile(l) | loc l <- sourceFileLocations);
+}

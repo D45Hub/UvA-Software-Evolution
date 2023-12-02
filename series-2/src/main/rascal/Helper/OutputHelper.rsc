@@ -53,6 +53,7 @@ str getJSONContentOfLocation(DuplicationLocation duplicationLocation) {
     content += "\"id\": \"<duplicationLocation.uuid>\",";
     content += "\"filePath\": \"<duplicationLocation.filePath>\",";
     content += "\"methodName\": \"<duplicationLocation.methodName>\",";
+    content += "\"methodLOC\": <duplicationLocation.methodLoc>,";
     content += "\"startLine\": <duplicationLocation.startLine>,";
     content += "\"endLine\": <duplicationLocation.endLine>},";
 

@@ -14,6 +14,7 @@ import Helper::SubsequenceHelper;
 import Helper::ProjectHelper;
 import Helper::OutputHelper;
 import Helper::Types;
+import Helper::LOCHelper;
 
 import IO;
 import Set;
@@ -58,7 +59,7 @@ void main() {
 
     M3 model = createM3FromMavenProject(encryptorProject);
     methodObjects = methods(model);
-    map[loc fileLoc, loc method] mapLocs = ();
+    map[loc fileLoc, MethodLoc method] mapLocs = ();
     
     for(m <- methodObjects) {
         decl = getFirstFrom(model.declarations[m]);
@@ -66,7 +67,8 @@ void main() {
         int endDecl = decl.end.line;
 
         if(endDecl - beginDecl >= MASS_THRESHOLD) {
-            mapLocs += (decl: m);
+            int methodLoc = size(getLOC(readFile(m)));
+            mapLocs += (decl: <m, methodLoc>);
         }   
     }
 
@@ -115,32 +117,32 @@ void main() {
         }
 
 // TODO REFACTOR THIS RADIOACTIVE GLOWING SHIT... I DONT WANT ANYMORE... IT IS LATE...
-        str methodNameA = "";
-        str methodNameB = "";
+        MethodLoc methodA = <noLocation, -1>;
+        MethodLoc methodB = <noLocation, -1>;
         for(k <- mapLocs) {
             str nodeAFileName = split("///", nodeALoc.uri)[1];
             str nodeBFileName = split("///", nodeBLoc.uri)[1];
             str projectFileName = split("//", k.uri)[1];
             if(contains(projectFileName, nodeAFileName) && nodeALoc.begin.line >= k.begin.line && nodeALoc.end.line <= k.end.line) {
-                methodNameA = mapLocs[k].path;
+                methodA = mapLocs[k];
 
-                if(methodNameB != ""){
+                if(methodB.methodLocation != noLocation && methodB.methodLoc != -1){
                     break;
                 }
             }
 
             if(contains(projectFileName, nodeBFileName) && nodeBLoc.begin.line >= k.begin.line && nodeBLoc.end.line <= k.end.line) {
-                methodNameB = mapLocs[k].path;
-                if(methodNameA != ""){
+                methodB = mapLocs[k];
+                if(methodA.methodLocation != noLocation && methodA.methodLoc != -1){
                     break;
                 }
             }
         }
 
         str duplicationUUID = toString(uuidi());
-        DuplicationLocation res1 = <duplicationUUID, nodeALoc.path, methodNameA, maxToLineA, maxFromLineA>;
+        DuplicationLocation res1 = <duplicationUUID, nodeALoc.path, methodA<0>.path, methodA<1>, maxToLineA, maxFromLineA>;
         duplicationUUID = toString(uuidi());
-        DuplicationLocation res2 = <duplicationUUID, nodeBLoc.path, methodNameB, maxToLineB, maxFromLineB>;
+        DuplicationLocation res2 = <duplicationUUID, nodeBLoc.path, methodB<0>.path, methodB<1>, maxToLineB, maxFromLineB>;
         DuplicationResult dRes = [res1, res2];
 
         duplicationResults += [dRes];
@@ -152,8 +154,8 @@ void main() {
     println("Duplicated Lines: <duplicatedLinesAmount>");
     println("Duplicate Results: <size(duplicationResults)>");
 
-
-    writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, duplicationResults, encryptorProject.uri, 21500, duplicatedLinesAmount, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
+    int projectLoc = size(getLOC(getConcatenatedProjectFile(model)));
+    writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, duplicationResults, encryptorProject.uri, projectLoc, duplicatedLinesAmount, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
     str stopBenchmarkTime = stopBenchmark("benchmark");
     println(stopBenchmarkTime);
 }
