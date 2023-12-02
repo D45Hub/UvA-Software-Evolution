@@ -154,14 +154,26 @@ void main() {
         duplicatedLinesAmount += cl[0].endLine - cl[0].startLine;
     }
 
+    DuplicationResult biggestDuplicationClass = classes[0];
+    DuplicationLocation biggestDuplicationLoc = biggestDuplicationClass[0];
+    int biggestDuplLines = biggestDuplicationLoc.endLine - biggestDuplicationLoc.startLine;
+
+    for(itClass <- classes) {
+        DuplicationLocation itDuplicationLoc = itClass[0];
+        int itDuplicationLines = (itDuplicationLoc.endLine - itDuplicationLoc.startLine);
+        if(biggestDuplLines < itDuplicationLines) {
+            biggestDuplLines = itDuplicationLines;
+            biggestDuplicationLoc = itDuplicationLoc;
+            biggestDuplicationClass = itClass;
+        }
+    }
+
     println("Clone clas: <size(classes)>");
     println("Duplicated Lines: <duplicatedLinesAmount>");
     println("Duplicate Results: <size(duplicationResults)>");
 
-    
-
     int projectLoc = size(getLOC(getConcatenatedProjectFile(model)));
-    writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
+    writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, size(classes), duplicatedLinesAmount, biggestDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
     str stopBenchmarkTime = stopBenchmark("benchmark");
     println(stopBenchmarkTime);
 }

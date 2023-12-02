@@ -4,22 +4,26 @@ import Helper::Types;
 import IO;
 import String;
 import util::Math;
+import List;
 
-void writeJSONFile(loc outputFileLocation, list[DuplicationResult] results, str projectName, int projectLOC, int duplicatedLines, int massThreshold, real similarityThreshold) {
+void writeJSONFile(loc outputFileLocation, list[DuplicationResult] results, str projectName, int projectLOC, int duplicatedLines, int cloneClassesAmount, DuplicationResult biggestCloneClass, int massThreshold, real similarityThreshold) {
     real duplicatedLinePercentage = toReal(toReal(duplicatedLines) / toReal(projectLOC)) * 100.0;
-    
+
+    // Doesn't matter from which we base our LOC generation from.
+    DuplicationLocation biggestCloneClassLocation = biggestCloneClass[0];
+    int biggestCloneClassLOC = biggestCloneClassLocation.endLine - biggestCloneClassLocation.startLine;
+
     str jsonContent = "{
     
     \"projectName\": \"<projectName>\", 
     \"projectLOC\": <projectLOC>, 
     \"duplicatedLines\": <duplicatedLines>, 
     \"duplicatedLinePercentage\": <duplicatedLinePercentage>, 
-    \"numberOfCloneClasses\": \"test\", 
-    \"biggestCloneLocation\": \"test\", 
-    \"biggestCloneLOC\": \"test\", 
-    \"biggestCloneClass\": \"test\", 
+    \"numberOfCloneClasses\": <cloneClassesAmount>, 
+    \"biggestCloneLOC\": <biggestCloneClassLOC>, 
+    \"biggestCloneClass\": <size(biggestCloneClass)>, 
     \"massThreshold\": <massThreshold>,
-    \"similarityThreshold\": <similarityThreshold>,
+    \"similarityThreshold\": <similarityThreshold * 100.0>,
 
     \"clonePairs\": 
      [";
