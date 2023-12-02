@@ -23,7 +23,7 @@ import Map;
 
 loc denisProject = |file:///C:/Users/denis/Documents/Software-Evolution/UvA-Software-Evolution/series-1/smallsql/|;
 loc lisaProject = |file:///Users/ekletsko/Downloads/smallsql0.21_src|;
-loc encryptorProject = denisProject;//|project://series-2/src/main/rascal/simpleencryptor|;
+loc encryptorProject = |project://series-2/src/main/rascal/simpleencryptor|;
 
 ProjectLocation project = denisProject;
 
@@ -146,16 +146,90 @@ void main() {
         DuplicationResult dRes = [res1, res2];
 
         duplicationResults += [dRes];
-
-        duplicatedLinesAmount += maxFromLineA - maxToLineA;
-
     }    
     
+    list[DuplicationResult] classes = getCloneClasses(duplicationResults);
+
+    for(cl <- classes) {
+        duplicatedLinesAmount += cl[0].endLine - cl[0].startLine;
+    }
+
+    println("Clone clas: <size(classes)>");
     println("Duplicated Lines: <duplicatedLinesAmount>");
     println("Duplicate Results: <size(duplicationResults)>");
 
+    
+
     int projectLoc = size(getLOC(getConcatenatedProjectFile(model)));
-    writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, duplicationResults, encryptorProject.uri, projectLoc, duplicatedLinesAmount, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
+    writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
     str stopBenchmarkTime = stopBenchmark("benchmark");
     println(stopBenchmarkTime);
 }
+
+
+public list[DuplicationResult] getCloneClasses(list[DuplicationResult] duplicationResults) {
+    list[DuplicationResult] cloneClasses = [];
+    
+    for(DuplicationResult d <- duplicationResults) {
+        DuplicationLocation maxSizedDuplicationLoc1 = d[0];
+        DuplicationLocation maxSizedDuplicationLoc2 = d[1];        
+
+        for(DuplicationResult r <- duplicationResults) {
+            for(DuplicationLocation l <- r){
+                if((l.filePath == maxSizedDuplicationLoc1.filePath) && (l.methodName == maxSizedDuplicationLoc1.methodName)) {
+                    if(l.startLine < maxSizedDuplicationLoc1.startLine) {
+                        maxSizedDuplicationLoc1.startLine = l.startLine;
+                    }
+
+                    if(l.endLine > maxSizedDuplicationLoc1.endLine) {
+                        maxSizedDuplicationLoc1.endLine = l.endLine;
+                    }
+                }
+
+                if((l.filePath == maxSizedDuplicationLoc2.filePath) && (l.methodName == maxSizedDuplicationLoc2.methodName)) {
+                    if(l.startLine < maxSizedDuplicationLoc2.startLine) {
+                        maxSizedDuplicationLoc2.startLine = l.startLine;
+                    }
+
+                    if(l.endLine > maxSizedDuplicationLoc2.endLine) {
+                        maxSizedDuplicationLoc2.endLine = l.endLine;
+                    }
+                }
+            } 
+        }
+
+        DuplicationResult newDuplRes = [maxSizedDuplicationLoc1, maxSizedDuplicationLoc2];
+
+        if(!containsDuplicationResult(cloneClasses, newDuplRes)) {
+            cloneClasses += [newDuplRes];
+        }
+    }
+
+    //println(cloneClasses);
+
+    return cloneClasses;
+}
+
+bool containsDuplicationResult(list[DuplicationResult] results, DuplicationResult result) {
+    bool containsResult = false;
+
+    DuplicationLocation resultLoc1 = result[0];
+    DuplicationLocation resultLoc2 = result[1];
+    
+    for(r <- results) {
+        DuplicationLocation l1 = r[0];
+        DuplicationLocation l2 = r[1];
+
+        bool containsInL1 = (l1.filePath == resultLoc1.filePath) && (l1.methodName == resultLoc1.methodName) && (l1.startLine == resultLoc1.startLine) && (l1.endLine == resultLoc1.endLine);
+        bool containsInL2 = (l2.filePath == resultLoc2.filePath) && (l2.methodName == resultLoc2.methodName) && (l2.startLine == resultLoc2.startLine) && (l2.endLine == resultLoc2.endLine);
+
+        bool reverseContainsInL1 = (l1.filePath == resultLoc2.filePath) && (l1.methodName == resultLoc2.methodName) && (l1.startLine == resultLoc2.startLine) && (l1.endLine == resultLoc2.endLine);
+        bool reverseContainsInL2 = (l2.filePath == resultLoc1.filePath) && (l2.methodName == resultLoc1.methodName) && (l2.startLine == resultLoc1.startLine) && (l2.endLine == resultLoc1.endLine);
+
+
+        if((containsInL1 && containsInL2) || (reverseContainsInL1 && reverseContainsInL2)) {
+            containsResult = true;
+        }
+    }
+    return containsResult;
+} 
