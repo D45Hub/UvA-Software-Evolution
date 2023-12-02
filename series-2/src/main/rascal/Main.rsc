@@ -7,13 +7,14 @@ import List;
 import TreeComparison::SubtreeComparator;
 import lang::java::m3::Core;
 import lang::java::m3::AST;
+import util::UUID;
 import util::Math;
 import Configuration;
 import Helper::SubsequenceHelper;
 import Helper::ProjectHelper;
 import Helper::OutputHelper;
+import Helper::Types;
 
-import lang::java::\syntax::Java15;
 import IO;
 import Set;
 import Location;
@@ -42,7 +43,7 @@ void main() {
 
     //map[str hash, list[list[node]] sequenceRoots] sequences = getSequences(asts, 15);
     //println("Sequences: <size(sequences)>");
-    map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, 5, 1);
+    map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, MASS_THRESHOLD, 1);
 
     println("Sequences: <size(sequences2)>");
 /**
@@ -64,7 +65,7 @@ void main() {
         int beginDecl = decl.begin.line;
         int endDecl = decl.end.line;
 
-        if(endDecl - beginDecl >= 6) {
+        if(endDecl - beginDecl >= MASS_THRESHOLD) {
             mapLocs += (decl: m);
         }   
     }
@@ -116,12 +117,12 @@ void main() {
 // TODO REFACTOR THIS RADIOACTIVE GLOWING SHIT... I DONT WANT ANYMORE... IT IS LATE...
         str methodNameA = "";
         str methodNameB = "";
-        for(k <- mapLoc) {
+        for(k <- mapLocs) {
             str nodeAFileName = split("///", nodeALoc.uri)[1];
             str nodeBFileName = split("///", nodeBLoc.uri)[1];
             str projectFileName = split("//", k.uri)[1];
             if(contains(projectFileName, nodeAFileName) && nodeALoc.begin.line >= k.begin.line && nodeALoc.end.line <= k.end.line) {
-                methodNameA = mapLoc[k].path;
+                methodNameA = mapLocs[k].path;
 
                 if(methodNameB != ""){
                     break;
@@ -129,17 +130,20 @@ void main() {
             }
 
             if(contains(projectFileName, nodeBFileName) && nodeBLoc.begin.line >= k.begin.line && nodeBLoc.end.line <= k.end.line) {
-                methodNameB = mapLoc[k].path;
+                methodNameB = mapLocs[k].path;
                 if(methodNameA != ""){
                     break;
                 }
             }
         }
 
-        DuplicationLocation res1 = <nodeALoc.path, methodNameA, maxToLineA, maxFromLineA, "Type 1">;
-        DuplicationLocation res2 = <nodeBLoc.path, methodNameB, maxToLineB, maxFromLineB, "Type 1">;
+        str duplicationUUID = toString(uuidi());
+        DuplicationLocation res1 = <duplicationUUID, nodeALoc.path, methodNameA, maxToLineA, maxFromLineA>;
+        duplicationUUID = toString(uuidi());
+        DuplicationLocation res2 = <duplicationUUID, nodeBLoc.path, methodNameB, maxToLineB, maxFromLineB>;
+        DuplicationResult dRes = [res1, res2];
 
-        duplicationResults += [<res1, res2>];
+        duplicationResults += [dRes];
 
         duplicatedLinesAmount += maxFromLineA - maxToLineA;
 
@@ -149,7 +153,7 @@ void main() {
     println("Duplicate Results: <size(duplicationResults)>");
 
 
-    writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, duplicationResults);
+    writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, duplicationResults, encryptorProject.uri, 21500, duplicatedLinesAmount, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
     str stopBenchmarkTime = stopBenchmark("benchmark");
     println(stopBenchmarkTime);
 }
