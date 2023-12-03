@@ -38,11 +38,10 @@ void main() {
     println("Sequence Clones: <size(sequenceClones)>");
 
     int duplicatedLinesAmount = 0;
-    list[DuplicationResult] duplicationResults = [];
 
     map[loc fileLoc, MethodLoc method] mapLocs = getMethodLocs(model);
  
-    duplicationResults = getRawDuplicationResults(sequenceClones, mapLocs);
+    list[DuplicationResult] duplicationResults = getRawDuplicationResults(sequenceClones, mapLocs);
     list[DuplicationResult] classes = getCloneClasses(duplicationResults);
 
     for(cl <- classes) {

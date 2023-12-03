@@ -9,5 +9,5 @@ public alias NodeHashLoc = tuple[NodeHash nHash, loc nodeLoc];
 
 public alias MethodLoc = tuple[loc methodLocation, int methodLoc];
 
-public alias DuplicationLocation = tuple[str uuid, str filePath, str methodName, int methodLoc, int startLine, int endLine];
+public alias DuplicationLocation = tuple[str uuid, str filePath, str fileUri, str methodName, int methodLoc, int startLine, int endLine, str base64Content];
 public alias DuplicationResult = list[DuplicationLocation];
