@@ -18,7 +18,7 @@ import Location;
 
 loc denisProject = |file:///C:/Users/denis/Documents/Software-Evolution/UvA-Software-Evolution/series-1/smallsql/|;
 loc lisaProject = |file:///Users/ekletsko/Downloads/smallsql0.21_src|;
-loc encryptorProject = denisProject;//|project://series-2/src/main/rascal/simpleencryptor|;
+loc encryptorProject = |project://series-2/src/main/rascal/simpleencryptor|;
 
 ProjectLocation project = denisProject;
 
