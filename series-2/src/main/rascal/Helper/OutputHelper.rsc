@@ -59,7 +59,8 @@ str getJSONContentOfLocation(DuplicationLocation duplicationLocation) {
     content += "\"methodName\": \"<duplicationLocation.methodName>\",";
     content += "\"methodLOC\": <duplicationLocation.methodLoc>,";
     content += "\"startLine\": <duplicationLocation.startLine>,";
-    content += "\"endLine\": <duplicationLocation.endLine>},";
+    content += "\"endLine\": <duplicationLocation.endLine>,";
+    content += "\"base64Content\": \"<duplicationLocation.base64Content>\"},";
 
     return content;
 }

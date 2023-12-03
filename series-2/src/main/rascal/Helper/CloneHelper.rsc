@@ -3,6 +3,8 @@ import Helper::ProjectHelper;
 import Helper::Types;
 
 import util::UUID;
+import String;
+import IO;
 
 public list[CloneTuple] getClonePairs(list[NodeHashLoc] hashedSubtrees, num similarityThreshold) {
     map[str, list[NodeLoc]] hashBuckets = placingSubTreesInBuckets(hashedSubtrees);
@@ -92,6 +94,19 @@ public list[DuplicationResult] getCloneClasses(list[DuplicationResult] duplicati
                 maxSizedDuplicationLoc2 = modifyPotentialMaxLoc(itDuplicationResult, maxSizedDuplicationLoc2);
             } 
         }
+
+        list[str] rawAMethodContent = split("\n", readFile(toLocation(maxSizedDuplicationLoc1.fileUri)));
+        list[str] rawALocationContent = rawAMethodContent[(maxSizedDuplicationLoc1.startLine)..(maxSizedDuplicationLoc1.endLine)];
+        str joinedALocString = ("" | it + "\n" + s | s <- rawALocationContent);
+        str base64NodeAContent = toBase64(joinedALocString);
+
+        list[str] rawBMethodContent = split("\n", readFile(toLocation(maxSizedDuplicationLoc2.fileUri)));
+        list[str] rawBLocationContent = rawBMethodContent[(maxSizedDuplicationLoc2.startLine)..(maxSizedDuplicationLoc2.endLine)];
+        str joinedBLocString = ("" | it + "\n" + s | s <- rawBLocationContent);
+        str base64NodeBContent = toBase64(joinedBLocString);
+
+        maxSizedDuplicationLoc1.base64Content = base64NodeAContent;
+        maxSizedDuplicationLoc2.base64Content = base64NodeBContent;
 
         DuplicationResult newDuplRes = [maxSizedDuplicationLoc1, maxSizedDuplicationLoc2];
 
@@ -207,8 +222,8 @@ list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[nod
         MethodLoc methodA = <noLocation, -1>;
         MethodLoc methodB = <noLocation, -1>;
         for(k <- mapLocs) {
-            str nodeAFileName = split("///", nodeALoc.uri)[1];
-            str nodeBFileName = split("///", nodeBLoc.uri)[1];
+            str nodeAFileName = nodeALoc.path;
+            str nodeBFileName = nodeBLoc.path;
             str projectFileName = k.uri;
             if(contains(projectFileName, nodeAFileName) && nodeALoc.begin.line >= k.begin.line && nodeALoc.end.line <= k.end.line) {
                 methodA = mapLocs[k];
@@ -226,10 +241,12 @@ list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[nod
             }
         }
 
+        
+
         str duplicationUUID = toString(uuidi());
-        DuplicationLocation res1 = <duplicationUUID, nodeALoc.path, methodA<0>.path, methodA<1>, maxToLineA, maxFromLineA>;
+        DuplicationLocation res1 = <duplicationUUID, nodeALoc.path, nodeALoc.uri, methodA<0>.path, methodA<1>, maxToLineA, maxFromLineA, "">;
         duplicationUUID = toString(uuidi());
-        DuplicationLocation res2 = <duplicationUUID, nodeBLoc.path, methodB<0>.path, methodB<1>, maxToLineB, maxFromLineB>;
+        DuplicationLocation res2 = <duplicationUUID, nodeBLoc.path, nodeBLoc.uri, methodB<0>.path, methodB<1>, maxToLineB, maxFromLineB, "">;
         DuplicationResult dRes = [res1, res2];
 
         duplicationResults += [dRes];
