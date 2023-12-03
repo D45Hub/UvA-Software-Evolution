@@ -17,9 +17,7 @@ public class HashingAlgorithm implements IAlgorithm {
         System.out.println("Hey");
         System.out.println("Hey");
         System.out.println("Hey");
-        System.out.println("Hey");
-        System.out.println("Hey");
-
+        
         StringBuilder encryptedText = new StringBuilder();
         for (char c : sourceString.toCharArray()) {
             if (Character.isLetter(c)) {
@@ -35,4 +33,14 @@ public class HashingAlgorithm implements IAlgorithm {
 	private void testMethod(String test1, String test2, String test3, String test4, String test5, String test6, String test7) {
 		System.out.println("Hello World");
 	}
+
+    public void printHey() {
+        System.out.println("1");
+        System.out.println("1");
+        System.out.println("1");
+        System.out.println("1");
+        System.out.println("1");
+        System.out.println("1");
+        System.out.println("1");
+    }
 }

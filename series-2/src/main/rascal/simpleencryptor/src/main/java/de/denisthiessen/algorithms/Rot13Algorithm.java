@@ -10,6 +10,13 @@ public class Rot13Algorithm implements IAlgorithm {
     public String executeAlgorithm(String sourceString) {
         StringBuilder sb = new StringBuilder();
 
+        System.out.println("ye");
+        System.out.println("ye");
+        System.out.println("ye");
+        System.out.println("ye");
+        System.out.println("ye");
+        System.out.println("ye");
+
         for (int i = 0; i < sourceString.length(); i++) {
             char c = sourceString.charAt(i);
             if (c >= 'a' && c <= 'm')

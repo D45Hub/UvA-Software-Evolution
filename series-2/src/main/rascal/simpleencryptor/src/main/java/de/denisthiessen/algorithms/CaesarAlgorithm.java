@@ -17,8 +17,6 @@ public class CaesarAlgorithm implements IAlgorithm {
         System.out.println("Hey");
         System.out.println("Hey");
         System.out.println("Hey");
-        System.out.println("Hey");
-        System.out.println("Hey");
 
         StringBuilder encryptedText = new StringBuilder();
         for (char c : sourceString.toCharArray()) {
@@ -30,6 +28,16 @@ public class CaesarAlgorithm implements IAlgorithm {
             }
         }
         return encryptedText.toString();
+    }
+
+    public void printHey() {
+        System.out.println("1");
+        System.out.println("1");
+        System.out.println("1");
+        System.out.println("1");
+        System.out.println("1");
+        System.out.println("1");
+        System.out.println("1");
     }
     
 }
