@@ -23,14 +23,12 @@ loc encryptorProject = |project://series-2/src/main/rascal/simpleencryptor|;
 ProjectLocation project = denisProject;
 
 
-public alias CloneConnections = lrel[str,str];
-
 /** Returns transitive closure of nodes*/ 
-public list[tuple[str, str]] getCloneConnections (lrel[str,str] idPairs) {
+public TransitiveCloneConnections getCloneConnections (CloneConnections idPairs) {
     return idPairs+;
 }
 
-public  lrel[str,str] extractIDPairs (list[DuplicationResult] duplicationResults) {
+public  CloneConnections extractIDPairs (list[DuplicationResult] duplicationResults) {
     return [<duplicationResult[0].uuid, duplicationResult[1].uuid> | duplicationResult <- duplicationResults];
 }
 
@@ -61,13 +59,13 @@ void main() {
     }
 
     DuplicationResult biggestDuplicationClass = getLargestDuplicationClass(classes);
-
+    TransitiveCloneConnections allCloneConnections = getCloneConnections(extractIDPairs(duplicationResults));
     println("Clone classes: <size(classes)>");
     println("Duplicated Lines: <duplicatedLinesAmount>");
     println("Duplicate Results: <size(duplicationResults)>");
 
     int projectLoc = size(getLOC(getConcatenatedProjectFile(model)));
-    writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
+    writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD,allCloneConnections);
     str stopBenchmarkTime = stopBenchmark("benchmark");
     println(stopBenchmarkTime);
 }
