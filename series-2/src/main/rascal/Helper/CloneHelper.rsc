@@ -263,14 +263,15 @@ DuplicationResult getNewAddedDuplicationResults(loc nodeALoc, loc nodeBLoc, map[
 }
 
 DuplicationLocation generateDuplicationLocation(loc nodeLocation, MethodLoc nodeMethodLocation, LocationLines nodeMaxBounds) {
-    str duplicationUUID = toString(uuidi());
-
     str nodeLocationPath = nodeLocation.path;
     str nodeLocationUri = nodeLocation.uri;
     str methodPath = nodeMethodLocation<0>.path;
     int methodLOC = nodeMethodLocation<1>;
     int minLine = nodeMaxBounds.lineTo;
     int maxLine = nodeMaxBounds.lineFrom;
+
+    str concatDuplLocValues = "<nodeLocationPath><nodeLocationUri><methodPath><methodLOC><minLine><maxLine>";
+    str duplicationUUID = md5Hash(concatDuplLocValues);
 
     DuplicationLocation result = <duplicationUUID, nodeLocationPath, nodeLocationUri, methodPath, methodLOC, minLine, maxLine, "">;
     return result;
