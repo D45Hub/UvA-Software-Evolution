@@ -136,18 +136,8 @@ bool containsDuplicationResult(list[DuplicationResult] results, DuplicationResul
 
     DuplicationLocation resultLoc1 = result[0];
     DuplicationLocation resultLoc2 = result[1];
-    
-    for(r <- results) {
-        DuplicationLocation l1 = r[0];
-        DuplicationLocation l2 = r[1];
 
-        bool areLocsInDuplicationResult = areLocationsContainedInResultLocations(l1, l2, resultLoc1, resultLoc2);
-
-        if(areLocsInDuplicationResult) {
-            containsResult = true;
-        }
-    }
-    return containsResult;
+    return any(DuplicationResult res <- results, areLocationsContainedInResultLocations(res[0], res[1], resultLoc1, resultLoc2));
 } 
 
 bool areLocationsContainedInResultLocations(DuplicationLocation l1, DuplicationLocation l2, DuplicationLocation resultLoc1, DuplicationLocation resultLoc2) {
@@ -173,39 +163,26 @@ list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[nod
     list[DuplicationResult] duplicationResults = [];
     for(c <- sequenceClones) {
 
-        //set[tuple[int from, int to]] maxAmount = ();
-        int maxFromLineA = -1;
-        int maxToLineA = -1;
-        int maxFromLineB = -1;
-        int maxToLineB = -1;
-        loc nodeALoc = noLocation;
-        loc nodeBLoc = noLocation;
+        loc nodeALoc = nodeFileLocation((c[0])[0]);
+        loc nodeBLoc = nodeFileLocation((c[1])[0]);
+        int maxFromLineA = nodeALoc.begin.line;
+        int maxToLineA = nodeALoc.end.line;
+        int maxFromLineB = nodeBLoc.begin.line;
+        int maxToLineB = nodeBLoc.end.line;
 
         for(nodeA <- c[0], nodeB <- c[1]) {
             nodeALoc = nodeFileLocation(nodeA);
             nodeBLoc = nodeFileLocation(nodeB);
-
-            if(maxFromLineA == -1 && maxToLineA == -1) {
-                maxFromLineA = nodeALoc.begin.line;
-                maxToLineA = nodeALoc.end.line;
-            }
             
             if(nodeALoc.begin.line < maxFromLineA) {
                 maxFromLineA = nodeALoc.begin.line;
             }
 
             if(nodeALoc.end.line > maxToLineA) {
-                // WHY NOT MAXTOLINEB? THIS DOES NOT WORK OTHERWISE...
+                // WHY NOT MAXTOLINEA? THIS DOES NOT WORK OTHERWISE...
                 maxFromLineA = nodeALoc.end.line;
             }
 
-            
-
-
-            if(maxFromLineB == -1 && maxToLineB == -1) {
-                maxFromLineB = nodeBLoc.begin.line;
-                maxToLineB = nodeBLoc.end.line;
-            }
             
             if(nodeBLoc.begin.line < maxFromLineA) {
                 maxFromLineB = nodeBLoc.begin.line;
@@ -217,8 +194,9 @@ list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[nod
             }
         }
 
-// TODO REFACTOR THIS RADIOACTIVE GLOWING SHIT... I DONT WANT ANYMORE... IT IS LATE...
-        DuplicationResult dRes = getNewAddedDuplicationResults(nodeALoc, nodeBLoc, mapLocs, <maxFromLineA, maxToLineA>, <maxFromLineB, maxToLineB>);
+        LocationLines nodeABounds = <maxFromLineA, maxToLineA>;
+        LocationLines nodeBBounds = <maxFromLineB, maxToLineB>;
+        DuplicationResult dRes = getNewAddedDuplicationResults(nodeALoc, nodeBLoc, mapLocs, nodeABounds, nodeBBounds);
 
         duplicationResults += [dRes];
     }  
