@@ -9,17 +9,33 @@ import util::Math;
 import Helper::Helper;
 import Type;
 
-map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, int minimumSequenceLengthThreshold, int cloneType) {
-    map[str, list[list[node]]] hashTable = ();
+
+// One sequence is a list of statements. 
+list[list[node]] getListOfSequences(list[Declaration] ast, int minimumSequenceLengthThreshold) {
     list[list[node]] sequences = [];
     visit (ast) {
-        case \block(statements): {
+        /**
+        * This block makes use of the https://www.rascal-mpl.org/docs/Rascal/Statements/Block/ 
+        * statement in rascal which detects sequences, mostly separated by a ; 
+        * 
+        */ 
+        case \block(list[Statement] statements): {
+            /* You are putting the statements into a list of node -> Why temporal? */ 
             list[node] sequence = statements;
-            if (size(sequence) >= minimumSequenceLengthThreshold) {
-                sequences += [sequence];
+            if (size(statements) >= minimumSequenceLengthThreshold) {
+                // Why are you using a list in here and not just adding the sequence which is already a list?
+                
+                sequences += [sequence]; // Sequences list.
             }
         }
     }
+    return sequences;
+}
+
+map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, int minimumSequenceLengthThreshold, int cloneType) {
+    map[str, list[list[node]]] hashTable = ();
+    list[list[node]] sequences = getListOfSequences(ast, minimumSequenceLengthThreshold);
+    
     for (sequence <- sequences) {
         for (i <- [0..(size(sequence) + 1)], j <- [0..(size(sequence) + 1)]) {
             if ((j >= i + minimumSequenceLengthThreshold)) {
