@@ -95,18 +95,8 @@ public list[DuplicationResult] getCloneClasses(list[DuplicationResult] duplicati
             } 
         }
 
-        list[str] rawAMethodContent = split("\n", readFile(toLocation(maxSizedDuplicationLoc1.fileUri)));
-        list[str] rawALocationContent = rawAMethodContent[(maxSizedDuplicationLoc1.startLine)..(maxSizedDuplicationLoc1.endLine)];
-        str joinedALocString = ("" | it + "\n" + s | s <- rawALocationContent);
-        str base64NodeAContent = toBase64(joinedALocString);
-
-        list[str] rawBMethodContent = split("\n", readFile(toLocation(maxSizedDuplicationLoc2.fileUri)));
-        list[str] rawBLocationContent = rawBMethodContent[(maxSizedDuplicationLoc2.startLine)..(maxSizedDuplicationLoc2.endLine)];
-        str joinedBLocString = ("" | it + "\n" + s | s <- rawBLocationContent);
-        str base64NodeBContent = toBase64(joinedBLocString);
-
-        maxSizedDuplicationLoc1.base64Content = base64NodeAContent;
-        maxSizedDuplicationLoc2.base64Content = base64NodeBContent;
+        maxSizedDuplicationLoc1.base64Content = getBase64FileFromDuplicationLocation(maxSizedDuplicationLoc1);
+        maxSizedDuplicationLoc2.base64Content = getBase64FileFromDuplicationLocation(maxSizedDuplicationLoc2);
 
         DuplicationResult newDuplRes = [maxSizedDuplicationLoc1, maxSizedDuplicationLoc2];
 
@@ -116,6 +106,15 @@ public list[DuplicationResult] getCloneClasses(list[DuplicationResult] duplicati
     }
 
     return cloneClasses;
+}
+
+str getBase64FileFromDuplicationLocation(DuplicationLocation maxSizedDuplicationLocation) {
+    list[str] rawMethodContent = split("\n", readFile(toLocation(maxSizedDuplicationLocation.fileUri)));
+    list[str] rawLocationContent = rawMethodContent[(maxSizedDuplicationLocation.startLine)..(maxSizedDuplicationLocation.endLine)];
+    str joinedLocString = ("" | it + "\n" + s | s <- rawLocationContent);
+    str base64NodeContent = toBase64(joinedLocString);
+
+    return base64NodeContent;
 }
 
 DuplicationLocation modifyPotentialMaxLoc(DuplicationLocation duplLoc, DuplicationLocation maxDuplicationLoc) {
@@ -219,35 +218,7 @@ list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[nod
         }
 
 // TODO REFACTOR THIS RADIOACTIVE GLOWING SHIT... I DONT WANT ANYMORE... IT IS LATE...
-        MethodLoc methodA = <noLocation, -1>;
-        MethodLoc methodB = <noLocation, -1>;
-        for(k <- mapLocs) {
-            str nodeAFileName = nodeALoc.path;
-            str nodeBFileName = nodeBLoc.path;
-            str projectFileName = k.uri;
-            if(contains(projectFileName, nodeAFileName) && nodeALoc.begin.line >= k.begin.line && nodeALoc.end.line <= k.end.line) {
-                methodA = mapLocs[k];
-
-                if(methodB.methodLocation != noLocation && methodB.methodLoc != -1){
-                    break;
-                }
-            }
-
-            if(contains(projectFileName, nodeBFileName) && nodeBLoc.begin.line >= k.begin.line && nodeBLoc.end.line <= k.end.line) {
-                methodB = mapLocs[k];
-                if(methodA.methodLocation != noLocation && methodA.methodLoc != -1){
-                    break;
-                }
-            }
-        }
-
-        
-
-        str duplicationUUID = toString(uuidi());
-        DuplicationLocation res1 = <duplicationUUID, nodeALoc.path, nodeALoc.uri, methodA<0>.path, methodA<1>, maxToLineA, maxFromLineA, "">;
-        duplicationUUID = toString(uuidi());
-        DuplicationLocation res2 = <duplicationUUID, nodeBLoc.path, nodeBLoc.uri, methodB<0>.path, methodB<1>, maxToLineB, maxFromLineB, "">;
-        DuplicationResult dRes = [res1, res2];
+        DuplicationResult dRes = getNewAddedDuplicationResults(nodeALoc, nodeBLoc, mapLocs, <maxFromLineA, maxToLineA>, <maxFromLineB, maxToLineB>);
 
         duplicationResults += [dRes];
     }  
@@ -272,3 +243,57 @@ DuplicationResult getLargestDuplicationClass(list[DuplicationResult] cloneClasse
 
     return biggestDuplicationClass;
 } 
+
+bool areCodeLinesInBounds(int minBound, int maxBound, int minTestedValue, int maxTestedValues) {
+    return (minTestedValue >= minBound && maxTestedValues <= maxBound);
+}
+
+DuplicationResult getNewAddedDuplicationResults(loc nodeALoc, loc nodeBLoc, map[loc fileLoc, MethodLoc method] mapLocs, LocationLines nodeABounds, LocationLines nodeBBounds) {
+    MethodLoc methodA = <noLocation, -1>;
+    MethodLoc methodB = <noLocation, -1>;
+    for(k <- mapLocs) {
+        str nodeAFileName = nodeALoc.path;
+        str nodeBFileName = nodeBLoc.path;
+        str projectFileName = k.uri;
+
+        int mapLocBeginLine = k.begin.line;
+        int mapLocEndLine = k.end.line;
+
+        bool areALinesInBounds = areCodeLinesInBounds(mapLocBeginLine, mapLocEndLine, nodeALoc.begin.line, nodeALoc.end.line);
+        bool areBLinesInBounds = areCodeLinesInBounds(mapLocBeginLine, mapLocEndLine, nodeBLoc.begin.line, nodeBLoc.end.line);
+
+        if(contains(projectFileName, nodeAFileName) && areALinesInBounds) {
+            methodA = mapLocs[k];
+
+            if(methodB.methodLocation != noLocation && methodB.methodLoc != -1){
+                break;
+            }
+        }
+
+        if(contains(projectFileName, nodeBFileName) && areBLinesInBounds) {
+            methodB = mapLocs[k];
+            if(methodA.methodLocation != noLocation && methodA.methodLoc != -1){
+                break;
+            }
+        }
+    }   
+
+    DuplicationLocation res1 = generateDuplicationLocation(nodeALoc, methodA, nodeABounds);
+    DuplicationLocation res2 = generateDuplicationLocation(nodeBLoc, methodB, nodeBBounds);
+
+    return [res1, res2];
+}
+
+DuplicationLocation generateDuplicationLocation(loc nodeLocation, MethodLoc nodeMethodLocation, LocationLines nodeMaxBounds) {
+    str duplicationUUID = toString(uuidi());
+
+    str nodeLocationPath = nodeLocation.path;
+    str nodeLocationUri = nodeLocation.uri;
+    str methodPath = nodeMethodLocation<0>.path;
+    int methodLOC = nodeMethodLocation<1>;
+    int minLine = nodeMaxBounds.lineTo;
+    int maxLine = nodeMaxBounds.lineFrom;
+
+    DuplicationLocation result = <duplicationUUID, nodeLocationPath, nodeLocationUri, methodPath, methodLOC, minLine, maxLine, "">;
+    return result;
+}
