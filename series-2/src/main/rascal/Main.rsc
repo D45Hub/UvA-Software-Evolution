@@ -23,6 +23,17 @@ loc encryptorProject = |project://series-2/src/main/rascal/simpleencryptor|;
 ProjectLocation project = denisProject;
 
 
+public alias CloneConnections = lrel[str,str];
+
+/** Returns transitive closure of nodes*/ 
+public list[tuple[str, str]] getCloneConnections (lrel[str,str] idPairs) {
+    return idPairs+;
+}
+
+public  lrel[str,str] extractIDPairs (list[DuplicationResult] duplicationResults) {
+    return [<duplicationResult[0].uuid, duplicationResult[1].uuid> | duplicationResult <- duplicationResults];
+}
+
 void main() {
     str startBenchmarkTime = startBenchmark("benchmark");
     println(startBenchmarkTime);
@@ -42,6 +53,7 @@ void main() {
     map[loc fileLoc, MethodLoc method] mapLocs = getMethodLocs(model);
  
     list[DuplicationResult] duplicationResults = getRawDuplicationResults(sequenceClones, mapLocs);
+
     list[DuplicationResult] classes = getCloneClasses(duplicationResults);
 
     for(cl <- classes) {
