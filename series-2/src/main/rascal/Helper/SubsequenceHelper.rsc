@@ -11,6 +11,11 @@ import Type;
 
 
 // One sequence is a list of statements. 
+// This represents the list structure in the paper
+/* 
+{x=0; if(d>1) ... } hashcodes = 675, 3004
+so e.g. [[[x=0;, if(d>1);]],[[y=1;, z= 2;]]]
+*/ 
 list[list[node]] getListOfSequences(list[Declaration] ast, int minimumSequenceLengthThreshold) {
     list[list[node]] sequences = [];
     visit (ast) {
@@ -78,12 +83,7 @@ list[tuple[list[node], list[node]]] removeSequenceSubclones(list[tuple[list[node
 }
 
 bool canAddSequence(list[tuple[list[node], list[node]]] clones, list[node] i, list[node] j) {
-    for(pair <- clones) {
-        if(isSubset(pair[0], i) || isSubset(pair[1], j)){
-            return false;
-        }
-    }
-    return true;
+    return all(pair <- clones, !(isSubset(pair[0], i) || isSubset(pair[1], j))); 
 }
 
 list[tuple[list[node], list[node]]] addSequenceClone(list[tuple[list[node], list[node]]] clones, list[node] i, list[node] j) {
