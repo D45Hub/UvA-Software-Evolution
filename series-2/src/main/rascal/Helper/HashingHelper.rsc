@@ -28,16 +28,6 @@ public str hashSubtree(node subtree, bool ignoreLeaves) {
     return md5Hash(toString(elementsToHash));
 }
 
-public str hashSequence(list[node] sequence, bool ignoreLeaves) {
-    hash = "";
-    for (n <- sequence) {
-        hash += hashSubtree(n, ignoreLeaves);
-    }
-    hash = md5Hash(hash);
-
-    return hash;
-}
-
 public map[str, list[NodeLoc]] placingSubTreesInBuckets(list[NodeHashLoc] nodeHashList) {
         set[str] nodeHashes = toSet([nodeHash.nHash.nodeHash | nodeHash <- nodeHashList, true]);
         map[str, list[NodeLoc]] hashBuckets = ();
