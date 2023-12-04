@@ -13,3 +13,6 @@ public alias DuplicationLocation = tuple[str uuid, str filePath, str fileUri, st
 public alias DuplicationResult = list[DuplicationLocation];
 
 public alias LocationLines = tuple[int lineFrom, int lineTo];
+
+public alias CloneConnections = lrel[str,str];
+public alias TransitiveCloneConnections = list[tuple[str, str]];

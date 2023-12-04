@@ -6,7 +6,16 @@ import String;
 import util::Math;
 import List;
 
-void writeJSONFile(loc outputFileLocation, list[DuplicationResult] results, str projectName, int projectLOC, int duplicatedLines, int cloneClassesAmount, DuplicationResult biggestCloneClass, int massThreshold, real similarityThreshold) {
+void writeJSONFile(loc outputFileLocation,
+                list[DuplicationResult] results,
+                str projectName,
+                int projectLOC,
+                int duplicatedLines,
+                int cloneClassesAmount,
+                DuplicationResult biggestCloneClass,
+                int massThreshold,
+                real similarityThreshold,
+                TransitiveCloneConnections allCloneConnections) {
     real duplicatedLinePercentage = toReal(toReal(duplicatedLines) / toReal(projectLOC)) * 100.0;
 
     // Doesn't matter from which we base our LOC generation from.
@@ -34,6 +43,7 @@ void writeJSONFile(loc outputFileLocation, list[DuplicationResult] results, str 
 
     jsonContent = jsonContent[0..(size(jsonContent) - 1)];
     jsonContent += "]}";
+    
     writeFile(outputFileLocation, jsonContent);
 }
 
