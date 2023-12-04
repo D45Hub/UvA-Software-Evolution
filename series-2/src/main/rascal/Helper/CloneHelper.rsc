@@ -276,3 +276,48 @@ DuplicationLocation generateDuplicationLocation(loc nodeLocation, MethodLoc node
     DuplicationLocation result = <duplicationUUID, nodeLocationPath, nodeLocationUri, methodPath, methodLOC, minLine, maxLine, "">;
     return result;
 }
+
+map[str, list[str]] generateCloneConnectionMap(TransitiveCloneConnections connections) {
+    map[str, list[str]] cloneConnectionMap = ();
+    
+    for(conn <- connections) {
+        list[str] connValues = [];
+        str connID = conn<0>;
+
+        for(c <- connections) {
+            if(c<0> == connID) {
+                connValues += c<1>;
+            }
+        }
+
+        cloneConnectionMap[connID]?[] += connValues;
+    } 
+
+    return cloneConnectionMap;
+}
+
+DuplicationLocation getDuplicationLocationFromID(list[DuplicationResult] results, str id) {
+    for(DuplicationResult duplicationResult <- results) {
+        for(DuplicationLocation duplicationLocation <- duplicationResult) {
+            if(duplicationLocation.uuid == id) {
+                return duplicationLocation;
+            }
+        }
+    }
+
+    return <"", "", "", "", 0, 0, 0, "">;
+}
+
+list[DuplicationResult] getFilteredDuplicationResultList(list[DuplicationResult] results, map[str, list[str]] connections) {
+    set[DuplicationResult] filteredResults = {};
+    for(connectionKey <- connections) {
+        list[str] mappedConnections = connections[connectionKey];
+        mappedConnections += [connectionKey];
+        DuplicationResult duplicationResult = toList(toSet([getDuplicationLocationFromID(results, conn) | conn <- mappedConnections]));
+        
+        if(size(duplicationResult) > 1) {
+            filteredResults += {duplicationResult};
+        }
+    }
+    return toList(filteredResults);
+}
