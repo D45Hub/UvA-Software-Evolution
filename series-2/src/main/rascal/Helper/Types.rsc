@@ -11,3 +11,5 @@ public alias MethodLoc = tuple[loc methodLocation, int methodLoc];
 
 public alias DuplicationLocation = tuple[str uuid, str filePath, str fileUri, str methodName, int methodLoc, int startLine, int endLine, str base64Content];
 public alias DuplicationResult = list[DuplicationLocation];
+
+public alias LocationLines = tuple[int lineFrom, int lineTo];
