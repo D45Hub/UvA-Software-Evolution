@@ -60,6 +60,9 @@ void main() {
 
     DuplicationResult biggestDuplicationClass = getLargestDuplicationClass(classes);
     TransitiveCloneConnections allCloneConnections = getCloneConnections(extractIDPairs(duplicationResults));
+    map[str, list[str]] cloneConnectionMap = generateCloneConnectionMap(allCloneConnections);
+    classes = getFilteredDuplicationResultList(classes, cloneConnectionMap);
+    println(cloneConnectionMap);
     println("Clone classes: <size(classes)>");
     println("Duplicated Lines: <duplicatedLinesAmount>");
     println("Duplicate Results: <size(duplicationResults)>");
@@ -68,4 +71,44 @@ void main() {
     writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD,allCloneConnections);
     str stopBenchmarkTime = stopBenchmark("benchmark");
     println(stopBenchmarkTime);
+}
+
+map[str, list[str]] generateCloneConnectionMap(TransitiveCloneConnections connections) {
+    map[str, list[str]] cloneConnectionMap = ();
+    
+    for(conn <- connections) {
+        list[str] connValues = [];
+        str connID = conn<0>;
+
+        for(c <- connections) {
+            if(c<0> == connID) {
+                connValues += c<1>;
+            }
+        }
+
+        cloneConnectionMap[connID]?[] += connValues;
+    } 
+
+    return cloneConnectionMap;
+}
+
+DuplicationLocation getDuplicationLocationFromID(list[DuplicationResult] results, str id) {
+    for(DuplicationResult duplicationResult <- results) {
+        for(DuplicationLocation duplicationLocation <- duplicationResult) {
+            if(duplicationLocation.uuid == id) {
+                return duplicationLocation;
+            }
+        }
+    }
+    return duplicationLocation;
+}
+
+list[DuplicationResult] getFilteredDuplicationResultList(list[DuplicationResult] results, map[str, list[str]] connections) {
+    list[DuplicationResult] results = [];
+    for(connectionKey <- connections) {
+        list[str] mappedConnections = connections[connectionKey];
+        DuplicationResult duplicationResult = [getDuplicationLocationFromID(results, conn) | conn <- mappedConnections];
+        results += duplicationResult;
+    }
+    return results;
 }
