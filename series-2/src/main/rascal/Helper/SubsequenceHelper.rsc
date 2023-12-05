@@ -8,6 +8,12 @@ import List;
 import util::Math;
 import Helper::Helper;
 import Type;
+import Boolean;
+
+//Type defaultType = lang::java::jdt::m3::AST::short();
+
+map[tuple[list[node] zNode, list[node] i] zList, str subsetResult] zeroSubsetResults = ();
+map[tuple[list[node] oNode, list[node] j] oList, str subsetResult] oneSubsetResults = ();
 
 
 // One sequence is a list of statements. 
@@ -48,13 +54,16 @@ map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, int mi
                 // hash every subsequence
                 str subsequenceHash = "";
                 for (n <- subsequence) {
+                    /**
+                    if (cloneType == 2) {
+                        n = normalizeIdentifiers(n);
+                    }
+                    */
                     subsequenceHash += md5Hash(unsetRec(n));
                 }
                 str sequenceHash = md5Hash(subsequenceHash);
                 // println("<subsequence> <i> <j> <subsequenceHash> <sequenceHash>\n");
-                // if (cloneType == 2) {
-                //     n = normalizeIdentifiers(n);
-                // } else if (cloneType == 3) {
+                 //else if (cloneType == 3) {
                 //     n = normalizeIdentifiers(n);
                 // }
                 if (sequenceHash in hashTable) {
@@ -83,7 +92,35 @@ list[tuple[list[node], list[node]]] removeSequenceSubclones(list[tuple[list[node
 }
 
 bool canAddSequence(list[tuple[list[node], list[node]]] clones, list[node] i, list[node] j) {
-    return all(pair <- clones, !(isSubset(pair[0], i) || isSubset(pair[1], j))); 
+    return all(pair <- clones, !(checkSubset(pair[0], pair[1], i, j))); 
+}
+
+bool checkSubset(list[node] zeroNode, list[node] oneNode, list[node] i, list[node] j) {
+    bool zeroValue = false;
+    bool oneValue = false;
+
+    if(zeroNode in zeroSubsetResults) {
+        zeroValue = fromString(zeroSubsetResults[<zeroNode,i>]);
+        print(zeroValue);
+    } else {
+        zeroValue = isSubset(zeroNode, i);
+        str zeroValueString = toString(zeroValue);
+        zeroSubsetResults[<zeroNode,i>]?"" += zeroValueString;
+    }
+
+    if(zeroValue) {
+        return true;
+    }
+
+    if(oneNode in oneSubsetResults) {
+        oneValue = fromString(oneSubsetResults[<oneNode,j>]);
+    } else {
+        oneValue = isSubset(oneNode, j);
+        str oneValueString = toString(oneValue);
+        oneSubsetResults[<oneNode,j>]?"" += oneValueString;
+    }
+
+    return oneValue;    
 }
 
 list[tuple[list[node], list[node]]] addSequenceClone(list[tuple[list[node], list[node]]] clones, list[node] i, list[node] j) {

@@ -16,3 +16,5 @@ public alias LocationLines = tuple[int lineFrom, int lineTo];
 
 public alias CloneConnections = lrel[str,str];
 public alias TransitiveCloneConnections = list[tuple[str, str]];
+
+alias NodeListTuple = tuple[list[node] nodeListKey, list[node] nodeListValue];
