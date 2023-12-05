@@ -108,9 +108,17 @@ bool isSubset(list[node] rootSequence, list[node] subSequence) {
         return true;
     }
 
+    list[loc] rootSequenceLocs = [nodeFileLocation(n) | n <- rootSequence];
+    list[loc] subSequenceLocs = [nodeFileLocation(n) | n <- subSequence];
+
+    return any(loc rootSeqLoc <- rootSequenceLocs, nodeLocContainedInNodeLocList(rootSeqLoc, subSequenceLocs));
+
     // For every sequence node in the root, visit the subtree. If this subtree
     // has a sequence which entails our subsequence, it is a subset.
+
+    /**
     for (node n <- rootSequence) {
+        
         visit(n) {
             // subsequence is contained in sequence of the current node.
             case \block(statements): {
@@ -127,6 +135,18 @@ bool isSubset(list[node] rootSequence, list[node] subSequence) {
             }
         }
     }
+    */
+}
+
+bool nodeLocContainedInNodeLocList(loc testedNodeLoc, list[loc] sequenceValueLocs) {
+    return any(loc seqValueLoc <- sequenceValueLocs, nodeLocContainsInOtherLoc(testedNodeLoc, seqValueLoc));
+}
+
+bool nodeLocContainsInOtherLoc(loc testedLoc, loc encapsulatedLoc) {
+    if((testedLoc.path == encapsulatedLoc.path) && (testedLoc.begin.line < encapsulatedLoc.begin.line) && (testedLoc.end.line > encapsulatedLoc.end.line)) {
+        return true;
+    }
+
     return false;
 }
 
