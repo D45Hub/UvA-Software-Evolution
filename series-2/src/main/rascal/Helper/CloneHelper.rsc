@@ -314,6 +314,7 @@ list[DuplicationResult] getFilteredDuplicationResultList(list[DuplicationResult]
         list[str] mappedConnections = connections[connectionKey];
         mappedConnections += [connectionKey];
         DuplicationResult duplicationResult = toList(toSet([getDuplicationLocationFromID(results, conn) | conn <- mappedConnections]));
+        duplicationResult = [r | r <- duplicationResult, r != <"", "", "", "", 0, 0, 0, "">];
         
         if(size(duplicationResult) > 1) {
             filteredResults += {duplicationResult};

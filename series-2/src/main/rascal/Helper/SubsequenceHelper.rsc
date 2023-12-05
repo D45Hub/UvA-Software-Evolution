@@ -9,12 +9,14 @@ import util::Math;
 import Helper::Helper;
 import Type;
 import Boolean;
+import Set;
 
 //Type defaultType = lang::java::jdt::m3::AST::short();
 
 map[tuple[list[node] zNode, list[node] i] zList, str subsetResult] zeroSubsetResults = ();
 map[tuple[list[node] oNode, list[node] j] oList, str subsetResult] oneSubsetResults = ();
 
+map[node uNode, int uniqueNodes] uniqueNodes = ();
 
 // One sequence is a list of statements. 
 // This represents the list structure in the paper
@@ -46,9 +48,12 @@ list[list[node]] getListOfSequences(list[Declaration] ast, int minimumSequenceLe
 map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, int minimumSequenceLengthThreshold, int cloneType) {
     map[str, list[list[node]]] hashTable = ();
     list[list[node]] sequences = getListOfSequences(ast, minimumSequenceLengthThreshold);
+
+    map[node, str] nodeHashMap = ();
     
     for (sequence <- sequences) {
-        for (i <- [0..(size(sequence) + 1)], j <- [0..(size(sequence) + 1)]) {
+        int sequenceSize = size(sequence);
+        for (i <- [0..(sequenceSize + 1)], j <- [0..(sequenceSize + 1)]) {
             if ((j >= i + minimumSequenceLengthThreshold)) {
                 list[node] subsequence = sequence[i..j];
                 // hash every subsequence
@@ -59,7 +64,15 @@ map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, int mi
                         n = normalizeIdentifiers(n);
                     }
                     */
-                    subsequenceHash += md5Hash(unsetRec(n));
+
+                    if(n in nodeHashMap) {
+                        subsequenceHash += nodeHashMap[n];
+                    } else {
+                        str nodeHash = md5Hash(unsetRec(n));
+                        nodeHashMap[n]?"" += nodeHash; 
+                        subsequenceHash += nodeHash;
+                    }
+                    
                 }
                 str sequenceHash = md5Hash(subsequenceHash);
                 // println("<subsequence> <i> <j> <subsequenceHash> <sequenceHash>\n");
@@ -79,16 +92,10 @@ map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, int mi
 
 
 list[tuple[list[node], list[node]]] removeSequenceSubclones(list[tuple[list[node], list[node]]] clones, list[node] i, list[node] j) {
-    for(pair <- clones) {
-        for(s <- i, s2 <- j){
-            if (pair[0] == s && pair[1] == s2) {
-                clones -= <s, s2>;
-            } else if (pair[0] == s2 && pair[1] == s) {
-                clones -= <s2, s>;
-            }
-        }
-    }
-    return clones;   
+    set[tuple[list[node], list[node]]] cloneSet = toSet(clones);
+    set[tuple[list[node], list[node]]] sequencesToRemove = {[s, s2] | pair <- clones, s <- i, s2 <- j, (pair[0] == s && pair[1] == s2) || (pair[0] == s2 && pair[1] == s)};
+
+    return toList(cloneSet - sequencesToRemove);
 }
 
 bool canAddSequence(list[tuple[list[node], list[node]]] clones, list[node] i, list[node] j) {
@@ -99,9 +106,8 @@ bool checkSubset(list[node] zeroNode, list[node] oneNode, list[node] i, list[nod
     bool zeroValue = false;
     bool oneValue = false;
 
-    if(zeroNode in zeroSubsetResults) {
+    if(<zeroNode,i> in zeroSubsetResults) {
         zeroValue = fromString(zeroSubsetResults[<zeroNode,i>]);
-        print(zeroValue);
     } else {
         zeroValue = isSubset(zeroNode, i);
         str zeroValueString = toString(zeroValue);
@@ -112,7 +118,7 @@ bool checkSubset(list[node] zeroNode, list[node] oneNode, list[node] i, list[nod
         return true;
     }
 
-    if(oneNode in oneSubsetResults) {
+    if(<oneNode,j> in oneSubsetResults) {
         oneValue = fromString(oneSubsetResults[<oneNode,j>]);
     } else {
         oneValue = isSubset(oneNode, j);
@@ -143,17 +149,29 @@ list[tuple[list[node], list[node]]] addSequenceClone(list[tuple[list[node], list
 
 list[tuple[list[node], list[node]]] findSequenceClonePairs(map[str, list[list[node]]] hashTable, real similarityThreshold, int cloneType) {
     list[tuple[list[node], list[node]]] clones = [];
+    map[str, real] similarityMap = ();
+
     // for each sequence i and j in the same bucket
 	for (bucket <- hashTable) {	
-        for (i <- hashTable[bucket], j <- hashTable[bucket]) {
+        for (i <- hashTable[bucket], j <- hashTable[bucket] - [i]) {
             // ensure we are not comparing one thing with itself
-            if (i != j) {
-                real comparison = similarity(i, j);
+                str iString = toString(i);
+                str jString = toString(j);
+                str listStr = iString + jString;
+                str listStrRev = jString + iString;
+                real comparison = 0.0;
+                if(listStr in similarityMap) {
+                    comparison = similarityMap[listStr];
+                } else if (listStrRev in similarityMap) {
+                    comparison = similarityMap[listStrRev];
+                } else {
+                    comparison = similarity(i, j);
+                    similarityMap[listStr]?0.0 = comparison;
+                }
                 // check if are clones
                 if (((cloneType == 1 && comparison == 1.0) || ((cloneType == 2 || cloneType == 3)) && (comparison >= similarityThreshold))) {
                     clones = addSequenceClone(clones, i, j);
                 }
-            }
         }	
     }
     return clones;

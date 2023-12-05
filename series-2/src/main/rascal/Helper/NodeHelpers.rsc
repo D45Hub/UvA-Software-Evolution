@@ -38,9 +38,9 @@ public list[NodeHash] getNSizedHashedSubtrees(list[node] rootNode, int minSubtre
 }
 
 public loc nodeFileLocation(node n) {
-
+    
 	loc location = noLocation;
-	
+	/**
 	if (Declaration d := n) 
 		location = d.src;
 	
@@ -54,6 +54,13 @@ public loc nodeFileLocation(node n) {
 	if(location == |unknown:///|) {
 		location = noLocation;
 	}
+    */
+
+    bool hasSrcParam = ("src" in getKeywordParameters(n));
+
+    if(hasSrcParam) {
+        location = n.src;
+    }
 	
 	return location;
 }
@@ -151,8 +158,10 @@ bool nodeLocContainsInOtherLoc(loc testedLoc, loc encapsulatedLoc) {
 }
 
 bool isSubsequence(list[value] mainList, list[value] subList) {
-    for (i <- [0..size(mainList)]) {
-        int j = i + size(subList);
+    int sizeSubList = size(subList);
+    int sizeMainList = size(mainList);
+    for (i <- [0..sizeMainList]) {
+        int j = i + sizeSubList;
         if (mainList[i..j] == subList) {
             return true;
         }
