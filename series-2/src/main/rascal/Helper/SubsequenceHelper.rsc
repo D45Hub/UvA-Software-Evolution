@@ -18,6 +18,7 @@ map[tuple[list[node] oNode, list[node] j] oList, str subsetResult] oneSubsetResu
 
 map[node uNode, int uniqueNodes] uniqueNodes = ();
 
+
 // One sequence is a list of statements. 
 // This represents the list structure in the paper
 /* 
@@ -90,11 +91,9 @@ map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, int mi
     return hashTable;
 }
 
-
 list[tuple[list[node], list[node]]] removeSequenceSubclones(list[tuple[list[node], list[node]]] clones, list[node] i, list[node] j) {
     set[tuple[list[node], list[node]]] cloneSet = toSet(clones);
-    set[tuple[list[node], list[node]]] sequencesToRemove = {[s, s2] | pair <- clones, s <- i, s2 <- j, (pair[0] == s && pair[1] == s2) || (pair[0] == s2 && pair[1] == s)};
-
+    set[tuple[list[node], list[node]]] sequencesToRemove = {[s, s2] | s <- i, s2 <- j, {s, s2} in cloneSet || {s2, s} in cloneSet};
     return toList(cloneSet - sequencesToRemove);
 }
 
@@ -117,7 +116,7 @@ bool checkSubset(list[node] zeroNode, list[node] oneNode, list[node] i, list[nod
     if(zeroValue) {
         return true;
     }
-
+    
     if(<oneNode,j> in oneSubsetResults) {
         oneValue = fromString(oneSubsetResults[<oneNode,j>]);
     } else {
@@ -135,12 +134,12 @@ list[tuple[list[node], list[node]]] addSequenceClone(list[tuple[list[node], list
         clones = [<i, j>];
     } else {
         // check if the pair is already in clones, as is or as a subclone
-        if (<j,i> in clones) {
+        if (<j,i> in clones || <i,j> in clones) {
             return clones;
         }
-        clones = removeSequenceSubclones(clones, i, j);
+        //clones = removeSequenceSubclones(clones, i, j);
         if (canAddSequence(clones, i, j)) {
-            clones += <i, j>;
+            clones = removeSequenceSubclones(clones, i, j) + [<i, j>];
         }
     }
 
@@ -150,6 +149,7 @@ list[tuple[list[node], list[node]]] addSequenceClone(list[tuple[list[node], list
 list[tuple[list[node], list[node]]] findSequenceClonePairs(map[str, list[list[node]]] hashTable, real similarityThreshold, int cloneType) {
     list[tuple[list[node], list[node]]] clones = [];
     map[str, real] similarityMap = ();
+    set[str] processedPairs = {};
 
     // for each sequence i and j in the same bucket
 	for (bucket <- hashTable) {	
@@ -160,6 +160,12 @@ list[tuple[list[node], list[node]]] findSequenceClonePairs(map[str, list[list[no
                 str listStr = iString + jString;
                 str listStrRev = jString + iString;
                 real comparison = 0.0;
+
+                // Skip if pair has already been processed
+                if (listStr in processedPairs) {
+                    continue;
+                }
+
                 if(listStr in similarityMap) {
                     comparison = similarityMap[listStr];
                 } else if (listStrRev in similarityMap) {
@@ -170,8 +176,20 @@ list[tuple[list[node], list[node]]] findSequenceClonePairs(map[str, list[list[no
                 }
                 // check if are clones
                 if (((cloneType == 1 && comparison == 1.0) || ((cloneType == 2 || cloneType == 3)) && (comparison >= similarityThreshold))) {
+                    //int prevSize = size(clones);
                     clones = addSequenceClone(clones, i, j);
+                    //int afterSize = size(clones);
+                    /**
+                    if(afterSize - prevSize <= 0) {
+                        clones += <j,i>;
+                    }
+                    */
+                    //clones += <j,i>; //addSequenceClone(clones, j, i);
                 }
+
+                // Mark the pair as processed
+                processedPairs += listStr;
+                //processedPairs += listStrRev;
         }	
     }
     return clones;
