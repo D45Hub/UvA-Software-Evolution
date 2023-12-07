@@ -39,7 +39,7 @@ void main() {
     M3 model = createM3FromMavenProject(encryptorProject);
     list[Declaration] asts = [createAstFromFile(f, true) | f <- files(model.containment), isCompilationUnit(f)];
 
-    map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, MASS_THRESHOLD, 1);
+    map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, MASS_THRESHOLD, 2);
 
     println("Sequences: <size(sequences2)>");
 
@@ -60,10 +60,11 @@ void main() {
 
     DuplicationResult biggestDuplicationClass = getLargestDuplicationClass(classes);
     TransitiveCloneConnections allCloneConnections = getCloneConnections(extractIDPairs(duplicationResults));
-    println("Clone classes: <size(classes)>");
 
     map[str, list[str]] cloneConnectionMap = generateCloneConnectionMap(allCloneConnections);
     classes = getFilteredDuplicationResultList(classes, cloneConnectionMap);
+    println("Clone classes: <size(classes)>");
+
     
     println("Duplicated Lines: <duplicatedLinesAmount>");
     println("Duplicate Results: <size(duplicationResults)>");
