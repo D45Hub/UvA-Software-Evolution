@@ -11,7 +11,7 @@ import Type;
 import Boolean;
 import Set;
 
-//Type defaultType = lang::java::jdt::m3::AST::short();
+Type defaultType = Type::short();
 
 map[tuple[list[node] zNode, list[node] i] zList, str subsetResult] zeroSubsetResults = ();
 map[tuple[list[node] oNode, list[node] j] oList, str subsetResult] oneSubsetResults = ();
@@ -60,11 +60,10 @@ map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, int mi
                 // hash every subsequence
                 str subsequenceHash = "";
                 for (n <- subsequence) {
-                    /**
+                    
                     if (cloneType == 2) {
                         n = normalizeIdentifiers(n);
                     }
-                    */
 
                     if(n in nodeHashMap) {
                         subsequenceHash += nodeHashMap[n];
@@ -229,4 +228,45 @@ tuple[int S, int L, int R] sharedUniqueNodes(node subtree1, node subtree2) {
     }
 
     return <shared, unique, 0>;
+}
+
+public node normalizeIdentifiers(node nodeItem) {
+
+	return visit(nodeItem) {
+		case \enumConstant(_, args, cls) => \enumConstant("enumConstant", args, cls)
+		case \enumConstant(_, args) => \enumConstant("enumConstant", args)
+		case \class(_, ext, imp, bod) => \class("class", ext, imp, bod)
+		case \interface(_, ext, imp, bod) => \interface("interface", ext, imp, bod)
+		case \method(_, _, a, b, c) => \method(defaultType, "method", a, b, c)
+		case \method(Type a,str b,list[Declaration] c,list[Expression] d) => \method(a,b,c,d)
+		case \constructor(_, pars, expr, impl) => \constructor("constructor", pars, expr, impl)
+		case \variable(_,ext) => \variable("variableName",ext)
+		case \variable(_,ext, ini) => \variable("variable",ext,ini)
+		case \typeParameter(_, list[Type] ext) => \typeParameter("typeParameter",ext)
+		case \annotationType(_, bod) => \annotationType("annotationType", bod)
+		case \annotationTypeMember(_, _) => \annotationTypeMember(defaultType, "annotationTypeMember")
+		case \annotationTypeMember(_, _, def) => \annotationTypeMember(defaultType, "annotationTypeMember", def)
+		case \parameter(_, _, ext) => \parameter(defaultType, "parameter", ext)
+		case \vararg(_, _) => \vararg(defaultType, "vararg")
+		case \characterLiteral(_) => \characterLiteral("a")
+		case \fieldAccess(is, _) => \fieldAccess(is, "fa")
+		case \methodCall(is, _, arg) => \methodCall(is, "methodCall", arg)
+		case \methodCall(is, expr, _, arg) => \methodCall(is, expr, "methodCall", arg)
+		case \number(_) => \number("1")
+		case \booleanLiteral(_) => \booleanLiteral(true)
+		case \stringLiteral(_) => \stringLiteral("str")
+		case \type(_) => \type(defaultType)
+		case \simpleName(_) => \simpleName("simpleName")
+		case \markerAnnotation(_) => \markerAnnotation("markerAnnotation")
+		case \normalAnnotation(_, memb) => \normalAnnotation("normalAnnotation", memb)
+		case \memberValuePair(_, vl) => \memberValuePair("memberValuePair", vl)
+		case \singleMemberAnnotation(_, vl) => \singleMemberAnnotation("singleMemberAnnotation", vl)
+		case \break(_) => \break("break")
+		case \continue(_) => \continue("continue")
+		case \label(_, bdy) => \label("label", bdy)
+		case Type _ => defaultType
+		case Modifier _ => lang::java::m3::AST::\public()
+	}
+
+    return nodeItem;
 }
