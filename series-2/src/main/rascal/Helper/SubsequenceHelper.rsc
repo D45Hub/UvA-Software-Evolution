@@ -149,6 +149,7 @@ list[tuple[list[node], list[node]]] addSequenceClone(list[tuple[list[node], list
 list[tuple[list[node], list[node]]] findSequenceClonePairs(map[str, list[list[node]]] hashTable, real similarityThreshold, int cloneType) {
     list[tuple[list[node], list[node]]] clones = [];
     map[str, real] similarityMap = ();
+    map[str, str] compMap = ();
     set[str] processedPairs = {};
 
     // for each sequence i and j in the same bucket
@@ -166,6 +167,19 @@ list[tuple[list[node], list[node]]] findSequenceClonePairs(map[str, list[list[no
                     continue;
                 }
 
+                str compMapRes = "";
+                if(listStr in compMap) {
+                    compMapRes = compMap[listStr];
+                    //println("Cache Hit");
+                } else if (listStrRev in compMap) {
+                    compMapRes = compMap[listStrRev];
+                    //println("Cache Hit");
+                } else {
+                    compMapRes = toString(unsetRec(i) == unsetRec(j));
+                    compMap[listStrRev]?"" = compMapRes;
+                }
+
+                /**
                 if(listStr in similarityMap) {
                     comparison = similarityMap[listStr];
                 } else if (listStrRev in similarityMap) {
@@ -174,8 +188,10 @@ list[tuple[list[node], list[node]]] findSequenceClonePairs(map[str, list[list[no
                     comparison = similarity(i, j);
                     similarityMap[listStr]?0.0 = comparison;
                 }
+                */
+                
                 // check if are clones
-                if (((cloneType == 1 && comparison == 1.0) || ((cloneType == 2 || cloneType == 3)) && (comparison >= similarityThreshold))) {
+                if (((cloneType == 1 && comparison == 0.0 && fromString(compMapRes)) || ((cloneType == 2 || cloneType == 3)))){//&& (comparison >= similarityThreshold))) {
                     //int prevSize = size(clones);
                     clones = addSequenceClone(clones, i, j);
                     //int afterSize = size(clones);
