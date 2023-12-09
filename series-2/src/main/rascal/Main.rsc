@@ -37,9 +37,9 @@ void main() {
     println(startBenchmarkTime);
     
     M3 model = createM3FromMavenProject(encryptorProject);
-    list[Declaration] asts = [createAstFromFile(f, true) | f <- files(model.containment), isCompilationUnit(f)];
+    set[Declaration] asts = {createAstFromFile(f, true) | f <- files(model.containment), isCompilationUnit(f)};
 
-    map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, MASS_THRESHOLD, 2);
+    map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, MASS_THRESHOLD, CLONE_TYPE);
 
     println("Sequences: <size(sequences2)>");
 

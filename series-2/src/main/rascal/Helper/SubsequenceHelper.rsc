@@ -25,8 +25,8 @@ map[node uNode, int uniqueNodes] uniqueNodes = ();
 {x=0; if(d>1) ... } hashcodes = 675, 3004
 so e.g. [[[x=0;, if(d>1);]],[[y=1;, z= 2;]]]
 */ 
-list[list[node]] getListOfSequences(list[Declaration] ast, int minimumSequenceLengthThreshold) {
-    list[list[node]] sequences = [];
+set[list[node]] getListOfSequences(set[Declaration] ast, int minimumSequenceLengthThreshold) {
+    set[list[node]] sequences = {};
     visit (ast) {
         /**
         * This block makes use of the https://www.rascal-mpl.org/docs/Rascal/Statements/Block/ 
@@ -36,19 +36,20 @@ list[list[node]] getListOfSequences(list[Declaration] ast, int minimumSequenceLe
         case \block(list[Statement] statements): {
             /* You are putting the statements into a list of node -> Why temporal? */ 
             list[node] sequence = statements;
+
             if (size(statements) >= minimumSequenceLengthThreshold) {
                 // Why are you using a list in here and not just adding the sequence which is already a list?
-                
-                sequences += [sequence]; // Sequences list.
+                sequence = [unsetRec(n, {"typ","decl","messages"}) | n <- sequence];
+                sequences += {sequence}; // Sequences list.
             }
         }
     }
     return sequences;
 }
 
-map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, int minimumSequenceLengthThreshold, int cloneType) {
+map[str, list[list[node]]] createSequenceHashTable(set[Declaration] ast, int minimumSequenceLengthThreshold, int cloneType) {
     map[str, list[list[node]]] hashTable = ();
-    list[list[node]] sequences = getListOfSequences(ast, minimumSequenceLengthThreshold);
+    set[list[node]] sequences = getListOfSequences(ast, minimumSequenceLengthThreshold);
 
     map[node, str] nodeHashMap = ();
     
@@ -62,7 +63,7 @@ map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, int mi
                 for (n <- subsequence) {
                     
                     if (cloneType == 2) {
-                        n = normalizeIdentifiers(n);
+                        n = normalizeIdentifiers(unsetRec(n));
                     }
 
                     if(n in nodeHashMap) {
@@ -164,6 +165,11 @@ list[tuple[list[node], list[node]]] findSequenceClonePairs(map[str, list[list[no
                 if (listStr in processedPairs) {
                     continue;
                 }
+
+                //println("I: <size(i)>, J: <size(j)>");
+                //if((toReal(size(i)) / toReal(size(j))) < similarityThreshold) {
+                    //continue;
+                //}
 
                 if(listStr in similarityMap) {
                     comparison = similarityMap[listStr];
@@ -267,6 +273,4 @@ public node normalizeIdentifiers(node nodeItem) {
 		case Type _ => defaultType
 		case Modifier _ => lang::java::m3::AST::\public()
 	}
-
-    return nodeItem;
 }
