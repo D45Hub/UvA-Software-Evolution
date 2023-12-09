@@ -83,34 +83,95 @@ list[CloneTuple] removePotentialOldSubsetPair(list[CloneTuple] clonePairs, Clone
 
 public list[DuplicationResult] getCloneClasses(list[DuplicationResult] duplicationResults) {
     list[DuplicationResult] cloneClasses = [];
-    
-    for(DuplicationResult resultTupleList <- duplicationResults) {
-        DuplicationLocation maxSizedDuplicationLoc1 = resultTupleList[0];
-        DuplicationLocation maxSizedDuplicationLoc2 = resultTupleList[1];        
 
-        for(DuplicationResult duplicationResult <- duplicationResults) {
-            for(DuplicationLocation itDuplicationResult <- duplicationResult){
-                maxSizedDuplicationLoc1 = modifyPotentialMaxLoc(itDuplicationResult, maxSizedDuplicationLoc1);
-                maxSizedDuplicationLoc2 = modifyPotentialMaxLoc(itDuplicationResult, maxSizedDuplicationLoc2);
-            } 
+    for (DuplicationResult resultTupleList <- duplicationResults) {
+        bool merged = false;
+
+        for (DuplicationResult existingResult <- cloneClasses) {
+            for (DuplicationLocation newLoc <- resultTupleList) {
+                for (DuplicationLocation existingLoc <- existingResult) {
+                    if (areLocationsOverlapping(existingLoc, newLoc) && haveSameFileAndMethodNames(existingLoc, newLoc)) {
+                        existingResult += newLoc;
+                        merged = true;
+                        break;
+                    }
+                }
+                if (merged) {
+                    break;
+                }
+            }
+            if (merged) {
+                break;
+            }
         }
 
-        maxSizedDuplicationLoc1.base64Content = getBase64FileFromDuplicationLocation(maxSizedDuplicationLoc1);
-        maxSizedDuplicationLoc2.base64Content = getBase64FileFromDuplicationLocation(maxSizedDuplicationLoc2);
-
-        DuplicationResult newDuplRes = [maxSizedDuplicationLoc1, maxSizedDuplicationLoc2];
-
-        if(!containsDuplicationResult(cloneClasses, newDuplRes)) {
-            cloneClasses += [newDuplRes];
+        if (!merged) {
+            cloneClasses += [resultTupleList];
         }
     }
 
-    return cloneClasses;
+    list[DuplicationResult] finalCloneClasses = [];
+    for (DuplicationResult result <- cloneClasses) {
+        DuplicationResult res = [];
+
+        DuplicationLocation dlFirst = result[0];
+        bool hasDifferentLocations = any(DuplicationLocation dl <- result, (dl.methodName != dlFirst.methodName) || (dl.filePath != dlFirst.filePath && dl.methodName == dlFirst.methondName));
+
+        if(hasDifferentLocations){
+            for (DuplicationLocation l <- result) {
+                l.base64Content = getBase64FileFromDuplicationLocation(l);
+                res += [l];
+            }
+        finalCloneClasses += [res];
+        }
+    }
+
+    return finalCloneClasses;
 }
 
-str getBase64FileFromDuplicationLocation(DuplicationLocation maxSizedDuplicationLocation) {
-    list[str] rawMethodContent = split("\n", readFile(toLocation(maxSizedDuplicationLocation.fileUri)));
-    list[str] rawLocationContent = rawMethodContent[(maxSizedDuplicationLocation.startLine)..(maxSizedDuplicationLocation.endLine)];
+bool haveSameFileAndMethodNames(DuplicationLocation loc1, DuplicationLocation loc2) {
+    return loc1.filePath == loc2.filePath && loc1.methodName == loc2.methodName;
+}
+
+bool areLocationsOverlapping(DuplicationLocation loc1, DuplicationLocation loc2) {
+    return loc1.filePath == loc2.filePath &&
+           loc1.startLine <= loc2.endLine && loc1.endLine >= loc2.startLine;
+}
+
+DuplicationResult mergeDuplicationResults(DuplicationResult existing, list[DuplicationLocation] newLocations) {
+    for (DuplicationLocation newLoc <- newLocations) {
+        bool merged = false;
+
+        for (DuplicationLocation existingLoc <- existing) {
+            if (areLocationsOverlapping(existingLoc, newLoc)) {
+                existingLoc = mergeDuplicationLocations(existingLoc, newLoc);
+                merged = true;
+                break;
+            }
+        }
+
+        if (!merged) {
+            existing += newLoc;
+        }
+    }
+
+    return existing;
+}
+
+DuplicationLocation mergeDuplicationLocations(DuplicationLocation loc1, DuplicationLocation loc2) {
+    int size1 = loc1.endLine - loc1.startLine;
+    int size2 = loc2.endLine - loc2.startLine;
+
+    if (size1 >= size2) {
+        return loc1;
+    } else {
+        return loc2;
+    }
+}
+
+str getBase64FileFromDuplicationLocation(DuplicationLocation duplicationLocation) {
+    list[str] rawMethodContent = split("\n", readFile(toLocation(duplicationLocation.fileUri)));
+    list[str] rawLocationContent = rawMethodContent[(duplicationLocation.startLine)..(duplicationLocation.endLine)];
     str joinedLocString = ("" | it + "\n" + s | s <- rawLocationContent);
     str base64NodeContent = toBase64(joinedLocString);
 
@@ -118,14 +179,8 @@ str getBase64FileFromDuplicationLocation(DuplicationLocation maxSizedDuplication
 }
 
 DuplicationLocation modifyPotentialMaxLoc(DuplicationLocation duplLoc, DuplicationLocation maxDuplicationLoc) {
-    if((duplLoc.filePath == maxDuplicationLoc.filePath) && (duplLoc.methodName == maxDuplicationLoc.methodName)) {
-        if(duplLoc.startLine < maxDuplicationLoc.startLine) {
-            maxDuplicationLoc.startLine = duplLoc.startLine;
-        }
-
-        if(duplLoc.endLine > maxDuplicationLoc.endLine) {
-            maxDuplicationLoc.endLine = duplLoc.endLine;
-        }
+    if ((duplLoc.filePath == maxDuplicationLoc.filePath) && (duplLoc.methodName == maxDuplicationLoc.methodName)) {
+        return mergeDuplicationLocations(duplLoc, maxDuplicationLoc);
     }
 
     return maxDuplicationLoc;
@@ -161,6 +216,9 @@ bool isLocContainedInResultLoc(DuplicationLocation duplLoc1, DuplicationLocation
 
 list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[node]]] sequenceClones, map[loc fileLoc, MethodLoc method] mapLocs) {
     list[DuplicationResult] duplicationResults = [];
+    // TODO Maybe use caching here for equivalent nodes and node lists...
+    // You can improve this.
+
     for(c <- sequenceClones) {
 
         loc nodeALoc = nodeFileLocation((c[0])[0]);
