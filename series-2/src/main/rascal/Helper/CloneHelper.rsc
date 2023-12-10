@@ -2,16 +2,8 @@ module Helper::CloneHelper
 import Helper::ProjectHelper;
 import Helper::Types;
 
-import util::UUID;
 import String;
 import IO;
-
-public list[CloneTuple] getClonePairs(list[NodeHashLoc] hashedSubtrees, num similarityThreshold) {
-    map[str, list[NodeLoc]] hashBuckets = placingSubTreesInBuckets(hashedSubtrees);
-	list[CloneTuple] clonePairs = findClones(hashBuckets, similarityThreshold);
-
-    return clonePairs;
-}
 
 list[CloneTuple] findClones(map[str, list[NodeLoc]] subtrees, real similarityThreshold bool type2=false) {
     list[CloneTuple] clonePairs = [];
@@ -138,37 +130,6 @@ bool areLocationsOverlapping(DuplicationLocation loc1, DuplicationLocation loc2)
            loc1.startLine <= loc2.endLine && loc1.endLine >= loc2.startLine;
 }
 
-DuplicationResult mergeDuplicationResults(DuplicationResult existing, list[DuplicationLocation] newLocations) {
-    for (DuplicationLocation newLoc <- newLocations) {
-        bool merged = false;
-
-        for (DuplicationLocation existingLoc <- existing) {
-            if (areLocationsOverlapping(existingLoc, newLoc)) {
-                existingLoc = mergeDuplicationLocations(existingLoc, newLoc);
-                merged = true;
-                break;
-            }
-        }
-
-        if (!merged) {
-            existing += newLoc;
-        }
-    }
-
-    return existing;
-}
-
-DuplicationLocation mergeDuplicationLocations(DuplicationLocation loc1, DuplicationLocation loc2) {
-    int size1 = loc1.endLine - loc1.startLine;
-    int size2 = loc2.endLine - loc2.startLine;
-
-    if (size1 >= size2) {
-        return loc1;
-    } else {
-        return loc2;
-    }
-}
-
 str getBase64FileFromDuplicationLocation(DuplicationLocation duplicationLocation) {
     list[str] rawMethodContent = split("\n", readFile(toLocation(duplicationLocation.fileUri)));
     list[str] rawLocationContent = rawMethodContent[(duplicationLocation.startLine)..(duplicationLocation.endLine)];
@@ -177,23 +138,6 @@ str getBase64FileFromDuplicationLocation(DuplicationLocation duplicationLocation
 
     return base64NodeContent;
 }
-
-DuplicationLocation modifyPotentialMaxLoc(DuplicationLocation duplLoc, DuplicationLocation maxDuplicationLoc) {
-    if ((duplLoc.filePath == maxDuplicationLoc.filePath) && (duplLoc.methodName == maxDuplicationLoc.methodName)) {
-        return mergeDuplicationLocations(duplLoc, maxDuplicationLoc);
-    }
-
-    return maxDuplicationLoc;
-}
-
-bool containsDuplicationResult(list[DuplicationResult] results, DuplicationResult result) {
-    bool containsResult = false;
-
-    DuplicationLocation resultLoc1 = result[0];
-    DuplicationLocation resultLoc2 = result[1];
-
-    return any(DuplicationResult res <- results, areLocationsContainedInResultLocations(res[0], res[1], resultLoc1, resultLoc2));
-} 
 
 bool areLocationsContainedInResultLocations(DuplicationLocation l1, DuplicationLocation l2, DuplicationLocation resultLoc1, DuplicationLocation resultLoc2) {
     bool containsInL1 = isLocContainedInResultLoc(l1, resultLoc1);
