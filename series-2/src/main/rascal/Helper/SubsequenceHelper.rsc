@@ -55,7 +55,7 @@ map[str, list[list[node]]] createSequenceHashTable(set[Declaration] ast, int min
     
     for (sequence <- sequences) {
         int sequenceSize = size(sequence);
-        for (i <- [0..(sequenceSize + 1)], j <- [0..(sequenceSize + 1)]) {
+        for (i <- [0..(sequenceSize - minimumSequenceLengthThreshold + 1)], j <- [i + minimumSequenceLengthThreshold..(sequenceSize + 1)]) {
             if ((j >= i + minimumSequenceLengthThreshold)) {
                 list[node] subsequence = sequence[i..j];
                 // hash every subsequence
@@ -166,11 +166,15 @@ list[tuple[list[node], list[node]]] findSequenceClonePairs(map[str, list[list[no
                     continue;
                 }
 
+                if (quickCheckBeforeSimilarity(i, j)) {
+                    processedPairs += listStr;
+                    continue;
+                }
+
                 //println("I: <size(i)>, J: <size(j)>");
                 //if((toReal(size(i)) / toReal(size(j))) < similarityThreshold) {
                     //continue;
                 //}
-
                 if(listStr in similarityMap) {
                     comparison = similarityMap[listStr];
                 } else if (listStrRev in similarityMap) {
@@ -179,6 +183,7 @@ list[tuple[list[node], list[node]]] findSequenceClonePairs(map[str, list[list[no
                     comparison = similarity(i, j);
                     similarityMap[listStr]?0.0 = comparison;
                 }
+                
                 // check if are clones
                 if (((cloneType == 1 && comparison == 1.0) || ((cloneType == 2 || cloneType == 3)) && (comparison >= similarityThreshold))) {
                     //int prevSize = size(clones);
@@ -198,6 +203,16 @@ list[tuple[list[node], list[node]]] findSequenceClonePairs(map[str, list[list[no
         }	
     }
     return clones;
+}
+
+bool quickCheckBeforeSimilarity(list[node] i, list[node] j) {
+    // Example: Check if the lengths of the sequences differ significantly
+    int minLength = min(size(i), size(j));
+    int maxLength = max(size(i), size(j));
+    real lengthRatio = toReal(maxLength) / toReal(minLength);
+
+    // If the length ratio is above a certain threshold, consider the sequences dissimilar
+    return lengthRatio > 2.0;
 }
 
 real similarity(list[node] subtrees1, list[node] subtrees2) {
