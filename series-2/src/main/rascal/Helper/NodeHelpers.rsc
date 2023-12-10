@@ -38,23 +38,7 @@ public list[NodeHash] getNSizedHashedSubtrees(list[node] rootNode, int minSubtre
 }
 
 public loc nodeFileLocation(node n) {
-    
 	loc location = noLocation;
-	/**
-	if (Declaration d := n) 
-		location = d.src;
-	
-	if (Expression e := n) 
-		location = e.src;
-	
-	if (Statement s := n)
-		location = s.src;
-	
-	//Unit that is not related to source-code
-	if(location == |unknown:///|) {
-		location = noLocation;
-	}
-    */
 
     bool hasSrcParam = ("src" in getKeywordParameters(n));
 
@@ -102,7 +86,7 @@ public bool isNodeSubset(node tree1, node tree2) {
 	nodeString1 = toString(tree1);
 	nodeString2 = toString(tree2);
 
-	if(nodeString1 ==  nodeString2) {
+	if(nodeString1 == nodeString2) {
 		return false;
 	}
 
@@ -111,6 +95,7 @@ public bool isNodeSubset(node tree1, node tree2) {
 
 bool isSubset(list[node] rootSequence, list[node] subSequence) {
     // If the root sequence entails the sub-sequence, it is a subset.
+    // We check that by comparing the node locations and if they are subsumed by another element.
     if (isSubsequence(rootSequence, subSequence)) {
         return true;
     }
@@ -119,30 +104,6 @@ bool isSubset(list[node] rootSequence, list[node] subSequence) {
     list[loc] subSequenceLocs = [nodeFileLocation(n) | n <- subSequence];
 
     return any(loc rootSeqLoc <- rootSequenceLocs, nodeLocContainedInNodeLocList(rootSeqLoc, subSequenceLocs));
-
-    // For every sequence node in the root, visit the subtree. If this subtree
-    // has a sequence which entails our subsequence, it is a subset.
-
-    /**
-    for (node n <- rootSequence) {
-        
-        visit(n) {
-            // subsequence is contained in sequence of the current node.
-            case \block(statements): {
-                list[node] sequence = statements;
-                if (isSubsequence(statements, subSequence)) {
-                    return true;
-                }
-            }
-            // subsequence is contained in the current node
-            case node n: {
-                if (size(subSequence) == 1 && subSequence[0] == n) {
-                    return true;
-                }
-            }
-        }
-    }
-    */
 }
 
 bool nodeLocContainedInNodeLocList(loc testedNodeLoc, list[loc] sequenceValueLocs) {
