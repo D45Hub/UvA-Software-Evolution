@@ -39,7 +39,6 @@ set[list[node]] getListOfSequences(set[Declaration] ast, int minimumSequenceLeng
 
             if (size(statements) >= minimumSequenceLengthThreshold) {
                 // Why are you using a list in here and not just adding the sequence which is already a list?
-                sequence = [unsetRec(n, {"typ","decl","messages"}) | n <- sequence];
                 sequences += {sequence}; // Sequences list.
             }
         }
@@ -62,6 +61,7 @@ map[str, list[list[node]]] createSequenceHashTable(set[Declaration] ast, int min
                 str subsequenceHash = "";
                 for (n <- subsequence) {
                     
+                    // TODO check for type 2 
                     if (cloneType == 2) {
                         n = normalizeIdentifiers(unsetRec(n));
                     }
@@ -238,10 +238,11 @@ tuple[int S, int L, int R] sharedUniqueNodes(node subtree1, node subtree2) {
     }
     visit(subtree2) {
         case node n: {
-            int a = nodeCounter[unsetRec(n)]?0;
+            node unset = unsetRec(n);
+            int a = nodeCounter[unset]?0;
             if (a > 0) {
                 shared += 2;
-                nodeCounter[unsetRec(n)] -= 1;
+                nodeCounter[unset] -= 1;
             } else {
                 unique += 1;
             }
