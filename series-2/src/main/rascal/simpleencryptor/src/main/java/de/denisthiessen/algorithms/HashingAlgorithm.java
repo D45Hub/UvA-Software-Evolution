@@ -43,4 +43,35 @@ public class HashingAlgorithm implements IAlgorithm {
         System.out.println("1");
         System.out.println("1");
     }
+
+    public static void test() {
+        int x = 0;
+        int x = 0;
+        int x = 0;
+        int x = 0;
+        int x = 0;
+        int x = 0;
+        int x = 0;
+        int x = 0;
+        int x = 0;
+        int x = 0;
+        int x = 0;
+        int y = 1;
+    }
+
+    public static void test2(){
+        int x = 0;
+        int x = 0;
+        int x = 0;
+        int x = 0;
+        int x = 0;
+        int x = 0;
+        int x = 0;
+        int x = 0;
+        int x = 0;
+        int x = 0;
+        int x = 0;
+
+        int z = 3;
+    }
 }
