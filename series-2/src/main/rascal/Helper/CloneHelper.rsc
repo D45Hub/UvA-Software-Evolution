@@ -127,7 +127,7 @@ bool haveSameFileAndMethodNames(DuplicationLocation loc1, DuplicationLocation lo
 
 bool areLocationsOverlapping(DuplicationLocation loc1, DuplicationLocation loc2) {
     return loc1.filePath == loc2.filePath &&
-           loc1.startLine <= loc2.endLine && loc1.endLine >= loc2.startLine;
+           ((loc1.startLine <= loc2.endLine && loc1.endLine >= loc2.startLine) || (loc1.startLine <= loc2.endLine - 1 && loc1.endLine >= loc2.startLine + 1));
 }
 
 str getBase64FileFromDuplicationLocation(DuplicationLocation duplicationLocation) {
