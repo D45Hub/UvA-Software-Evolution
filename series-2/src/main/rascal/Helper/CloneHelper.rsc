@@ -5,74 +5,6 @@ import Helper::Types;
 import String;
 import IO;
 
-list[CloneTuple] findClones(map[str, list[NodeLoc]] subtrees, real similarityThreshold bool type2=false) {
-    list[CloneTuple] clonePairs = [];
-    for (hash <- subtrees) {
-        list[NodeLoc] nodes = subtrees[hash];
-        for (i <- nodes, j <- nodes) {
-            if (!type2 && i.l != j.l) {
-                clonePairs = addClone(clonePairs, <i.nodeLocNode, j.nodeLocNode>);
-            }
-            else if (i.l != j.l && toReal(nodeSimilarity(i.nodeLocNode, j.nodeLocNode)) >= similarityThreshold) {
-                clonePairs = addClone(clonePairs, <i.nodeLocNode, j.nodeLocNode>);
-            }
-        }
-    }
-    return clonePairs;
-}
-
-public list[CloneTuple] addClone(list[CloneTuple] clonePairs, CloneTuple newPair) {
-    // Ignore the pair if one node is a subtree of another node
-    bool isNewNodeABSubset = isNodeSubset(newPair.nodeA, newPair.nodeB);
-    bool isNewNodeBASubset = isNodeSubset(newPair.nodeB, newPair.nodeA);
-
-    if (isNewNodeABSubset || isNewNodeBASubset) {
-        return clonePairs;
-    }
-
-    for (CloneTuple oldPair <- clonePairs) {
-        // Check if the pair already exists in flipped form
-        if (oldPair == <newPair.nodeB, newPair.nodeA> || oldPair == newPair) {
-            return clonePairs;
-        }
-
-        // Ignore the pair if it is a subset of an already existing pair
-        bool nodePairsIgnorable = areNodePairsIgnorable(oldPair, newPair);
-        if (nodePairsIgnorable) {
-            return clonePairs;
-        }
-
-        clonePairs = removePotentialOldSubsetPair(clonePairs, oldPair, newPair);
-    }
-
-    clonePairs += newPair;
-
-    return clonePairs;
-}
-
-bool areNodePairsIgnorable(CloneTuple oldPair, CloneTuple newPair) {
-    bool isOldSubsetCombo1 = isNodeSubset(oldPair.nodeA, newPair.nodeA);
-    bool isOldSubsetCombo2 = isNodeSubset(oldPair.nodeB, newPair.nodeB);
-    bool isOldSubsetCombo3 = isNodeSubset(oldPair.nodeA, newPair.nodeB);
-    bool isOldSubsetCombo4 = isNodeSubset(oldPair.nodeB, newPair.nodeA);
-
-    return (isOldSubsetCombo1 && isOldSubsetCombo2) || (isOldSubsetCombo3 && isOldSubsetCombo4);
-}
-
-list[CloneTuple] removePotentialOldSubsetPair(list[CloneTuple] clonePairs, CloneTuple oldPair, CloneTuple newPair) {
-    bool isNewSubsetCombo1 = isNodeSubset(newPair.nodeA, oldPair.nodeA);
-    bool isNewSubsetCombo2 = isNodeSubset(newPair.nodeB, oldPair.nodeB);
-    bool isNewSubsetCombo3 = isNodeSubset(newPair.nodeA, oldPair.nodeB);
-    bool isNewSubsetCombo4 = isNodeSubset(newPair.nodeB, oldPair.nodeA);
-
-    // If the current old pair is a subset of the current new pair. Remove it.
-    if ((isNewSubsetCombo1 && isNewSubsetCombo2) || (isNewSubsetCombo3 && isNewSubsetCombo4)) {
-        clonePairs = clonePairs - [oldPair];
-    }
-
-    return clonePairs;
-}
-
 public list[DuplicationResult] getCloneClasses(list[DuplicationResult] duplicationResults) {
     list[DuplicationResult] cloneClasses = [];
 
@@ -191,22 +123,6 @@ list[tuple[int, int]] trimTransitiveClosures(list[tuple[int, int]] locLinesList)
     return toList(trimmedClosures);
 }
 
-bool locationTupleOverlaps(tuple[int, int] t1, tuple[int, int] t2) {
-    bool beginLocOverlaps = (t1<0> > t2<0>) && (t1<0> < t2<1>);
-    bool endLocOverlaps = (t1<1> > t2<0>) && (t1<1> < t2<1>);
-
-    return beginLocOverlaps || endLocOverlaps;
-}
-
-bool haveSameFileAndMethodNames(DuplicationLocation loc1, DuplicationLocation loc2) {
-    return loc1.filePath == loc2.filePath && loc1.methodName == loc2.methodName;
-}
-
-bool areLocationsOverlapping(DuplicationLocation loc1, DuplicationLocation loc2) {
-    return loc1.filePath == loc2.filePath &&
-           ((loc1.startLine <= loc2.endLine && loc1.endLine >= loc2.startLine) || (loc1.startLine <= loc2.endLine - 1 && loc1.endLine >= loc2.startLine + 1));
-}
-
 str getBase64FileFromDuplicationLocation(DuplicationLocation duplicationLocation) {
     list[str] rawMethodContent = split("\n", readFile(toLocation(duplicationLocation.fileUri)));
     list[str] rawLocationContent = rawMethodContent[(duplicationLocation.startLine)..(duplicationLocation.endLine)];
@@ -214,25 +130,6 @@ str getBase64FileFromDuplicationLocation(DuplicationLocation duplicationLocation
     str base64NodeContent = toBase64(joinedLocString);
 
     return base64NodeContent;
-}
-
-bool areLocationsContainedInResultLocations(DuplicationLocation l1, DuplicationLocation l2, DuplicationLocation resultLoc1, DuplicationLocation resultLoc2) {
-    bool containsInL1 = isLocContainedInResultLoc(l1, resultLoc1);
-    bool containsInL2 = isLocContainedInResultLoc(l2, resultLoc2);
-
-    bool reverseContainsInL1 = isLocContainedInResultLoc(l1, resultLoc2);
-    bool reverseContainsInL2 = isLocContainedInResultLoc(l2, resultLoc1);
-
-    return (containsInL1 && containsInL2) || (reverseContainsInL1 && reverseContainsInL2);
-}
-
-bool isLocContainedInResultLoc(DuplicationLocation duplLoc1, DuplicationLocation duplLoc2) {
-    bool areD1D2FilePathsEqual = (duplLoc1.filePath == duplLoc2.filePath);
-    bool areD1D2MethodNamesEqual = (duplLoc1.methodName == duplLoc2.methodName);
-    bool areD1D2StartLinesEqual = (duplLoc1.startLine == duplLoc2.startLine);
-    bool areD1D2EndLinesEqual = (duplLoc1.endLine == duplLoc2.endLine);
-
-    return areD1D2FilePathsEqual && areD1D2MethodNamesEqual && areD1D2StartLinesEqual && areD1D2EndLinesEqual;
 }
 
 list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[node]]] sequenceClones, map[loc fileLoc, MethodLoc method] mapLocs) {
