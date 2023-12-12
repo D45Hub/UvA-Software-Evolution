@@ -76,49 +76,126 @@ list[CloneTuple] removePotentialOldSubsetPair(list[CloneTuple] clonePairs, Clone
 public list[DuplicationResult] getCloneClasses(list[DuplicationResult] duplicationResults) {
     list[DuplicationResult] cloneClasses = [];
 
-    for (DuplicationResult resultTupleList <- duplicationResults) {
-        bool merged = false;
+    // Map mit File + Methode -> List[<Start,End>]
+    // Transitive Closure für jedes lustige Dingens da drinnen machen
+    // Die Closure sortieren nach Größe
+    // Die Liste von groß -> klein rekursiv abarbeiten und checken ob das Element "drunter" in dem "drüber" enthalten ist und aufhören, wenn nicht mehr drinnen ist...
+    // Und die lustigen Dinger sind die jeweiligen Clone Classes für die File + Methode
+    // Und das dann alles wieder zu DuplicationResults zusammenschnipseln...
 
-        for (DuplicationResult existingResult <- cloneClasses) {
-            for (DuplicationLocation newLoc <- resultTupleList) {
-                for (DuplicationLocation existingLoc <- existingResult) {
-                    if (areLocationsOverlapping(existingLoc, newLoc) && haveSameFileAndMethodNames(existingLoc, newLoc)) {
-                        existingResult += newLoc;
-                        merged = true;
-                        break;
-                    }
-                }
-                if (merged) {
-                    break;
-                }
-            }
-            if (merged) {
-                break;
-            }
+    map[DuplicationLocation, list[tuple[int, int]]] locMap = getModifiedLocMap(duplicationResults);
+
+    for(DuplicationLocation l <- locMap) {
+        DuplicationResult r = [];
+
+        for(tuple[int, int] t <- locMap[l]) {
+            l.startLine = t<0>;
+            l.endLine = t<1>;
+            r += [l];
         }
-
-        if (!merged) {
-            cloneClasses += [resultTupleList];
+        if(size(r) > 0) {
+            cloneClasses += [r];
         }
     }
 
     list[DuplicationResult] finalCloneClasses = [];
     for (DuplicationResult result <- cloneClasses) {
         DuplicationResult res = [];
-
-        DuplicationLocation dlFirst = result[0];
-        bool hasDifferentLocations = any(DuplicationLocation dl <- result, (dl.methodName != dlFirst.methodName) || (dl.filePath != dlFirst.filePath && dl.methodName == dlFirst.methondName));
-
-        if(hasDifferentLocations){
-            for (DuplicationLocation l <- result) {
-                l.base64Content = getBase64FileFromDuplicationLocation(l);
-                res += [l];
-            }
-        finalCloneClasses += [res];
+        for (DuplicationLocation l <- result) {
+            str concatDuplLocValues = "<l.filePath><l.fileUri><l.methodName><l.methodLoc><l.startLine><l.endLine>";
+            l.uuid = md5Hash(concatDuplLocValues);
+            l.base64Content = getBase64FileFromDuplicationLocation(l);
+            res += [l];
         }
+        finalCloneClasses += [res];
     }
 
     return finalCloneClasses;
+}
+
+map[DuplicationLocation, list[tuple[int, int]]] getLocMap(list[DuplicationResult] duplicationResults) {
+    map[DuplicationLocation, list[tuple[int, int]]] fileMethodMap = ();
+
+    for (DuplicationResult dupResult <- duplicationResults) {
+        for (DuplicationLocation location <- dupResult) {
+            DuplicationLocation normalizedDuplLocKey = location;
+            normalizedDuplLocKey.uuid = "test";
+            normalizedDuplLocKey.startLine = 0;
+            normalizedDuplLocKey.endLine = 0;
+            tuple[int, int] val = <location.startLine, location.endLine>;
+
+            if (normalizedDuplLocKey in fileMethodMap) {
+                set[tuple[int, int]] keySet = toSet(fileMethodMap[normalizedDuplLocKey]);
+                keySet += {val};
+                fileMethodMap[normalizedDuplLocKey] = toList(keySet);
+            } else {
+                fileMethodMap[normalizedDuplLocKey] = [val];
+            }
+        }
+    }
+    return fileMethodMap;
+}
+
+map[DuplicationLocation, list[tuple[int, int]]] getModifiedLocMap(list[DuplicationResult] duplicationResults) {
+    map[DuplicationLocation, list[tuple[int, int]]] rawLocMap = getLocMap(duplicationResults);
+    map[DuplicationLocation, list[tuple[int, int]]] filteredLocMap = ();
+    for(DuplicationLocation key <- rawLocMap) {
+        list[tuple[int, int]] lineTuples = rawLocMap[key];
+        list[tuple[int, int]] trimmedTransitiveTuples = getTrimmedTransitiveClosures(lineTuples);
+        filteredLocMap[key] = trimmedTransitiveTuples;
+    }
+
+    return filteredLocMap;
+}
+
+list[tuple[int, int]] getTrimmedTransitiveClosures(list[tuple[int, int]] locLinesList) {
+    list[tuple[int, int]] trLinesList = getLocTransitiveClosure(locLinesList);
+    return trimTransitiveClosures(trLinesList);
+}
+
+list[tuple[int, int]] getLocTransitiveClosure(list[tuple[int, int]] locLinesList) {
+    list[tuple[int, int]] transClosureList = locLinesList+;
+
+    list[tuple[int, int]] sortedTransClosureList = sort(transClosureList, bool(tuple[int, int] a, tuple[int, int] b) { return (a<1> - a<0>) > (b<1> - b<0>);});
+    return sortedTransClosureList;
+}
+
+list[tuple[int, int]] trimTransitiveClosures(list[tuple[int, int]] locLinesList) {
+    set[tuple[int, int]] trimmedClosures = {};
+
+    for (tuple[int, int] tClosure <- locLinesList) {
+        bool fullyIncluded = false;
+
+        for (tuple[int, int] iClosure <- locLinesList) {
+            if (tClosure == iClosure) {
+                continue;
+            }
+
+            if (iClosure<0> <= tClosure<0> && iClosure<1> >= tClosure<1>) {
+                fullyIncluded = true;
+                break;
+            }
+
+            if ((iClosure<0> <= tClosure<1> && iClosure<1> >= tClosure<0>) ||
+                (iClosure<0> <= tClosure<0> && iClosure<1> >= tClosure<0> - 1)) {
+                // Merge the intervals
+                tClosure = <min(iClosure<0>, tClosure<0>), max(iClosure<1>, tClosure<1>)>;
+            }
+        }
+
+        if (!fullyIncluded) {
+            trimmedClosures += {tClosure};
+        }
+    }
+
+    return toList(trimmedClosures);
+}
+
+bool locationTupleOverlaps(tuple[int, int] t1, tuple[int, int] t2) {
+    bool beginLocOverlaps = (t1<0> > t2<0>) && (t1<0> < t2<1>);
+    bool endLocOverlaps = (t1<1> > t2<0>) && (t1<1> < t2<1>);
+
+    return beginLocOverlaps || endLocOverlaps;
 }
 
 bool haveSameFileAndMethodNames(DuplicationLocation loc1, DuplicationLocation loc2) {
