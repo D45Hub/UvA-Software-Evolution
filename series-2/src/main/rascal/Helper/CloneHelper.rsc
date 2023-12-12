@@ -181,6 +181,11 @@ list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[nod
 }
 
 DuplicationResult getLargestDuplicationClass(list[DuplicationResult] cloneClasses) {
+
+    if(size(cloneClasses) == 0) {
+        return [];
+    }
+
     DuplicationResult biggestDuplicationClass = cloneClasses[0];
     DuplicationLocation biggestDuplicationLoc = biggestDuplicationClass[0];
     int biggestDuplLines = biggestDuplicationLoc.endLine - biggestDuplicationLoc.startLine;
