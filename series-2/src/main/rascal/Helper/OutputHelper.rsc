@@ -19,7 +19,11 @@ void writeJSONFile(loc outputFileLocation,
     real duplicatedLinePercentage = toReal(toReal(duplicatedLines) / toReal(projectLOC)) * 100.0;
 
     // Doesn't matter from which we base our LOC generation from.
-    DuplicationLocation biggestCloneClassLocation = biggestCloneClass[0];
+    DuplicationLocation biggestCloneClassLocation = <"", "", "", "", 0, 0, 0, "">;
+    
+    if(biggestCloneClass != []) {
+        biggestCloneClassLocation = biggestCloneClass[0];
+    }
     int biggestCloneClassLOC = biggestCloneClassLocation.endLine - biggestCloneClassLocation.startLine;
 
     str jsonContent = "{
