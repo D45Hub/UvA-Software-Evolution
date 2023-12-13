@@ -71,7 +71,8 @@ void main() {
     // AND ALSO INCLUDE TXT FILE OUTPUT...
 
     int projectLoc = size(getLOC(getConcatenatedProjectFile(model)));
-    writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD,allCloneConnections);
+    writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
+    writeMarkdownResult(|project://series-2/src/main/rsc/output/report.md|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
     str stopBenchmarkTime = stopBenchmark("benchmark");
     println(stopBenchmarkTime);
 }
