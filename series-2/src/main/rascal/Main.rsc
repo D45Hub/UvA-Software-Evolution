@@ -37,10 +37,9 @@ void main() {
     println(startBenchmarkTime);
     
     M3 model = createM3FromMavenProject(encryptorProject);
-    set[Declaration] asts = {createAstFromFile(f, true) | f <- files(model.containment), isCompilationUnit(f)};
+    list[Declaration] asts = [createAstFromFile(f, true) | f <- files(model.containment), isCompilationUnit(f)];
 
     map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, MASS_THRESHOLD, CLONE_TYPE);
-
     println("Sequences: <size(sequences2)>");
 
     list[tuple[list[node], list[node]]] sequenceClones = findSequenceClonePairs(sequences2, SIMILARTY_THRESHOLD, CLONE_TYPE);
@@ -65,9 +64,11 @@ void main() {
     classes = getFilteredDuplicationResultList(classes, cloneConnectionMap);
     println("Clone classes: <size(classes)>");
 
-    
     println("Duplicated Lines: <duplicatedLinesAmount>");
     println("Duplicate Results: <size(duplicationResults)>");
+
+    // TODO MORE FUNNY CONSOLE LOGS FOR ALL OF THE STATS... JUST PRINT OUTPUT HELPER...
+    // AND ALSO INCLUDE TXT FILE OUTPUT...
 
     int projectLoc = size(getLOC(getConcatenatedProjectFile(model)));
     writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD,allCloneConnections);

@@ -31,17 +31,26 @@ public class CaesarAlgorithm implements IAlgorithm {
     }
 
     public void printHey() {
+        test.track("ye");
+
         int i = 15;
         i += 3;
-        i += 3;
-        i += 3;
-        i += 3;
-        i += 3;
-        i += 3;
-        i += 3;
-        i += 3;
-
-        test.track("ye");
+        i += 5;
+        i += 2;
+        i += 2;
+        i += 2;
+        i += 2;
+        i += 2;
+        i += 2;
     }
-    
+
+    private void test() {
+        System.out.println("f");
+        System.out.println("f");
+        System.out.println("f");
+        System.out.println("f");
+        System.out.println("f");
+        System.out.println("f");
+        System.out.println("f");
+    } 
 }

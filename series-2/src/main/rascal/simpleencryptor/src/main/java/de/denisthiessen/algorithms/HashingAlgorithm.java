@@ -51,6 +51,7 @@ public class HashingAlgorithm implements IAlgorithm {
         int x = 0;
         int x = 0;
         int x = 0;
+        x = x + 5;
         int x = 0;
         int x = 0;
         int x = 0;
