@@ -26,8 +26,8 @@ map[node uNode, int uniqueNodes] uniqueNodes = ();
 {x=0; if(d>1) ... } hashcodes = 675, 3004
 so e.g. [[[x=0;, if(d>1);]],[[y=1;, z= 2;]]]
 */ 
-set[list[node]] getListOfSequences(set[Declaration] ast, int minimumSequenceLengthThreshold, int cloneType) {
-    set[list[node]] sequences = {};
+list[list[node]] getListOfSequences(list[Declaration] ast, int minimumSequenceLengthThreshold, int cloneType) {
+    list[list[node]] sequences = [];
     visit (ast) {
         /**
         * This block makes use of the https://www.rascal-mpl.org/docs/Rascal/Statements/Block/ 
@@ -42,17 +42,18 @@ set[list[node]] getListOfSequences(set[Declaration] ast, int minimumSequenceLeng
                 // Why are you using a list in here and not just adding the sequence which is already a list?
                 if(cloneType != 1) {
                     sequence = [normalizeIdentifiers(n) | n <- sequence];
+                    //iprintln(sequence);
                 }
-                sequences += {sequence}; // Sequences list.
+                sequences += [sequence]; // Sequences list.
             }
         }
     }
     return sequences;
 }
 
-map[str, list[list[node]]] createSequenceHashTable(set[Declaration] ast, int minimumSequenceLengthThreshold, int cloneType) {
+map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, int minimumSequenceLengthThreshold, int cloneType) {
     map[str, list[list[node]]] hashTable = ();
-    set[list[node]] sequences = getListOfSequences(ast, minimumSequenceLengthThreshold, cloneType);
+    list[list[node]] sequences = getListOfSequences(ast, minimumSequenceLengthThreshold, cloneType);
 
     map[node, str] nodeHashMap = ();
     

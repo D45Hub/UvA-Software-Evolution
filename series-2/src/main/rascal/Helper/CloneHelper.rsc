@@ -5,7 +5,7 @@ import Helper::Types;
 import String;
 import IO;
 
-map[loc fileLoc, str fileContent] fileContentMap = ();
+map[str fileLoc, str fileContent] fileContentMap = ();
 
 public list[DuplicationResult] getCloneClasses(list[DuplicationResult] duplicationResults) {
     list[DuplicationResult] cloneClasses = [];
@@ -127,14 +127,16 @@ list[tuple[int, int]] trimTransitiveClosures(list[tuple[int, int]] locLinesList)
 
 str getBase64FileFromDuplicationLocation(DuplicationLocation duplicationLocation) {
 
-    loc fileLocation = toLocation(duplicationLocation.fileUri);
+    // TODO CLEAR MAPS AFTER EXECUTION... THIS IS FUCKED UP...
+    str locUri = duplicationLocation.fileUri;
+    loc fileLocation = toLocation(locUri);
     str fileContent = "";
 
-    if(fileLocation in fileContentMap) {
-        fileContent = fileContentMap[fileLocation];
+    if(locUri in fileContentMap) {
+        fileContent = fileContentMap[locUri];
     } else {
         fileContent = readFile(fileLocation);
-        fileContentMap[fileLocation]?"" = fileContent;
+        fileContentMap[locUri]?"" = fileContent;
     } 
 
     list[str] rawMethodContent = split("\n", fileContent);
