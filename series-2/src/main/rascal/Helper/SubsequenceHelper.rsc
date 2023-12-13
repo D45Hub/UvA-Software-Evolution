@@ -2,6 +2,7 @@ module Helper::SubsequenceHelper
 
 import lang::java::m3::Core;
 import lang::java::m3::AST;
+import lang::java::\syntax::Java18;
 import IO;
 import Node;
 import List;
@@ -25,7 +26,7 @@ map[node uNode, int uniqueNodes] uniqueNodes = ();
 {x=0; if(d>1) ... } hashcodes = 675, 3004
 so e.g. [[[x=0;, if(d>1);]],[[y=1;, z= 2;]]]
 */ 
-set[list[node]] getListOfSequences(set[Declaration] ast, int minimumSequenceLengthThreshold) {
+set[list[node]] getListOfSequences(set[Declaration] ast, int minimumSequenceLengthThreshold, int cloneType) {
     set[list[node]] sequences = {};
     visit (ast) {
         /**
@@ -39,6 +40,9 @@ set[list[node]] getListOfSequences(set[Declaration] ast, int minimumSequenceLeng
 
             if (size(statements) >= minimumSequenceLengthThreshold) {
                 // Why are you using a list in here and not just adding the sequence which is already a list?
+                if(cloneType != 1) {
+                    sequence = [normalizeIdentifiers(n) | n <- sequence];
+                }
                 sequences += {sequence}; // Sequences list.
             }
         }
@@ -48,7 +52,7 @@ set[list[node]] getListOfSequences(set[Declaration] ast, int minimumSequenceLeng
 
 map[str, list[list[node]]] createSequenceHashTable(set[Declaration] ast, int minimumSequenceLengthThreshold, int cloneType) {
     map[str, list[list[node]]] hashTable = ();
-    set[list[node]] sequences = getListOfSequences(ast, minimumSequenceLengthThreshold);
+    set[list[node]] sequences = getListOfSequences(ast, minimumSequenceLengthThreshold, cloneType);
 
     map[node, str] nodeHashMap = ();
     
@@ -62,9 +66,9 @@ map[str, list[list[node]]] createSequenceHashTable(set[Declaration] ast, int min
                 for (n <- subsequence) {
                     
                     // TODO check for type 2 
-                    if (cloneType == 2) {
-                        n = normalizeIdentifiers(unsetRec(n));
-                    }
+                    //if (cloneType == 2) {
+                        //n = normalizeIdentifiers(n);
+                    //}
 
                     if(n in nodeHashMap) {
                         subsequenceHash += nodeHashMap[n];
@@ -166,10 +170,12 @@ list[tuple[list[node], list[node]]] findSequenceClonePairs(map[str, list[list[no
                     continue;
                 }
 
+                
                 if (quickCheckBeforeSimilarity(i, j)) {
                     processedPairs += listStr;
                     continue;
                 }
+                
 
                 //println("I: <size(i)>, J: <size(j)>");
                 //if((toReal(size(i)) / toReal(size(j))) < similarityThreshold) {
@@ -255,15 +261,17 @@ tuple[int S, int L, int R] sharedUniqueNodes(node subtree1, node subtree2) {
 public node normalizeIdentifiers(node nodeItem) {
 
 	return visit(nodeItem) {
+        case \enum(_, implements, constants, body) => \enum("enum", implements, constants, body)
 		case \enumConstant(_, args, cls) => \enumConstant("enumConstant", args, cls)
 		case \enumConstant(_, args) => \enumConstant("enumConstant", args)
 		case \class(_, ext, imp, bod) => \class("class", ext, imp, bod)
 		case \interface(_, ext, imp, bod) => \interface("interface", ext, imp, bod)
 		case \method(_, _, a, b, c) => \method(defaultType, "method", a, b, c)
-		case \method(Type a,str b,list[Declaration] c,list[Expression] d) => \method(a,b,c,d)
+		case \method(_, _, a, b) => \method(defaultType, "method",c,d)
 		case \constructor(_, pars, expr, impl) => \constructor("constructor", pars, expr, impl)
-		case \variable(_,ext) => \variable("variableName",ext)
+		case \variable(_,ext) => \variable("variable",ext)
 		case \variable(_,ext, ini) => \variable("variable",ext,ini)
+        case \variables(_, fragments) => \variables(defaultType, fragments)
 		case \typeParameter(_, list[Type] ext) => \typeParameter("typeParameter",ext)
 		case \annotationType(_, bod) => \annotationType("annotationType", bod)
 		case \annotationTypeMember(_, _) => \annotationTypeMember(defaultType, "annotationTypeMember")
@@ -271,12 +279,19 @@ public node normalizeIdentifiers(node nodeItem) {
 		case \parameter(_, _, ext) => \parameter(defaultType, "parameter", ext)
 		case \vararg(_, _) => \vararg(defaultType, "vararg")
 		case \characterLiteral(_) => \characterLiteral("a")
+        case \field(_, fragments) => \field(defaultType, fragments)
 		case \fieldAccess(is, _) => \fieldAccess(is, "fa")
+        case \fieldAccess(is, ex, _) => \fieldAccess(is, ex, "fa")
 		case \methodCall(is, _, arg) => \methodCall(is, "methodCall", arg)
 		case \methodCall(is, expr, _, arg) => \methodCall(is, expr, "methodCall", arg)
+        case \methodCall(is, _, \stringLiteral(_)) => \methodCall(is, expr, "methodCall", \stringLiteral("str"))
 		case \number(_) => \number("1")
 		case \booleanLiteral(_) => \booleanLiteral(true)
 		case \stringLiteral(_) => \stringLiteral("str")
+        case \stringConstant(_) => \stringConstant("str")
+        case \infix(lhs, _, rhs) => \infix(lhs, "=", rhs)
+        case \postfix(operand, _) => \postfix(operand, "=")
+        case \prefix(_, operand) => \prefix("=", operand)
 		case \type(_) => \type(defaultType)
 		case \simpleName(_) => \simpleName("simpleName")
 		case \markerAnnotation(_) => \markerAnnotation("markerAnnotation")
@@ -286,6 +301,15 @@ public node normalizeIdentifiers(node nodeItem) {
 		case \break(_) => \break("break")
 		case \continue(_) => \continue("continue")
 		case \label(_, bdy) => \label("label", bdy)
+        case \assignment(lhs, _, rhs) => \assignment(lhs, "=", rhs)
+        case \newObject(expr, _, args, class) => \newObject(expr, defaultType, args, class)
+        case \newObject(expr, _, args) => \newObject(expr, defaultType, args)
+        case \newObject(_, args, class) => \newObject(defaultType, args, class)
+        case \newObject(_, args) => \newObject(defaultType, args)
+        case \newArray(_, dimensions, init) => \newArray(defaultType, dimensions, init)
+        case \newArray(_, dimensions) => \newArray(defaultType, dimensions)
+        case \cast(_, expression) => \cast(defaultType, expression)
+        case \instanceOf(leftSide, _) => \instanceOf(leftSide, defaultType)
 		case Type _ => defaultType
 		case Modifier _ => lang::java::m3::AST::\public()
 	}
