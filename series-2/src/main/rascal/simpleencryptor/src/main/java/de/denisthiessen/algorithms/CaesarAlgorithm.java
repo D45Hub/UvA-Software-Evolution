@@ -32,14 +32,16 @@ public class CaesarAlgorithm implements IAlgorithm {
 
     public void printHey() {
         int i = 15;
-        i += 2;
-        i += 2;
-        i += 2;
-        i += 2;
-        i += 2;
-        i += 2;
-        i += 2;
-        i += 2;
+        i += 3;
+        i += 3;
+        i += 3;
+        i += 3;
+        i += 3;
+        i += 3;
+        i += 3;
+        i += 3;
+
+        test.track("ye");
     }
     
 }

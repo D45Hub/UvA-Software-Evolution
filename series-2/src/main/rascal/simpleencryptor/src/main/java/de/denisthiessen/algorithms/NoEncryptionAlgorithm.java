@@ -26,6 +26,8 @@ public class NoEncryptionAlgorithm implements IAlgorithm {
         i += 2;
         i += 2;
 
+        test.track("ye");
+
         return sourceString;
     }
 
