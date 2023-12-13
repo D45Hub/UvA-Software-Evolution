@@ -5,6 +5,8 @@ import Helper::Types;
 import String;
 import IO;
 
+map[loc fileLoc, str fileContent] fileContentMap = ();
+
 public list[DuplicationResult] getCloneClasses(list[DuplicationResult] duplicationResults) {
     list[DuplicationResult] cloneClasses = [];
 
@@ -124,7 +126,18 @@ list[tuple[int, int]] trimTransitiveClosures(list[tuple[int, int]] locLinesList)
 }
 
 str getBase64FileFromDuplicationLocation(DuplicationLocation duplicationLocation) {
-    list[str] rawMethodContent = split("\n", readFile(toLocation(duplicationLocation.fileUri)));
+
+    loc fileLocation = toLocation(duplicationLocation.fileUri);
+    str fileContent = "";
+
+    if(fileLocation in fileContentMap) {
+        fileContent = fileContentMap[fileLocation];
+    } else {
+        fileContent = readFile(fileLocation);
+        fileContentMap[fileLocation]?"" = fileContent;
+    } 
+
+    list[str] rawMethodContent = split("\n", fileContent);
     list[str] rawLocationContent = rawMethodContent[(duplicationLocation.startLine)..(duplicationLocation.endLine)];
     str joinedLocString = ("" | it + "\n" + s | s <- rawLocationContent);
     str base64NodeContent = toBase64(joinedLocString);
