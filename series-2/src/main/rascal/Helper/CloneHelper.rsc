@@ -138,7 +138,7 @@ str getBase64FileFromDuplicationLocation(DuplicationLocation duplicationLocation
     } 
 
     list[str] rawMethodContent = split("\n", fileContent);
-    list[str] rawLocationContent = rawMethodContent[(duplicationLocation.startLine)..(duplicationLocation.endLine)];
+    list[str] rawLocationContent = rawMethodContent[(duplicationLocation.startLine - 1)..(duplicationLocation.endLine)];
     str joinedLocString = ("" | it + "\n" + s | s <- rawLocationContent);
     str base64NodeContent = toBase64(joinedLocString);
 
