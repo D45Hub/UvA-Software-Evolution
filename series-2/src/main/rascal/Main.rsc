@@ -3,7 +3,6 @@ module Main
 import Helper::Helper;
 import Helper::BenchmarkHelper;
 import Prelude;
-import TreeComparison::SubtreeComparator;
 import lang::java::m3::Core;
 import lang::java::m3::AST;
 import util::Math;
@@ -38,9 +37,7 @@ void main() {
         duplicatedLinesAmount += cl[0].endLine - cl[0].startLine;
     }
 
-    DuplicationResult biggestDuplicationClass = getLargestDuplicationClass(classes);
     TransitiveCloneConnections allCloneConnections = getCloneConnections(extractIDPairs(duplicationResults));
-
     map[str, list[str]] cloneConnectionMap = generateCloneConnectionMap(allCloneConnections);
     classes = getFilteredDuplicationResultList(classes, cloneConnectionMap);
 
@@ -49,6 +46,8 @@ void main() {
     list[DuplicationResult] classes2 = getFilteredDuplicationResultList(classes, cloneConnectionMap);
     list[DuplicationResult] overlap = (classes2 - classes);
     classes = classes2 + (classes - classes2) - overlap;
+    
+    DuplicationResult biggestDuplicationClass = getLargestDuplicationClass(classes);
 
     int projectLoc = size(getLOC(getConcatenatedProjectFile(model)));
     writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);

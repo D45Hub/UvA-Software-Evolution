@@ -42,7 +42,7 @@ list[node] getNodesFromAST(node rootNode, int massThreshold) {
     bottom-up visit (rootNode) {
         case node n : {
             if(size(getChildren(n)) >= massThreshold) {
-                visitedNodes  += n;
+                visitedNodes += n;
             }
         }
         
