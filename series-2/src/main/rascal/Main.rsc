@@ -16,7 +16,6 @@ import Helper::LOCHelper;
 import Location;
 
 loc encryptorProject = |file:///C:/Users/denis/Documents/Software-Evolution/UvA-Software-Evolution/series-1/smallsql/|;
-public list[DuplicationResult] classes = [];
 
 void main(bool performanceMode=false) {
     str startBenchmarkTime = startBenchmark("benchmark");
