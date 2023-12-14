@@ -13,11 +13,12 @@ void writeJSONFile(loc outputFileLocation,
                 int projectLOC,
                 int duplicatedLines,
                 int cloneClassesAmount,
-                DuplicationResult biggestCloneClass,
+                DuplicationResult biggestLOCCloneClass,
+                DuplicationResult biggestMemberCloneClass,
                 int massThreshold,
                 real similarityThreshold) {
     real duplicatedLinePercentage = getDuplicationPercentage(projectLOC, duplicatedLines);
-    int biggestCloneClassLOC = getLargestCloneClassLOC(biggestCloneClass);
+    int biggestCloneClassLOC = getLargestCloneClassLOC(biggestLOCCloneClass);
 
     str jsonContent = "{
     
@@ -27,7 +28,7 @@ void writeJSONFile(loc outputFileLocation,
     \"duplicatedLinePercentage\": <duplicatedLinePercentage>, 
     \"numberOfCloneClasses\": <cloneClassesAmount>, 
     \"biggestCloneLOC\": <biggestCloneClassLOC>, 
-    \"biggestCloneClass\": <size(biggestCloneClass)>, 
+    \"biggestCloneClass\": <size(biggestMemberCloneClass)>, 
     \"cloneType\": <CLONE_TYPE>,
     \"massThreshold\": <massThreshold>,
     \"similarityThreshold\": <similarityThreshold * 100.0>,
@@ -78,12 +79,13 @@ void printCloneDetectionResults(list[DuplicationResult] results,
                 int projectLOC,
                 int duplicatedLines,
                 int cloneClassesAmount,
-                DuplicationResult biggestCloneClass,
+                DuplicationResult biggestLOCCloneClass,
+                DuplicationResult biggestMemberCloneClass,
                 int massThreshold,
                 real similarityThreshold) {
-    // TODO ADD MAYBE CLONE TYPE ALSO???
+
     real duplicatedLinePercentage = getDuplicationPercentage(projectLOC, duplicatedLines);
-    int biggestCloneClassLOC = getLargestCloneClassLOC(biggestCloneClass);
+    int biggestCloneClassLOC = getLargestCloneClassLOC(biggestLOCCloneClass);
     map[str fileName, list[DuplicationLocation] locations] filteredDuplicationResults = getFilteredDuplicationResultMap(results);
 
     println("Report for: \"<projectName>\" \n\n");
@@ -93,8 +95,8 @@ void printCloneDetectionResults(list[DuplicationResult] results,
     println("Duplicated Lines (in blocks): <duplicatedLines>");
     println("Duplicated Line Percentage: <duplicatedLinePercentage>");
     println("Number of Clone Classes: <cloneClassesAmount>");
-    println("Biggest Clone Class: <size(biggestCloneClass)>");
-    println("Lines of Code (Biggest Clone Class): <biggestCloneClassLOC>");
+    println("Biggest Clone Class: <size(biggestMemberCloneClass)> members");
+    println("Biggest Clone in Lines: <biggestCloneClassLOC>");
     println("Clone Type: <CLONE_TYPE>");
     println("Mass Threshold: <massThreshold>");
     println("Similarity Threshold: <similarityThreshold * 100.0>% \n\n");
@@ -133,12 +135,13 @@ void writeMarkdownResult(loc outputFileLocation,
                 int projectLOC,
                 int duplicatedLines,
                 int cloneClassesAmount,
-                DuplicationResult biggestCloneClass,
+                DuplicationResult biggestLOCCloneClass,
+                DuplicationResult biggestMemberCloneClass,
                 int massThreshold,
                 real similarityThreshold) {
 // TODO ADD MAYBE CLONE TYPE ALSO???
     real duplicatedLinePercentage = getDuplicationPercentage(projectLOC, duplicatedLines);
-    int biggestCloneClassLOC = getLargestCloneClassLOC(biggestCloneClass);
+    int biggestCloneClassLOC = getLargestCloneClassLOC(biggestLOCCloneClass);
 
     str outputMarkdown = "# Report for: \"<projectName>\"
 
@@ -148,8 +151,8 @@ void writeMarkdownResult(loc outputFileLocation,
 | Duplicated Lines (in blocks)        | <duplicatedLines>             |
 | Duplicated Line Percentage          | <duplicatedLinePercentage>    |
 | Number of Clone Classes             | <cloneClassesAmount>          |
-| Biggest Clone Class                 | <size(biggestCloneClass)>     |
-| Lines of Code (Biggest Clone Class) | <biggestCloneClassLOC>        |
+| Biggest Clone Class                 | <size(biggestMemberCloneClass)> members    |
+| Biggest Clone in Lines              | <biggestCloneClassLOC>        |
 | Clone Type                          | <CLONE_TYPE>                  |
 | Mass Threshold                      | <massThreshold>               |
 | Similarity Threshold                | <similarityThreshold * 100.0> |\n\n";

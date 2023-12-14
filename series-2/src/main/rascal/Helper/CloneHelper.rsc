@@ -195,7 +195,23 @@ list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[nod
     return duplicationResults;
 }
 
-DuplicationResult getLargestDuplicationClass(list[DuplicationResult] cloneClasses) {
+DuplicationResult getLargestMemberDuplicationClass(list[DuplicationResult] cloneClasses) {
+    if(size(cloneClasses) == 0) {
+        return [];
+    }
+
+    DuplicationResult biggestDuplicationClass = cloneClasses[0];
+
+    for(itClass <- cloneClasses) {
+        if(size(itClass) > size(biggestDuplicationClass)) {
+            biggestDuplicationClass = itClass;
+        }
+    }
+
+    return biggestDuplicationClass;
+}
+
+DuplicationResult getLargestLinesDuplicationClass(list[DuplicationResult] cloneClasses) {
 
     if(size(cloneClasses) == 0) {
         return [];

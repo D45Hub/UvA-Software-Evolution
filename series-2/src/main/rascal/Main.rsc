@@ -46,13 +46,14 @@ void main() {
     list[DuplicationResult] classes2 = getFilteredDuplicationResultList(classes, cloneConnectionMap);
     list[DuplicationResult] overlap = (classes2 - classes);
     classes = classes2 + (classes - classes2) - overlap;
-    
-    DuplicationResult biggestDuplicationClass = getLargestDuplicationClass(classes);
+
+    DuplicationResult biggestLinesDuplicationClass = getLargestLinesDuplicationClass(classes);
+    DuplicationResult biggestMemberDuplicationClass = getLargestMemberDuplicationClass(classes);
 
     int projectLoc = size(getLOC(getConcatenatedProjectFile(model)));
-    writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
-    writeMarkdownResult(|project://series-2/src/main/rsc/output/report.md|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
-    printCloneDetectionResults(classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
+    writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestLinesDuplicationClass, biggestMemberDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
+    writeMarkdownResult(|project://series-2/src/main/rsc/output/report.md|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestLinesDuplicationClass, biggestMemberDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
+    printCloneDetectionResults(classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestLinesDuplicationClass, biggestMemberDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
     
     str stopBenchmarkTime = stopBenchmark("benchmark");
     println(stopBenchmarkTime);
