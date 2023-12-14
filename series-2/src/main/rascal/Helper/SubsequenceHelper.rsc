@@ -39,10 +39,8 @@ list[list[node]] getListOfSequences(list[Declaration] ast, int minimumSequenceLe
             list[node] sequence = statements;
 
             if (size(statements) >= minimumSequenceLengthThreshold) {
-                // Why are you using a list in here and not just adding the sequence which is already a list?
                 if(cloneType != 1) {
                     sequence = [normalizeIdentifiers(n) | n <- sequence];
-                    //iprintln(sequence);
                 }
                 sequences += [sequence]; // Sequences list.
             }
@@ -65,12 +63,6 @@ map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, int mi
                 // hash every subsequence
                 str subsequenceHash = "";
                 for (n <- subsequence) {
-                    
-                    // TODO check for type 2 
-                    //if (cloneType == 2) {
-                        //n = normalizeIdentifiers(n);
-                    //}
-
                     if(n in nodeHashMap) {
                         subsequenceHash += nodeHashMap[n];
                     } else {
@@ -81,10 +73,7 @@ map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, int mi
                     
                 }
                 str sequenceHash = md5Hash(subsequenceHash);
-                // println("<subsequence> <i> <j> <subsequenceHash> <sequenceHash>\n");
-                 //else if (cloneType == 3) {
-                //     n = normalizeIdentifiers(n);
-                // }
+
                 if (sequenceHash in hashTable) {
                     hashTable[sequenceHash] += [subsequence];
                 } else {
@@ -176,12 +165,7 @@ list[tuple[list[node], list[node]]] findSequenceClonePairs(map[str, list[list[no
                     processedPairs += listStr;
                     continue;
                 }
-                
 
-                //println("I: <size(i)>, J: <size(j)>");
-                //if((toReal(size(i)) / toReal(size(j))) < similarityThreshold) {
-                    //continue;
-                //}
                 if(listStr in similarityMap) {
                     comparison = similarityMap[listStr];
                 } else if (listStrRev in similarityMap) {
@@ -193,20 +177,11 @@ list[tuple[list[node], list[node]]] findSequenceClonePairs(map[str, list[list[no
                 
                 // check if are clones
                 if (((cloneType == 1 && comparison == 1.0) || ((cloneType == 2 || cloneType == 3)) && (comparison >= similarityThreshold))) {
-                    //int prevSize = size(clones);
                     clones = addSequenceClone(clones, i, j);
-                    //int afterSize = size(clones);
-                    /**
-                    if(afterSize - prevSize <= 0) {
-                        clones += <j,i>;
-                    }
-                    */
-                    //clones += <j,i>; //addSequenceClone(clones, j, i);
                 }
 
                 // Mark the pair as processed
                 processedPairs += listStr;
-                //processedPairs += listStrRev;
         }	
     }
     return clones;
@@ -304,7 +279,6 @@ public node normalizeIdentifiers(node nodeItem) {
 		case \label(_, bdy) => \label("label", bdy)
         case \assignment(lhs, _, rhs) => \assignment(lhs, "=", rhs)
         case \newObject(expr, _, args, class) => \newObject(expr, defaultType, args, class)
-        //case \newObject(expr, _, args) => \newObject(expr, defaultType, args)
         case \newObject(_, args, class) => \newObject(defaultType, args, class)
         case \newObject(_, args) => \newObject(defaultType, args)
         case \newArray(_, dimensions, init) => \newArray(defaultType, dimensions, init)

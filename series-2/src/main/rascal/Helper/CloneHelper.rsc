@@ -4,19 +4,12 @@ import Helper::Types;
 
 import String;
 import IO;
+import util::Math;
 
 map[str fileLoc, str fileContent] fileContentMap = ();
 
 public list[DuplicationResult] getCloneClasses(list[DuplicationResult] duplicationResults) {
     list[DuplicationResult] cloneClasses = [];
-
-    // Map mit File + Methode -> List[<Start,End>]
-    // Transitive Closure für jedes lustige Dingens da drinnen machen
-    // Die Closure sortieren nach Größe
-    // Die Liste von groß -> klein rekursiv abarbeiten und checken ob das Element "drunter" in dem "drüber" enthalten ist und aufhören, wenn nicht mehr drinnen ist...
-    // Und die lustigen Dinger sind die jeweiligen Clone Classes für die File + Methode
-    // Und das dann alles wieder zu DuplicationResults zusammenschnipseln...
-
     map[DuplicationLocation, list[tuple[int, int]]] locMap = getModifiedLocMap(duplicationResults);
 
     for(DuplicationLocation l <- locMap) {
@@ -126,8 +119,6 @@ list[tuple[int, int]] trimTransitiveClosures(list[tuple[int, int]] locLinesList)
 }
 
 str getBase64FileFromDuplicationLocation(DuplicationLocation duplicationLocation) {
-
-    // TODO CLEAR MAPS AFTER EXECUTION... THIS IS FUCKED UP...
     str locUri = duplicationLocation.fileUri;
     loc fileLocation = toLocation(locUri);
     str fileContent = "";
@@ -149,8 +140,6 @@ str getBase64FileFromDuplicationLocation(DuplicationLocation duplicationLocation
 
 list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[node]]] sequenceClones, map[loc fileLoc, MethodLoc method] mapLocs) {
     list[DuplicationResult] duplicationResults = [];
-    // TODO Maybe use caching here for equivalent nodes and node lists...
-    // You can improve this.
 
     for(c <- sequenceClones) {
 
@@ -170,17 +159,14 @@ list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[nod
             }
 
             if(nodeALoc.end.line > maxToLineA) {
-                // WHY NOT MAXTOLINEA? THIS DOES NOT WORK OTHERWISE...
                 maxFromLineA = nodeALoc.end.line;
             }
 
-            
             if(nodeBLoc.begin.line < maxFromLineA) {
                 maxFromLineB = nodeBLoc.begin.line;
             }
 
             if(nodeBLoc.end.line > maxToLineB) {
-                // WHY NOT MAXTOLINEB? THIS DOES NOT WORK OTHERWISE...
                 maxFromLineB = nodeBLoc.end.line;
             }
         }
@@ -212,7 +198,6 @@ DuplicationResult getLargestMemberDuplicationClass(list[DuplicationResult] clone
 }
 
 DuplicationResult getLargestLinesDuplicationClass(list[DuplicationResult] cloneClasses) {
-
     if(size(cloneClasses) == 0) {
         return [];
     }

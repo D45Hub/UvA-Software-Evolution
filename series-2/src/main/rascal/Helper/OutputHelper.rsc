@@ -139,7 +139,6 @@ void writeMarkdownResult(loc outputFileLocation,
                 DuplicationResult biggestMemberCloneClass,
                 int massThreshold,
                 real similarityThreshold) {
-// TODO ADD MAYBE CLONE TYPE ALSO???
     real duplicatedLinePercentage = getDuplicationPercentage(projectLOC, duplicatedLines);
     int biggestCloneClassLOC = getLargestCloneClassLOC(biggestLOCCloneClass);
 
