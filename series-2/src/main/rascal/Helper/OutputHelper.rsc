@@ -71,6 +71,60 @@ str getJSONContentOfLocation(DuplicationLocation duplicationLocation) {
     return content;
 }
 
+void printCloneDetectionResults(loc outputFileLocation,
+                list[DuplicationResult] results,
+                str projectName,
+                int projectLOC,
+                int duplicatedLines,
+                int cloneClassesAmount,
+                DuplicationResult biggestCloneClass,
+                int massThreshold,
+                real similarityThreshold) {
+    // TODO ADD MAYBE CLONE TYPE ALSO???
+    real duplicatedLinePercentage = getDuplicationPercentage(projectLOC, duplicatedLines);
+    int biggestCloneClassLOC = getLargestCloneClassLOC(biggestCloneClass);
+    map[str fileName, list[DuplicationLocation] locations] filteredDuplicationResults = getFilteredDuplicationResultMap(results);
+
+    println("Report for: \"<projectName>\" \n\n");
+    println("General Statistics: \n");
+
+    println("Project Lines of Code: <projectLOC>");
+    println("Duplicated Lines (in blocks): <duplicatedLines>");
+    println("Duplicated Line Percentage: <duplicatedLinePercentage>");
+    println("Number of Clone Classes: <cloneClassesAmount>");
+    println("Biggest Clone Class: <size(biggestCloneClass)>");
+    println("Lines of Code (Biggest Clone Class): <biggestCloneClassLOC>");
+    println("Mass Threshold: <massThreshold>");
+    println("Similarity Threshold: <similarityThreshold * 100.0>% \n\n");
+
+    printFileResults(filteredDuplicationResults);
+    printThanks();
+}
+
+void printFileResults(map[str fileName, list[DuplicationLocation] locations] filteredDuplicationResults) {
+    int locationIndex = 1;
+    for(str locationFileName <- filteredDuplicationResults) {
+        println("Clones from \"<locationFileName>\"\n");
+
+        for(DuplicationLocation l <- filteredDuplicationResults[locationFileName]) {
+            printLocationResult(l, locationIndex);
+            locationIndex += 1;
+        }
+        locationIndex = 1;
+        println("\n");
+    }
+}
+
+void printLocationResult(DuplicationLocation location, int locationIndex) {
+    str locationNumber = "<locationIndex>)";
+    println("<locationNumber>");
+    println("File path: <location.filePath>");
+    println("Method name: <location.methodName>");
+    println("Clone start line: <location.startLine>");
+    println("Clone end line: <location.endLine>");
+    println("\n");
+}
+
 void writeMarkdownResult(loc outputFileLocation,
                 list[DuplicationResult] results,
                 str projectName,
@@ -80,7 +134,7 @@ void writeMarkdownResult(loc outputFileLocation,
                 DuplicationResult biggestCloneClass,
                 int massThreshold,
                 real similarityThreshold) {
-
+// TODO ADD MAYBE CLONE TYPE ALSO???
     real duplicatedLinePercentage = getDuplicationPercentage(projectLOC, duplicatedLines);
     int biggestCloneClassLOC = getLargestCloneClassLOC(biggestCloneClass);
 
@@ -97,6 +151,13 @@ void writeMarkdownResult(loc outputFileLocation,
 | Mass Threshold                      | <massThreshold>               |
 | Similarity Threshold                | <similarityThreshold * 100.0> |\n\n";
 
+    map[str fileName, list[DuplicationLocation] locations] filteredDuplicationResults = getFilteredDuplicationResultMap(results);
+    outputMarkdown = insertFileTables(filteredDuplicationResults, outputMarkdown);
+
+    writeFile(outputFileLocation, outputMarkdown);
+}
+
+map[str fileName, list[DuplicationLocation] locations] getFilteredDuplicationResultMap(list[DuplicationResult] results) {
     map[str fileName, list[DuplicationLocation] locations] filteredDuplicationResults = ();
 
     for(DuplicationResult res <- results) {
@@ -105,9 +166,7 @@ void writeMarkdownResult(loc outputFileLocation,
         }
     }
 
-    outputMarkdown = insertFileTables(filteredDuplicationResults, outputMarkdown);
-
-    writeFile(outputFileLocation, outputMarkdown);
+    return filteredDuplicationResults;
 }
 
 str insertFileTables(map[str fileName, list[DuplicationLocation] locations] filteredDuplicationResults, str outputMarkdown) {
@@ -154,4 +213,10 @@ int getLargestCloneClassLOC(DuplicationResult biggestCloneClass) {
     }
     int biggestCloneClassLOC = biggestCloneClassLocation.endLine - biggestCloneClassLocation.startLine;
     return biggestCloneClassLOC;
+}
+
+void printThanks() {
+    println("Thank you for using our tool. ❤️");
+    println("Made with love, tears and especially pain.");
+    println("- Denis, Lisa and ROCKY\n");
 }
