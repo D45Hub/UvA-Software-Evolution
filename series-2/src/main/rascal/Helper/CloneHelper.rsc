@@ -318,3 +318,16 @@ list[DuplicationResult] getFilteredDuplicationResultList(list[DuplicationResult]
     }
     return toList(filteredResults);
 }
+
+/** Returns transitive closure of nodes*/ 
+public TransitiveCloneConnections getCloneConnections (CloneConnections idPairs) {
+    return idPairs+;
+}
+
+public CloneConnections extractIDPairs (list[DuplicationResult] duplicationResults) {
+    return [<duplicationResult[0].uuid, duplicationResult[1].uuid> | duplicationResult <- duplicationResults];
+}
+
+void resetFileContentMap() {
+    fileContentMap = ();
+}

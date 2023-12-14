@@ -123,8 +123,8 @@ list[str] getAllLOC(str source) {
 }
 list[str] getLOC(str source, bool areCurlyBracketsAreCode){
 	source = "\n" + source + "\n";
-	//source = replaceMultiLineStringComments(source);
-	//source = pruneMultiLineComments(source);
+	source = replaceMultiLineStringComments(source);
+	source = pruneMultiLineComments(source);
 	
   	list[str] codeLines = split("\n", source);
   	return [trim(l) | str l <- codeLines, isLineCodeLine(l, areCurlyBracketsAreCode)];
