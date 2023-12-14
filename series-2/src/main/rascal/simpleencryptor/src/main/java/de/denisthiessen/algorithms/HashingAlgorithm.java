@@ -58,6 +58,13 @@ public class HashingAlgorithm implements IAlgorithm {
         int x = 0;
         int x = 0;
         int y = 1;
+
+        System.out.println("ye");
+        System.out.println("ye");
+        System.out.println("ye");
+        System.out.println("ye");
+        System.out.println("ye");
+        System.out.println("ye");
     }
 
     public static void test2(){

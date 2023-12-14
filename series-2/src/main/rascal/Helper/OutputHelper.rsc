@@ -71,8 +71,7 @@ str getJSONContentOfLocation(DuplicationLocation duplicationLocation) {
     return content;
 }
 
-void printCloneDetectionResults(loc outputFileLocation,
-                list[DuplicationResult] results,
+void printCloneDetectionResults(list[DuplicationResult] results,
                 str projectName,
                 int projectLOC,
                 int duplicatedLines,

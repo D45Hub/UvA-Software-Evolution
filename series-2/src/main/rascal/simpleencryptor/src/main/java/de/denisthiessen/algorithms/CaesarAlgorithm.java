@@ -45,12 +45,12 @@ public class CaesarAlgorithm implements IAlgorithm {
     }
 
     private void test() {
-        System.out.println("f");
-        System.out.println("f");
-        System.out.println("f");
-        System.out.println("f");
-        System.out.println("f");
-        System.out.println("f");
-        System.out.println("f");
+        System.out.println("1");
+        System.out.println("1");
+        System.out.println("1");
+        System.out.println("1");
+        System.out.println("1");
+        System.out.println("1");
+        System.out.println("1");
     } 
 }
