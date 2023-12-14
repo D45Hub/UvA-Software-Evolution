@@ -15,15 +15,8 @@ void writeJSONFile(loc outputFileLocation,
                 DuplicationResult biggestCloneClass,
                 int massThreshold,
                 real similarityThreshold) {
-    real duplicatedLinePercentage = toReal(toReal(duplicatedLines) / toReal(projectLOC)) * 100.0;
-
-    // Doesn't matter from which we base our LOC generation from.
-    DuplicationLocation biggestCloneClassLocation = <"", "", "", "", 0, 0, 0, "">;
-    
-    if(biggestCloneClass != []) {
-        biggestCloneClassLocation = biggestCloneClass[0];
-    }
-    int biggestCloneClassLOC = biggestCloneClassLocation.endLine - biggestCloneClassLocation.startLine;
+    real duplicatedLinePercentage = getDuplicationPercentage(projectLOC, duplicatedLines);
+    int biggestCloneClassLOC = getLargestCloneClassLOC(biggestCloneClass);
 
     str jsonContent = "{
     
@@ -88,15 +81,8 @@ void writeMarkdownResult(loc outputFileLocation,
                 int massThreshold,
                 real similarityThreshold) {
 
-    real duplicatedLinePercentage = toReal(toReal(duplicatedLines) / toReal(projectLOC)) * 100.0;
-
-    // Doesn't matter from which we base our LOC generation from.
-    DuplicationLocation biggestCloneClassLocation = <"", "", "", "", 0, 0, 0, "">;
-    
-    if(biggestCloneClass != []) {
-        biggestCloneClassLocation = biggestCloneClass[0];
-    }
-    int biggestCloneClassLOC = biggestCloneClassLocation.endLine - biggestCloneClassLocation.startLine;
+    real duplicatedLinePercentage = getDuplicationPercentage(projectLOC, duplicatedLines);
+    int biggestCloneClassLOC = getLargestCloneClassLOC(biggestCloneClass);
 
     str outputMarkdown = "# Report for: \"<projectName>\"
 
@@ -153,4 +139,19 @@ str getLocationTableHeader() {
     str locationFileTableHeader = "|                 | File path                      | Method name                      | Clone start line                | Clone end line                |
 |-----------------|--------------------------------|----------------------------------|---------------------------------|-------------------------------| \n";
     return locationFileTableHeader;
+}
+
+real getDuplicationPercentage(int projectLOC, int duplicatedLines) {
+    return toReal(toReal(duplicatedLines) / toReal(projectLOC)) * 100.0;
+}
+
+int getLargestCloneClassLOC(DuplicationResult biggestCloneClass) {
+    // Doesn't matter from which we base our LOC generation from.
+    DuplicationLocation biggestCloneClassLocation = <"", "", "", "", 0, 0, 0, "">;
+    
+    if(biggestCloneClass != []) {
+        biggestCloneClassLocation = biggestCloneClass[0];
+    }
+    int biggestCloneClassLOC = biggestCloneClassLocation.endLine - biggestCloneClassLocation.startLine;
+    return biggestCloneClassLOC;
 }
