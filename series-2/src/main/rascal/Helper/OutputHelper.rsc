@@ -1,5 +1,6 @@
 module Helper::OutputHelper
 
+import Configuration;
 import Helper::Types;
 import IO;
 import String;
@@ -27,6 +28,7 @@ void writeJSONFile(loc outputFileLocation,
     \"numberOfCloneClasses\": <cloneClassesAmount>, 
     \"biggestCloneLOC\": <biggestCloneClassLOC>, 
     \"biggestCloneClass\": <size(biggestCloneClass)>, 
+    \"cloneType\": <CLONE_TYPE>,
     \"massThreshold\": <massThreshold>,
     \"similarityThreshold\": <similarityThreshold * 100.0>,
 
@@ -93,6 +95,7 @@ void printCloneDetectionResults(list[DuplicationResult] results,
     println("Number of Clone Classes: <cloneClassesAmount>");
     println("Biggest Clone Class: <size(biggestCloneClass)>");
     println("Lines of Code (Biggest Clone Class): <biggestCloneClassLOC>");
+    println("Clone Type: <CLONE_TYPE>");
     println("Mass Threshold: <massThreshold>");
     println("Similarity Threshold: <similarityThreshold * 100.0>% \n\n");
 
@@ -147,6 +150,7 @@ void writeMarkdownResult(loc outputFileLocation,
 | Number of Clone Classes             | <cloneClassesAmount>          |
 | Biggest Clone Class                 | <size(biggestCloneClass)>     |
 | Lines of Code (Biggest Clone Class) | <biggestCloneClassLOC>        |
+| Clone Type                          | <CLONE_TYPE>                  |
 | Mass Threshold                      | <massThreshold>               |
 | Similarity Threshold                | <similarityThreshold * 100.0> |\n\n";
 
