@@ -33,10 +33,6 @@ void main() {
     list[DuplicationResult] duplicationResults = getRawDuplicationResults(sequenceClones, mapLocs);
     list[DuplicationResult] classes = getCloneClasses(duplicationResults);
 
-    for(cl <- classes) {
-        duplicatedLinesAmount += cl[0].endLine - cl[0].startLine;
-    }
-
     TransitiveCloneConnections allCloneConnections = getCloneConnections(extractIDPairs(duplicationResults));
     map[str, list[str]] cloneConnectionMap = generateCloneConnectionMap(allCloneConnections);
     classes = getFilteredDuplicationResultList(classes, cloneConnectionMap);
@@ -49,6 +45,10 @@ void main() {
 
     DuplicationResult biggestLinesDuplicationClass = getLargestLinesDuplicationClass(classes);
     DuplicationResult biggestMemberDuplicationClass = getLargestMemberDuplicationClass(classes);
+
+    for(cl <- classes) {
+        duplicatedLinesAmount += cl[0].endLine - cl[0].startLine;
+    }
 
     int projectLoc = size(getLOC(getConcatenatedProjectFile(model)));
     writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestLinesDuplicationClass, biggestMemberDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
