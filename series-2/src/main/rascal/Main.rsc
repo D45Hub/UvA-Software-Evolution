@@ -40,17 +40,12 @@ void main() {
     list[Declaration] asts = [createAstFromFile(f, true) | f <- files(model.containment), isCompilationUnit(f)];
 
     map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, MASS_THRESHOLD, CLONE_TYPE);
-    println("Sequences: <size(sequences2)>");
-
     list[tuple[list[node], list[node]]] sequenceClones = findSequenceClonePairs(sequences2, SIMILARTY_THRESHOLD, CLONE_TYPE);
-    println("Sequence Clones: <size(sequenceClones)>");
 
     int duplicatedLinesAmount = 0;
 
     map[loc fileLoc, MethodLoc method] mapLocs = getMethodLocs(model);
- 
     list[DuplicationResult] duplicationResults = getRawDuplicationResults(sequenceClones, mapLocs);
-
     list[DuplicationResult] classes = getCloneClasses(duplicationResults);
 
     for(cl <- classes) {
@@ -62,17 +57,12 @@ void main() {
 
     map[str, list[str]] cloneConnectionMap = generateCloneConnectionMap(allCloneConnections);
     classes = getFilteredDuplicationResultList(classes, cloneConnectionMap);
-    println("Clone classes: <size(classes)>");
-
-    println("Duplicated Lines: <duplicatedLinesAmount>");
-    println("Duplicate Results: <size(duplicationResults)>");
-
-    // TODO MORE FUNNY CONSOLE LOGS FOR ALL OF THE STATS... JUST PRINT OUTPUT HELPER...
-    // AND ALSO INCLUDE TXT FILE OUTPUT...
 
     int projectLoc = size(getLOC(getConcatenatedProjectFile(model)));
     writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
     writeMarkdownResult(|project://series-2/src/main/rsc/output/report.md|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
+    printCloneDetectionResults(|project://series-2/src/main/rsc/output/report.md|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
+    
     str stopBenchmarkTime = stopBenchmark("benchmark");
     println(stopBenchmarkTime);
 }
