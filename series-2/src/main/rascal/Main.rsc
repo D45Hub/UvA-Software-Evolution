@@ -15,7 +15,7 @@ import Helper::LOCHelper;
 
 import Location;
 
-loc encryptorProject = |project://series-2/src/main/rascal/simpleencryptor|;
+loc encryptorProject = |file:///C:/Users/denis/Documents/Software-Evolution/UvA-Software-Evolution/series-1/smallsql/|;
 
 void main() {
     str startBenchmarkTime = startBenchmark("benchmark");
@@ -26,8 +26,6 @@ void main() {
 
     map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, MASS_THRESHOLD, CLONE_TYPE);
     list[tuple[list[node], list[node]]] sequenceClones = findSequenceClonePairs(sequences2, SIMILARTY_THRESHOLD, CLONE_TYPE);
-
-    int duplicatedLinesAmount = 0;
 
     map[loc fileLoc, MethodLoc method] mapLocs = getMethodLocs(model);
     list[DuplicationResult] duplicationResults = getRawDuplicationResults(sequenceClones, mapLocs);
@@ -46,8 +44,12 @@ void main() {
     DuplicationResult biggestLinesDuplicationClass = getLargestLinesDuplicationClass(classes);
     DuplicationResult biggestMemberDuplicationClass = getLargestMemberDuplicationClass(classes);
 
+    int duplicatedLinesAmount = 0;
+
     for(cl <- classes) {
-        duplicatedLinesAmount += cl[0].endLine - cl[0].startLine;
+        for(l <- cl){
+            duplicatedLinesAmount += l.endLine - l.startLine;
+        }
     }
 
     int projectLoc = size(getLOC(getConcatenatedProjectFile(model)));
