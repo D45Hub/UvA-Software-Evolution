@@ -16,6 +16,9 @@ Type defaultType = Type::short();
 
 private map[node subtree, str hash] hashes = ();
 
+alias Block  = list[node];
+alias BlocksMap = map[str, Block];
+
 map[tuple[list[node] zNode, list[node] i] zList, str subsetResult] zeroSubsetResults = ();
 map[tuple[list[node] oNode, list[node] j] oList, str subsetResult] oneSubsetResults = ();
 
@@ -50,6 +53,80 @@ list[list[node]] getListOfSequences(list[Declaration] ast, int minimumSequenceLe
     }
     return sequences;
 }
+
+BlocksMap getSubtrees(list[Declaration] asts, int nodeNumberThreshold) {
+    BlocksMap hashedTrees = ();
+
+    visit (asts) {
+        case node n: {
+            hash = md5Hash(toString(unsetRec(n)));
+            if (nodeSize(n) >= nodeNumberThreshold) {
+                hashedTrees[hash]?[] += [n];
+            }
+        }
+    }
+    return hashedTrees;
+}
+
+private list[tuple[node, node]] _clonePairs = [];
+
+public list[tuple[node, node]] findClones(BlocksMap subtrees) {
+    for (hash <- subtrees) {
+        Block nodes = subtrees[hash];
+
+        for (i <- nodes) {
+            for (j <- nodes) {
+                if (i.src != j.src) {
+                    addClone(<i, j>);
+                }
+            }
+        }
+    }
+    return _clonePairs;
+}
+
+public int nodeSize(node subtree) {
+    return arity(subtree) + 1;
+}
+
+public void addClone(tuple[node, node] newPair) {
+
+    // Ignore the pair if one node is a subtree of another node
+    if (isSubset(newPair[0], newPair[1]) || isSubset(newPair[1], newPair[0])) {
+        return;
+    }
+
+    list[node] children1 = [n | node n <- getChildren(newPair[0])];
+    list[node] children2 = [n | node n <- getChildren(newPair[1])];
+
+    for (oldPair <- _clonePairs) {
+        // Check if the pair already exists in flipped form
+        if (oldPair == <newPair[1], newPair[0]> || oldPair == <newPair[0], newPair[1]> ) {
+            return;
+        }
+
+        // Ignore the pair if it is a subset of an already existing pair
+        if ((isSubset(oldPair[0], newPair[0]) && isSubset(oldPair[1], newPair[1])) || (isSubset(oldPair[0], newPair[1]) && isSubset(oldPair[1], newPair[0]))) {
+            return;
+        }
+
+        // If the current old pair is a subset of the current new pair. Remove it.
+        if ((isSubset(newPair[0], oldPair[0]) && isSubset(newPair[1], oldPair[1])) || (isSubset(newPair[0], oldPair[1]) && isSubset(newPair[1], oldPair[0]))) {
+            _clonePairs -= oldPair;
+        }
+    }
+    _clonePairs += newPair;
+
+    return;
+}
+
+public bool isSubset(node tree1, node tree2) {
+    bottom-up visit(tree1) {
+        case node n: if (n == tree2) {return true;}
+    }
+    return false;
+}
+
 
 map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, int minimumSequenceLengthThreshold, int cloneType) {
     map[str, list[list[node]]] hashTable = ();

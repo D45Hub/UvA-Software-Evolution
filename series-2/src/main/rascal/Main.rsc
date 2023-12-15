@@ -15,7 +15,7 @@ import Helper::LOCHelper;
 
 import Location;
 
-loc encryptorProject = |file:///C:/Users/denis/Documents/Software-Evolution/UvA-Software-Evolution/series-1/smallsql/|;
+loc encryptorProject = |project://series-2/src/main/rascal/simpleencryptor|;
 public list[DuplicationResult] classes = [];
 
 void main(bool performanceMode=false) {
@@ -25,11 +25,14 @@ void main(bool performanceMode=false) {
     M3 model = createM3FromMavenProject(encryptorProject);
     list[Declaration] asts = [createAstFromFile(f, true) | f <- files(model.containment), isCompilationUnit(f)];
 
+    BlocksMap bMap = getSubtrees(asts, 6);
+    list[tuple[node, node]] wholeClones = findClones(bMap);
+
     map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, MASS_THRESHOLD, CLONE_TYPE);
     list[tuple[list[node], list[node]]] sequenceClones = findSequenceClonePairs(sequences2, SIMILARTY_THRESHOLD, CLONE_TYPE);
 
     map[loc fileLoc, MethodLoc method] mapLocs = (performanceMode)?():getMethodLocs(model);
-    list[DuplicationResult] duplicationResults = getRawDuplicationResults(sequenceClones, mapLocs, performanceMode);
+    list[DuplicationResult] duplicationResults = getRawDuplicationResults(sequenceClones, wholeClones, mapLocs, performanceMode);
     classes = getCloneClasses(duplicationResults);
 
     TransitiveCloneConnections allCloneConnections = getCloneConnections(extractIDPairs(duplicationResults));

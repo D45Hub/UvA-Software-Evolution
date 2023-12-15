@@ -138,8 +138,15 @@ str getBase64FileFromDuplicationLocation(DuplicationLocation duplicationLocation
     return base64NodeContent;
 }
 
-list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[node]]] sequenceClones, map[loc fileLoc, MethodLoc method] mapLocs, bool performanceMode) {
+list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[node]]] sequenceClones, list[tuple[node, node]] wholeClones, map[loc fileLoc, MethodLoc method] mapLocs, bool performanceMode) {
     list[DuplicationResult] duplicationResults = [];
+
+    for(tuple[node, node] wholeClone <- wholeClones) {
+        loc aLoc = nodeFileLocation(wholeClone<0>);
+        loc bLoc = nodeFileLocation(wholeClone<1>);
+
+        println(aLoc);
+    }
 
     for(c <- sequenceClones) {
 
@@ -182,7 +189,7 @@ list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[nod
         } else {
             dRes = getNewAddedDuplicationResults(nodeALoc, nodeBLoc, mapLocs, nodeABounds, nodeBBounds);
         }
-        
+
         duplicationResults += [dRes];
     }  
 
