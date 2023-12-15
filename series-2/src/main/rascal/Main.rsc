@@ -25,7 +25,7 @@ void main(bool performanceMode=false) {
     M3 model = createM3FromMavenProject(encryptorProject);
     list[Declaration] asts = [createAstFromFile(f, true) | f <- files(model.containment), isCompilationUnit(f)];
 
-    BlocksMap bMap = getSubtrees(asts, MASS_THRESHOLD, MASS_THRESHOLD, CLONE_TYPE);
+    BlocksMap bMap = getSubtrees(asts, MASS_THRESHOLD, LINE_THRESHOLD, CLONE_TYPE);
     list[tuple[node, node]] wholeClones = findClones(bMap);
     println("nbrr");
 

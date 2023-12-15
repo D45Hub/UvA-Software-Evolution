@@ -25,7 +25,7 @@ map[loc fileLoc, MethodLoc method] getMethodLocs(M3 model) {
         int beginDecl = decl.begin.line;
         int endDecl = decl.end.line;
 
-        if(endDecl - beginDecl >= MASS_THRESHOLD) {
+        if(endDecl - beginDecl >= LINE_THRESHOLD) {
             int methodLoc = size(getLOC(readFile(m)));
             mapLocs += (decl: <m, methodLoc>);
         }   
