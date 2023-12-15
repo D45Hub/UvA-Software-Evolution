@@ -11,6 +11,7 @@ import Helper::Helper;
 import Type;
 import Boolean;
 import Set;
+import Location;
 
 Type defaultType = Type::short();
 
@@ -31,7 +32,7 @@ map[node uNode, int uniqueNodes] uniqueNodes = ();
 {x=0; if(d>1) ... } hashcodes = 675, 3004
 so e.g. [[[x=0;, if(d>1);]],[[y=1;, z= 2;]]]
 */ 
-list[list[node]] getListOfSequences(list[Declaration] ast, int minimumSequenceLengthThreshold, int cloneType) {
+list[list[node]] getListOfSequences(list[Declaration] ast, list[tuple[loc, loc]] wholeCloneLocs, int minimumSequenceLengthThreshold, int cloneType) {
     list[list[node]] sequences = [];
     visit (ast) {
         /**
@@ -44,23 +45,33 @@ list[list[node]] getListOfSequences(list[Declaration] ast, int minimumSequenceLe
             list[node] sequence = statements;
 
             if (size(statements) >= minimumSequenceLengthThreshold) {
+                bool isContained = false;
+                for(wLoc <- wholeCloneLocs) {
+                    isContained = any(node n <- sequence, isContainedIn(nodeFileLocation(n), wLoc<0>) || isContainedIn(nodeFileLocation(n), wLoc<1>));
+                    if(isContained) {
+                        break;
+                    }
+                }
+                if(!isContained) {
                 if(cloneType != 1) {
                     sequence = [normalizeIdentifiers(n) | n <- sequence];
                 }
                 sequences += [sequence]; // Sequences list.
+                }
             }
         }
     }
     return sequences;
 }
 
-BlocksMap getSubtrees(list[Declaration] asts, int nodeNumberThreshold, int cloneType) {
+BlocksMap getSubtrees(list[Declaration] asts, int nodeNumberThreshold, int lineThreshold, int cloneType) {
     BlocksMap hashedTrees = ();
 
     visit (asts) {
         case node n: {
             hash = md5Hash(toString(unsetRec(n)));
-            if (nodeSize(n) >= nodeNumberThreshold) {
+            loc nodeLoc = nodeFileLocation(n);
+            if (nodeSize(n) >= nodeNumberThreshold && (nodeLoc.end.line - nodeLoc.begin.line) >= lineThreshold) {
                 if(cloneType != 1) {
                     n = normalizeIdentifiers(n);
                 }
@@ -131,9 +142,10 @@ public bool isSubset(node tree1, node tree2) {
 }
 
 
-map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, int minimumSequenceLengthThreshold, int cloneType) {
+map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, list[tuple[node, node]] wholeClones, int minimumSequenceLengthThreshold, int cloneType) {
     map[str, list[list[node]]] hashTable = ();
-    list[list[node]] sequences = getListOfSequences(ast, minimumSequenceLengthThreshold, cloneType);
+    list[tuple[loc, loc]] wholeCloneLocs = [<nodeFileLocation(t<0>), nodeFileLocation(t<1>)> | t <- wholeClones];
+    list[list[node]] sequences = getListOfSequences(ast, wholeCloneLocs, minimumSequenceLengthThreshold, cloneType);
 
     map[node, str] nodeHashMap = ();
     

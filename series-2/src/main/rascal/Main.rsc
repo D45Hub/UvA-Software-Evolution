@@ -25,11 +25,13 @@ void main(bool performanceMode=false) {
     M3 model = createM3FromMavenProject(encryptorProject);
     list[Declaration] asts = [createAstFromFile(f, true) | f <- files(model.containment), isCompilationUnit(f)];
 
-    BlocksMap bMap = getSubtrees(asts, 6, CLONE_TYPE);
+    BlocksMap bMap = getSubtrees(asts, MASS_THRESHOLD, MASS_THRESHOLD, CLONE_TYPE);
     list[tuple[node, node]] wholeClones = findClones(bMap);
+    println("nbrr");
 
-    map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, MASS_THRESHOLD, CLONE_TYPE);
+    map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, wholeClones, MASS_THRESHOLD, CLONE_TYPE);
     list[tuple[list[node], list[node]]] sequenceClones = findSequenceClonePairs(sequences2, SIMILARTY_THRESHOLD, CLONE_TYPE);
+    println("nejfhsjdf");
 
     map[loc fileLoc, MethodLoc method] mapLocs = (performanceMode)?():getMethodLocs(model);
     list[DuplicationResult] duplicationResults = getRawDuplicationResults(sequenceClones, wholeClones, mapLocs, performanceMode);
