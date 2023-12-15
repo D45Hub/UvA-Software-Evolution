@@ -16,8 +16,9 @@ import Helper::LOCHelper;
 import Location;
 
 loc encryptorProject = |file:///C:/Users/denis/Documents/Software-Evolution/UvA-Software-Evolution/series-1/smallsql/|;
+public list[DuplicationResult] classes = [];
 
-void main() {
+void main(bool performanceMode=false) {
     str startBenchmarkTime = startBenchmark("benchmark");
     println(startBenchmarkTime);
     
@@ -27,9 +28,9 @@ void main() {
     map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, MASS_THRESHOLD, CLONE_TYPE);
     list[tuple[list[node], list[node]]] sequenceClones = findSequenceClonePairs(sequences2, SIMILARTY_THRESHOLD, CLONE_TYPE);
 
-    map[loc fileLoc, MethodLoc method] mapLocs = getMethodLocs(model);
-    list[DuplicationResult] duplicationResults = getRawDuplicationResults(sequenceClones, mapLocs);
-    list[DuplicationResult] classes = getCloneClasses(duplicationResults);
+    map[loc fileLoc, MethodLoc method] mapLocs = (performanceMode)?():getMethodLocs(model);
+    list[DuplicationResult] duplicationResults = getRawDuplicationResults(sequenceClones, mapLocs, performanceMode);
+    classes = getCloneClasses(duplicationResults);
 
     TransitiveCloneConnections allCloneConnections = getCloneConnections(extractIDPairs(duplicationResults));
     map[str, list[str]] cloneConnectionMap = generateCloneConnectionMap(allCloneConnections);
@@ -41,22 +42,26 @@ void main() {
     list[DuplicationResult] overlap = (classes2 - classes);
     classes = classes2 + (classes - classes2) - overlap;
 
-    DuplicationResult biggestLinesDuplicationClass = getLargestLinesDuplicationClass(classes);
-    DuplicationResult biggestMemberDuplicationClass = getLargestMemberDuplicationClass(classes);
+    if(!performanceMode){
+        DuplicationResult biggestLinesDuplicationClass = getLargestLinesDuplicationClass(classes);
+        DuplicationResult biggestMemberDuplicationClass = getLargestMemberDuplicationClass(classes);
 
-    int duplicatedLinesAmount = 0;
+        int duplicatedLinesAmount = 0;
 
-    for(cl <- classes) {
-        for(l <- cl){
-            duplicatedLinesAmount += l.endLine - l.startLine;
+        for(cl <- classes) {
+            for(l <- cl){
+                duplicatedLinesAmount += l.endLine - l.startLine;
+            }
         }
-    }
 
-    int projectLoc = size(getLOC(getConcatenatedProjectFile(model)));
-    writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestLinesDuplicationClass, biggestMemberDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
-    writeMarkdownResult(|project://series-2/src/main/rsc/output/report.md|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestLinesDuplicationClass, biggestMemberDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
-    printCloneDetectionResults(classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestLinesDuplicationClass, biggestMemberDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
-    
+        int projectLoc = size(getLOC(getConcatenatedProjectFile(model)));
+        writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestLinesDuplicationClass, biggestMemberDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
+        writeMarkdownResult(|project://series-2/src/main/rsc/output/report.md|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestLinesDuplicationClass, biggestMemberDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
+        printCloneDetectionResults(classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestLinesDuplicationClass, biggestMemberDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
+        
+    } else {
+        println("Clone Detection finished!");
+    }
     str stopBenchmarkTime = stopBenchmark("benchmark");
     println(stopBenchmarkTime);
 
