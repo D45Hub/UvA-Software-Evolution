@@ -138,7 +138,7 @@ str getBase64FileFromDuplicationLocation(DuplicationLocation duplicationLocation
     return base64NodeContent;
 }
 
-list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[node]]] sequenceClones, map[loc fileLoc, MethodLoc method] mapLocs) {
+list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[node]]] sequenceClones, map[loc fileLoc, MethodLoc method] mapLocs, bool performanceMode) {
     list[DuplicationResult] duplicationResults = [];
 
     for(c <- sequenceClones) {
@@ -173,8 +173,16 @@ list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[nod
 
         LocationLines nodeABounds = <maxFromLineA, maxToLineA>;
         LocationLines nodeBBounds = <maxFromLineB, maxToLineB>;
-        DuplicationResult dRes = getNewAddedDuplicationResults(nodeALoc, nodeBLoc, mapLocs, nodeABounds, nodeBBounds);
+        DuplicationResult dRes = [];
 
+        if(performanceMode) {
+            DuplicationLocation res1 = generateDuplicationLocation(nodeALoc, <noLocation, -1>, nodeABounds);
+            DuplicationLocation res2 = generateDuplicationLocation(nodeBLoc, <noLocation, -1>, nodeBBounds);
+            dRes += [res1, res2];
+        } else {
+            dRes = getNewAddedDuplicationResults(nodeALoc, nodeBLoc, mapLocs, nodeABounds, nodeBBounds);
+        }
+        
         duplicationResults += [dRes];
     }  
 
