@@ -25,7 +25,7 @@ void main(bool performanceMode=false) {
     M3 model = createM3FromMavenProject(encryptorProject);
     list[Declaration] asts = [createAstFromFile(f, true) | f <- files(model.containment), isCompilationUnit(f)];
 
-    BlocksMap bMap = getSubtrees(asts, 6);
+    BlocksMap bMap = getSubtrees(asts, 6, CLONE_TYPE);
     list[tuple[node, node]] wholeClones = findClones(bMap);
 
     map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, MASS_THRESHOLD, CLONE_TYPE);

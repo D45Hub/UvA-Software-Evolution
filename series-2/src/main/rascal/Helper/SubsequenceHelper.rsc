@@ -54,13 +54,16 @@ list[list[node]] getListOfSequences(list[Declaration] ast, int minimumSequenceLe
     return sequences;
 }
 
-BlocksMap getSubtrees(list[Declaration] asts, int nodeNumberThreshold) {
+BlocksMap getSubtrees(list[Declaration] asts, int nodeNumberThreshold, int cloneType) {
     BlocksMap hashedTrees = ();
 
     visit (asts) {
         case node n: {
             hash = md5Hash(toString(unsetRec(n)));
             if (nodeSize(n) >= nodeNumberThreshold) {
+                if(cloneType != 1) {
+                    n = normalizeIdentifiers(n);
+                }
                 hashedTrees[hash]?[] += [n];
             }
         }
