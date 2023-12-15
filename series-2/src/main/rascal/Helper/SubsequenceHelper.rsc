@@ -14,6 +14,8 @@ import Set;
 
 Type defaultType = Type::short();
 
+private map[node subtree, str hash] hashes = ();
+
 map[tuple[list[node] zNode, list[node] i] zList, str subsetResult] zeroSubsetResults = ();
 map[tuple[list[node] oNode, list[node] j] oList, str subsetResult] oneSubsetResults = ();
 
@@ -66,7 +68,7 @@ map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, int mi
                     if(n in nodeHashMap) {
                         subsequenceHash += nodeHashMap[n];
                     } else {
-                        str nodeHash = md5Hash(unsetRec(n));
+                        str nodeHash = hashNode(n);
                         nodeHashMap[n]?"" += nodeHash; 
                         subsequenceHash += nodeHash;
                     }
@@ -83,6 +85,39 @@ map[str, list[list[node]]] createSequenceHashTable(list[Declaration] ast, int mi
         }
     }
     return hashTable;
+}
+
+str hashNode(node n, bool ignoreLeaves=false) {
+    if (n in hashes) {
+        return hashes[n];
+    }
+    // Hash method 1. Hashes the entire subtree.
+    // Hash method 2. Ignores the leaves of the subtree, hashes roughly based on merkle tree.
+    if (! ignoreLeaves) {
+        hashes[n] = md5Hash(unsetRec(n));
+    } else {
+        str hash = "";
+        for (child <- directChildren2(n)) {
+            if (! isLeaf(child)) {
+                if (!(child in hashes)) {
+                    hashNode(child, ignoreLeaves=true);
+                }
+                hash += hashes[child];
+            }
+        }
+
+        // All the information exclusive to the root node(filtered out child nodes)
+        list[value] hashable = unsetRec(getChildren(n) - directChildren2(n)) + getName(n);
+        
+        if (hash != "") {
+            hashes[n] = md5Hash(hashable + hash);
+        }
+        else {
+            hashes[n] = md5Hash(hashable);
+        }
+    }
+
+    return hashes[n];
 }
 
 list[tuple[list[node], list[node]]] removeSequenceSubclones(list[tuple[list[node], list[node]]] clones, list[node] i, list[node] j) {
