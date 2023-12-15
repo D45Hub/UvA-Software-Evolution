@@ -71,7 +71,7 @@ BlocksMap getSubtrees(list[Declaration] asts, int nodeNumberThreshold, int lineT
         case node n: {
             hash = md5Hash(toString(unsetRec(n)));
             loc nodeLoc = nodeFileLocation(n);
-            if (nodeSize(n) >= nodeNumberThreshold && (nodeLoc.end.line - nodeLoc.begin.line) >= lineThreshold) {
+            if (nodeSize(n) >= nodeNumberThreshold && ((nodeLoc.end.line - nodeLoc.begin.line) + 1) >= lineThreshold) {
                 if(cloneType != 1) {
                     n = normalizeIdentifiers(n);
                 }
