@@ -15,7 +15,7 @@ import Helper::LOCHelper;
 
 import Location;
 
-loc encryptorProject = |project://series-2/src/main/rascal/simpleencryptor|;
+loc encryptorProject = |file:///C:/Users/denis/Documents/Software-Evolution/UvA-Software-Evolution/series-1/smallsql/|;
 public list[DuplicationResult] classes = [];
 
 void main(bool performanceMode=false) {
@@ -27,11 +27,9 @@ void main(bool performanceMode=false) {
 
     BlocksMap bMap = getSubtrees(asts, MASS_THRESHOLD, LINE_THRESHOLD, CLONE_TYPE);
     list[tuple[node, node]] wholeClones = findClones(bMap);
-    println("nbrr");
 
     map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, wholeClones, MASS_THRESHOLD, CLONE_TYPE);
     list[tuple[list[node], list[node]]] sequenceClones = findSequenceClonePairs(sequences2, SIMILARTY_THRESHOLD, CLONE_TYPE);
-    println("nejfhsjdf");
 
     map[loc fileLoc, MethodLoc method] mapLocs = (performanceMode)?():getMethodLocs(model);
     list[DuplicationResult] duplicationResults = getRawDuplicationResults(sequenceClones, wholeClones, mapLocs, performanceMode);
@@ -40,12 +38,6 @@ void main(bool performanceMode=false) {
     TransitiveCloneConnections allCloneConnections = getCloneConnections(extractIDPairs(duplicationResults));
     map[str, list[str]] cloneConnectionMap = generateCloneConnectionMap(allCloneConnections);
     classes = getFilteredDuplicationResultList(classes, cloneConnectionMap);
-
-    allCloneConnections = getCloneConnections(extractIDPairs(classes));
-    cloneConnectionMap = generateCloneConnectionMap(allCloneConnections);
-    list[DuplicationResult] classes2 = getFilteredDuplicationResultList(classes, cloneConnectionMap);
-    list[DuplicationResult] overlap = (classes2 - classes);
-    classes = classes2 + (classes - classes2) - overlap;
 
     if(!performanceMode){
         DuplicationResult biggestLinesDuplicationClass = getLargestLinesDuplicationClass(classes);

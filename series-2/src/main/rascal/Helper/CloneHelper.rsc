@@ -144,28 +144,44 @@ list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[nod
     for(tuple[node, node] wholeClone <- wholeClones) {
         loc aLoc = nodeFileLocation(wholeClone<0>);
         loc bLoc = nodeFileLocation(wholeClone<1>);
+        str nodeAFileName = aLoc.path;
+        str nodeBFileName = bLoc.path;
 
         MethodLoc methodA = <noLocation, -1>;
         MethodLoc methodB = <noLocation, -1>;
 
         for(k <- mapLocs) {
             str projectFileName = k.uri;
-            if(contains(projectFileName, aLoc.uri)) {
-                methodA = mapLocs[k];
+            
+            int mapLocBeginLine = k.begin.line;
+        int mapLocEndLine = k.end.line;
+            bool areALinesInBounds = areCodeLinesInBounds(mapLocBeginLine, mapLocEndLine, aLoc.begin.line, aLoc.end.line);
+        bool areBLinesInBounds = areCodeLinesInBounds(mapLocBeginLine, mapLocEndLine, bLoc.begin.line, bLoc.end.line);
 
-                if(methodB.methodLocation != noLocation && methodB.methodLoc != -1){
-                    break;
-                }
-            }
+        if(contains(projectFileName, nodeAFileName) && areALinesInBounds) {
+            methodA = mapLocs[k];
 
-            if(contains(projectFileName, bLoc.uri)) {
-                methodB = mapLocs[k];
-                if(methodA.methodLocation != noLocation && methodA.methodLoc != -1){
-                    break;
-                }
+            if(methodB.methodLocation != noLocation && methodB.methodLoc != -1){
+                break;
             }
         }
 
+        if(contains(projectFileName, nodeBFileName) && areBLinesInBounds) {
+            methodB = mapLocs[k];
+            if(methodA.methodLocation != noLocation && methodA.methodLoc != -1){
+                break;
+            }
+        }
+        }
+        /**
+        if(methodA == <noLocation, -1>) {
+            println("A: <aLoc>");
+        }
+
+        if(methodB == <noLocation, -1>) {
+            println("B: <bLoc>");
+        }
+*/
         DuplicationLocation l1 = generateDuplicationLocation(aLoc, methodA);
         DuplicationLocation l2 = generateDuplicationLocation(bLoc, methodB);
         duplicationResults += [[l1,l2]];
@@ -366,11 +382,16 @@ list[DuplicationResult] getFilteredDuplicationResultList(list[DuplicationResult]
         DuplicationResult duplicationResult = toList(toSet([getDuplicationLocationFromID(results, conn) | conn <- mappedConnections]));
         duplicationResult = [r | r <- duplicationResult, r != <"", "", "", "", 0, 0, 0, "">];
         
-        if(size(duplicationResult) > 1) {
+        if(size(duplicationResult) > 1 && !isSubset(duplicationResult, filteredResults)) {
             filteredResults += {duplicationResult};
         }
     }
-    return toList(filteredResults);
+    return (toList(filteredResults));
+}
+
+// Function to check if one DuplicationResult is a subset of another
+bool isSubset(DuplicationResult result1, set[DuplicationResult] result2) {
+    return any(r2 <- result2, all(loc1 <- result1, loc1 in r2));
 }
 
 /** Returns transitive closure of nodes*/ 
