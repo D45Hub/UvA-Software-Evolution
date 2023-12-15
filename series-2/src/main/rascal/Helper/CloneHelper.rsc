@@ -10,6 +10,7 @@ import util::Math;
 import List;
 
 map[str fileLoc, str fileContent] fileContentMap = ();
+map[node n, MethodLoc methodLoc] nodeMethodCache = ();
 
 public list[DuplicationResult] getCloneClasses(list[DuplicationResult] duplicationResults) {
     list[DuplicationResult] cloneClasses = [];
@@ -153,26 +154,50 @@ list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[nod
         MethodLoc methodA = <noLocation, -1>;
         MethodLoc methodB = <noLocation, -1>;
 
-        for(k <- mapLocs) {
-            str projectFileName = k.uri;
-            
-            int mapLocBeginLine = k.begin.line;
-        int mapLocEndLine = k.end.line;
-            bool areALinesInBounds = areCodeLinesInBounds(mapLocBeginLine, mapLocEndLine, aLoc.begin.line, aLoc.end.line);
-        bool areBLinesInBounds = areCodeLinesInBounds(mapLocBeginLine, mapLocEndLine, bLoc.begin.line, bLoc.end.line);
-
-        if(contains(projectFileName, nodeAFileName) && areALinesInBounds) {
-            methodA = mapLocs[k];
-
-            if(methodB.methodLocation != noLocation && methodB.methodLoc != -1){
-                break;
-            }
+        if(wholeClone<0> in nodeMethodCache) {
+            methodA = nodeMethodCache[wholeClone<0>];
         }
 
-        if(contains(projectFileName, nodeBFileName) && areBLinesInBounds) {
-            methodB = mapLocs[k];
-            if(methodA.methodLocation != noLocation && methodA.methodLoc != -1){
-                break;
+        if(wholeClone<1> in nodeMethodCache) {
+            methodB = nodeMethodCache[wholeClone<1>];
+        }
+
+        if(methodA == <noLocation, -1> || methodB == <noLocation, -1>) {
+        for(k <- mapLocs) {
+            str projectFileName = k.uri;
+            /**
+            if(contains(projectFileName, "TestOperatoren")) {
+                bool c = contains(projectFileName, nodeAFileName);
+                println(c);
+                if(!c) {
+                    println(projectFileName);
+                    println(nodeAFileName);
+                    println(nodeBFileName);
+                    println("----");
+                }
+            }
+            */
+            
+            int mapLocBeginLine = k.begin.line;
+            int mapLocEndLine = k.end.line;
+            bool areALinesInBounds = areCodeLinesInBounds(mapLocBeginLine, mapLocEndLine, aLoc.begin.line, aLoc.end.line);
+            bool areBLinesInBounds = areCodeLinesInBounds(mapLocBeginLine, mapLocEndLine, bLoc.begin.line, bLoc.end.line);
+
+            if(contains(projectFileName, nodeAFileName) && areALinesInBounds) {
+                methodA = mapLocs[k];
+                nodeMethodCache[wholeClone<0>] = methodA;
+
+                if(methodB.methodLocation != noLocation && methodB.methodLoc != -1){
+                    break;
+                }
+            }
+
+            if(contains(projectFileName, nodeBFileName) && areBLinesInBounds) {
+                methodB = mapLocs[k];
+                nodeMethodCache[wholeClone<1>] = methodB;
+                if(methodA.methodLocation != noLocation && methodA.methodLoc != -1){
+                    break;
+                }
             }
         }
         }
@@ -390,6 +415,31 @@ list[DuplicationResult] getFilteredDuplicationResultList(list[DuplicationResult]
         }
     }
     return (toList(filteredResults));
+}
+
+list[DuplicationResult] filterDuplicates(list[DuplicationResult] results) {
+    set[str] seenUUIDs = {};
+    list[DuplicationResult] filteredResults = [];
+
+    for (DuplicationResult result <- results) {
+        str uuid = result[0][0]; // Assuming the UUID is the first element in the first DuplicationLocation
+
+        if (!(uuid in seenUUIDs)) {
+            seenUUIDs += {uuid};
+
+            // Find the largest DuplicationResult with the same UUID
+            DuplicationResult largestResult = result;
+            for (DuplicationResult otherResult <- results) {
+                if (otherResult[0][0] == uuid && size(otherResult) > size(largestResult)) {
+                    largestResult = otherResult;
+                }
+            }
+
+            filteredResults += [largestResult];
+        }
+    }
+
+    return filteredResults;
 }
 
 // Function to check if one DuplicationResult is a subset of another
