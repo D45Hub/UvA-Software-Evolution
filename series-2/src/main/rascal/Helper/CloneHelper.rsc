@@ -1,10 +1,13 @@
 module Helper::CloneHelper
 import Helper::ProjectHelper;
+import Helper::NodeHelpers;
 import Helper::Types;
 
+import Set;
 import String;
 import IO;
 import util::Math;
+import List;
 
 map[str fileLoc, str fileContent] fileContentMap = ();
 

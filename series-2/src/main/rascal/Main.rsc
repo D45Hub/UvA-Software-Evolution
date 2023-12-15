@@ -12,10 +12,11 @@ import Helper::ProjectHelper;
 import Helper::OutputHelper;
 import Helper::Types;
 import Helper::LOCHelper;
+import Helper::CloneHelper;
 
 import Location;
 
-loc encryptorProject = |file:///C:/Users/denis/Documents/Software-Evolution/UvA-Software-Evolution/series-1/smallsql/|;
+loc encryptorProject = |file:///Users/ekletsko/Downloads/smallsql0.21_src|;
 public list[DuplicationResult] classes = [];
 
 void main(bool performanceMode=false) {
@@ -38,12 +39,41 @@ void main(bool performanceMode=false) {
     TransitiveCloneConnections allCloneConnections = getCloneConnections(extractIDPairs(duplicationResults));
     map[str, list[str]] cloneConnectionMap = generateCloneConnectionMap(allCloneConnections);
     classes = getFilteredDuplicationResultList(classes, cloneConnectionMap);
+    println(typeOf(classes));
 
     if(!performanceMode){
         DuplicationResult biggestLinesDuplicationClass = getLargestLinesDuplicationClass(classes);
         DuplicationResult biggestMemberDuplicationClass = getLargestMemberDuplicationClass(classes);
 
         int duplicatedLinesAmount = 0;
+
+
+list[DuplicationResult] filterDuplicates(list[DuplicationResult] results) {
+    set[str] seenUUIDs = {};
+    list[DuplicationResult] filteredResults = [];
+
+    for (DuplicationResult result <- results) {
+        str uuid = result[0][0]; // Assuming the UUID is the first element in the first DuplicationLocation
+
+        if (!(uuid in seenUUIDs)) {
+            seenUUIDs += {uuid};
+
+            // Find the largest DuplicationResult with the same UUID
+            DuplicationResult largestResult = result;
+            for (DuplicationResult otherResult <- results) {
+                if (otherResult[0][0] == uuid && size(otherResult) > size(largestResult)) {
+                    largestResult = otherResult;
+                }
+            }
+
+            filteredResults += [largestResult];
+        }
+    }
+
+    return filteredResults;
+}
+    classes = filterDuplicates(classes);
+    
 
         for(cl <- classes) {
             for(l <- cl){
