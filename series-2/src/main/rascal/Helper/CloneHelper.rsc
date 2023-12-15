@@ -145,7 +145,30 @@ list[DuplicationResult] getRawDuplicationResults(list[tuple[list[node], list[nod
         loc aLoc = nodeFileLocation(wholeClone<0>);
         loc bLoc = nodeFileLocation(wholeClone<1>);
 
-        println(aLoc);
+        MethodLoc methodA = <noLocation, -1>;
+        MethodLoc methodB = <noLocation, -1>;
+
+        for(k <- mapLocs) {
+            str projectFileName = k.uri;
+            if(contains(projectFileName, aLoc.uri)) {
+                methodA = mapLocs[k];
+
+                if(methodB.methodLocation != noLocation && methodB.methodLoc != -1){
+                    break;
+                }
+            }
+
+            if(contains(projectFileName, bLoc.uri)) {
+                methodB = mapLocs[k];
+                if(methodA.methodLocation != noLocation && methodA.methodLoc != -1){
+                    break;
+                }
+            }
+        }
+
+        DuplicationLocation l1 = generateDuplicationLocation(aLoc, methodA);
+        DuplicationLocation l2 = generateDuplicationLocation(bLoc, methodB);
+        duplicationResults += [[l1,l2]];
     }
 
     for(c <- sequenceClones) {
@@ -272,6 +295,21 @@ DuplicationResult getNewAddedDuplicationResults(loc nodeALoc, loc nodeBLoc, map[
     DuplicationLocation res2 = generateDuplicationLocation(nodeBLoc, methodB, nodeBBounds);
 
     return [res1, res2];
+}
+
+DuplicationLocation generateDuplicationLocation(loc nodeLocation, MethodLoc nodeMethodLocation) {
+    str nodeLocationPath = nodeLocation.path;
+    str nodeLocationUri = nodeLocation.uri;
+    str methodPath = nodeMethodLocation<0>.path;
+    int methodLOC = nodeMethodLocation<1>;
+    int minLine = nodeLocation.begin.line;
+    int maxLine = nodeLocation.end.line;
+
+    str concatDuplLocValues = "<nodeLocationPath><nodeLocationUri><methodPath><methodLOC><minLine><maxLine>";
+    str duplicationUUID = md5Hash(concatDuplLocValues);
+
+    DuplicationLocation result = <duplicationUUID, nodeLocationPath, nodeLocationUri, methodPath, methodLOC, minLine, maxLine, "">;
+    return result;
 }
 
 DuplicationLocation generateDuplicationLocation(loc nodeLocation, MethodLoc nodeMethodLocation, LocationLines nodeMaxBounds) {
