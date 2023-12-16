@@ -17,14 +17,10 @@ Type defaultType = Type::short();
 
 private map[node subtree, str hash] hashes = ();
 
-alias Block  = list[node];
-alias BlocksMap = map[str, Block];
-
 map[tuple[list[node] zNode, list[node] i] zList, str subsetResult] zeroSubsetResults = ();
 map[tuple[list[node] oNode, list[node] j] oList, str subsetResult] oneSubsetResults = ();
 
 map[node uNode, int uniqueNodes] uniqueNodes = ();
-
 
 // One sequence is a list of statements. 
 // This represents the list structure in the paper
@@ -53,9 +49,9 @@ list[list[node]] getListOfSequences(list[Declaration] ast, list[tuple[loc, loc]]
                     }
                 }
                 if(!isContained) {
-                if(cloneType != 1) {
-                    sequence = [normalizeIdentifiers(n) | n <- sequence];
-                }
+                    if(cloneType != 1) {
+                        sequence = [normalizeIdentifiers(n) | n <- sequence];
+                    }
                 sequences += [sequence]; // Sequences list.
                 }
             }
@@ -64,8 +60,8 @@ list[list[node]] getListOfSequences(list[Declaration] ast, list[tuple[loc, loc]]
     return sequences;
 }
 
-BlocksMap getSubtrees(list[Declaration] asts, int nodeNumberThreshold, int lineThreshold, int cloneType) {
-    BlocksMap hashedTrees = ();
+map[str, list[node]] getSubtrees(list[Declaration] asts, int nodeNumberThreshold, int lineThreshold, int cloneType) {
+    map[str, list[node]] hashedTrees = ();
 
     visit (asts) {
         case node n: {
@@ -82,29 +78,27 @@ BlocksMap getSubtrees(list[Declaration] asts, int nodeNumberThreshold, int lineT
     return hashedTrees;
 }
 
-private list[tuple[node, node]] _clonePairs = [];
-
-public list[tuple[node, node]] findClones(BlocksMap subtrees) {
+public list[tuple[node, node]] findClones(map[str, list[node]] subtrees) {
+    list[tuple[node, node]] clonePairs = [];
     for (hash <- subtrees) {
-        Block nodes = subtrees[hash];
+        list[node] nodes = subtrees[hash];
 
         for (i <- nodes) {
             for (j <- nodes) {
                 if (i.src != j.src) {
-                    addClone(<i, j>);
+                    clonePairs = addClone(<i, j>, clonePairs);
                 }
             }
         }
     }
-    return _clonePairs;
+    return clonePairs;
 }
 
 public int nodeSize(node subtree) {
     return arity(subtree) + 1;
 }
 
-public void addClone(tuple[node, node] newPair) {
-
+public list[tuple[node, node]] addClone(tuple[node, node] newPair, list[tuple[node, node]] clonePairs) {
     // Ignore the pair if one node is a subtree of another node
     if (isSubset(newPair[0], newPair[1]) || isSubset(newPair[1], newPair[0])) {
         return;
@@ -113,29 +107,29 @@ public void addClone(tuple[node, node] newPair) {
     list[node] children1 = [n | node n <- getChildren(newPair[0])];
     list[node] children2 = [n | node n <- getChildren(newPair[1])];
 
-    for (oldPair <- _clonePairs) {
+    for (oldPair <- clonePairs) {
         // Check if the pair already exists in flipped form
         if (oldPair == <newPair[1], newPair[0]> || oldPair == <newPair[0], newPair[1]> ) {
-            return;
+            return clonePairs;
         }
 
         // Ignore the pair if it is a subset of an already existing pair
         if ((isSubset(oldPair[0], newPair[0]) && isSubset(oldPair[1], newPair[1])) || (isSubset(oldPair[0], newPair[1]) && isSubset(oldPair[1], newPair[0]))) {
-            return;
+            return clonePairs;
         }
 
         // If the current old pair is a subset of the current new pair. Remove it.
         if ((isSubset(newPair[0], oldPair[0]) && isSubset(newPair[1], oldPair[1])) || (isSubset(newPair[0], oldPair[1]) && isSubset(newPair[1], oldPair[0]))) {
-            _clonePairs -= oldPair;
+            clonePairs -= oldPair;
         }
     }
-    _clonePairs += newPair;
+    clonePairs += newPair;
 
-    return;
+    return clonePairs;
 }
 
 public bool isSubset(node tree1, node tree2) {
-    bottom-up visit(tree1) {
+    visit(tree1) {
         case node n: if (n == tree2) {return true;}
     }
     return false;
