@@ -8,78 +8,39 @@ public class HashingAlgorithm implements IAlgorithm {
 
     @Override
     public String executeAlgorithm(String sourceString) {
-        int shift = 42;
-
-        System.out.println("Hey");
-        System.out.println("Hey");
-        System.out.println("Hey");
-        System.out.println("Hey");
-        System.out.println("Hey");
-        System.out.println("Hey");
-        System.out.println("Hey");
-        
-        StringBuilder encryptedText = new StringBuilder();
-        for (char c : sourceString.toCharArray()) {
-            if (Character.isLetter(c)) {
-                char base = Character.isLowerCase(c) ? 'a' : 'A';
-                encryptedText.append((char) (((c - base + shift) % 26) + base));
-            } else {
-                encryptedText.append(c);
-            }
+        int hashCode = 7;
+        char[] inputCharacters = sourceString.toCharArray();
+    
+        for(char character : inputCharacters) {
+            hashCode = hashCode*31 + ((int)character);
         }
-        return encryptedText.toString();
-    }
-	
-	private void testMethod(String test1, String test2, String test3, String test4, String test5, String test6, String test7) {
-		System.out.println("Hello World");
-	}
 
-    public void printHey() {
-        System.out.println("1");
-        System.out.println("1");
-        System.out.println("1");
-        System.out.println("1");
-        System.out.println("1");
-        System.out.println("1");
-        System.out.println("1");
-    }
-
-    public static void test() {
-        int x = 0;
-        int x = 0;
-        int x = 0;
-        int x = 0;
-        int x = 0;
-        int x = 0;
-        x = x + 5;
-        int x = 0;
-        int x = 0;
-        int x = 0;
-        int x = 0;
-        int x = 0;
-        int y = 1;
-
-        System.out.println("ye");
-        System.out.println("ye");
-        System.out.println("ye");
-        System.out.println("ye");
-        System.out.println("ye");
-        System.out.println("ye");
+        // Type 2 example clone (2)
+        int i = 5;
+        i += 5;
+        i += 3;
+        i -= 4;
+        i = 3;
+        i += 1;
+        i += 1;
+        i += 1;
+        i += 1;
+        System.out.println(i);
+    
+        return String.valueOf(hashCode);
     }
 
-    public static void test2(){
-        int x = 0;
-        int x = 0;
-        int x = 0;
-        int x = 0;
-        int x = 0;
-        int y = 0;
-        int x = 0;
-        int x = 0;
-        int x = 0;
-        int x = 0;
-        int x = 0;
-
-        int z = 3;
+    private void type3TestFunction() {
+        // Type 3 example clone (3)
+        int y = 12;
+        y += 6;
+        y += 3;
+        y -= 2;
+        y += 8;
+        y = 1;
+        y += 4;
+        y += 2;
+        y += 93;
+        System.out.println(y);
     }
 }

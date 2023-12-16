@@ -41,6 +41,9 @@ list[list[node]] getListOfSequences(list[Declaration] ast, list[tuple[loc, loc]]
             list[node] sequence = statements;
 
             if (size(statements) >= minimumSequenceLengthThreshold) {
+                if(cloneType != 1) {
+                    sequence = [normalizeIdentifiers(n) | n <- sequence];
+                }
                 bool isContained = false;
                 for(wLoc <- wholeCloneLocs) {
                     isContained = any(node n <- sequence, isContainedIn(nodeFileLocation(n), wLoc<0>) || isContainedIn(nodeFileLocation(n), wLoc<1>));
@@ -49,10 +52,7 @@ list[list[node]] getListOfSequences(list[Declaration] ast, list[tuple[loc, loc]]
                     }
                 }
                 if(!isContained) {
-                    if(cloneType != 1) {
-                        sequence = [normalizeIdentifiers(n) | n <- sequence];
-                    }
-                sequences += [sequence]; // Sequences list.
+                    sequences += [sequence]; // Sequences list.
                 }
             }
         }
@@ -65,12 +65,12 @@ map[str, list[node]] getSubtrees(list[Declaration] asts, int nodeNumberThreshold
 
     visit (asts) {
         case node n: {
+            if(cloneType != 1) {
+                n = normalizeIdentifiers(n);
+            }
             hash = md5Hash(toString(unsetRec(n)));
             loc nodeLoc = nodeFileLocation(n);
-            if (nodeLoc != |unresolved:///| && nodeSize(n) >= nodeNumberThreshold && ((nodeLoc.end.line - nodeLoc.begin.line) + 1) >= lineThreshold) {
-                if(cloneType != 1) {
-                    n = normalizeIdentifiers(n);
-                }
+            if (nodeLoc != |unresolved:///| && (!isLeaf(n) || cloneType == 1) && nodeSize(n) >= nodeNumberThreshold && ((nodeLoc.end.line - nodeLoc.begin.line) + 1) >= lineThreshold) {
                 hashedTrees[hash]?[] += [n];
             }
         }
@@ -85,7 +85,7 @@ public list[tuple[node, node]] findClones(map[str, list[node]] subtrees) {
 
         for (i <- nodes) {
             for (j <- nodes) {
-                if (i.src != j.src) {
+                if (i.src? && j.src? && (i.src != j.src)) {
                     clonePairs = addClone(<i, j>, clonePairs);
                 }
             }

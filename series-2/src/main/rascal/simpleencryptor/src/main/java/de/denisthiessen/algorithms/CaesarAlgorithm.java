@@ -8,16 +8,14 @@ public class CaesarAlgorithm implements IAlgorithm {
 
     @Override
     public String executeAlgorithm(String sourceString) {
+
+        // Type 2 example clone (4)
+        testNothing("Test", 1);
+        testNothing("Hello", 5);
+        testNothing("Please. Send. Help", 69);
+        testNothing("I'm stuck in this array of characters", 420);
+
         int shift = 42;
-
-        System.out.println("Hey");
-        System.out.println("Hey");
-        System.out.println("Hey");
-        System.out.println("Hey");
-        System.out.println("Hey");
-        System.out.println("Hey");
-        System.out.println("Hey");
-
         StringBuilder encryptedText = new StringBuilder();
         for (char c : sourceString.toCharArray()) {
             if (Character.isLetter(c)) {
@@ -30,27 +28,21 @@ public class CaesarAlgorithm implements IAlgorithm {
         return encryptedText.toString();
     }
 
+    // Type 1 Example Clone. (1)
     public void printHey() {
-        test.track("ye");
-
-        int i = 15;
-        i += 3;
-        i += 5;
-        i += 2;
-        i += 2;
-        i += 2;
-        i += 2;
-        i += 2;
-        i += 2;
+        System.out.println("Hey!");
+        System.out.println("Hey!");
+        System.out.println("Hey!");
+        System.out.println("Hey!");
+        System.out.println("Hey!");
+        System.out.println("Hey!");
+        System.out.println("Hey!");
+        System.out.println("Hey!");
+        System.out.println("Hey!");
+        System.out.println("Hey!");
     }
 
-    private void test() {
-        System.out.println("1");
-        System.out.println("1");
-        System.out.println("1");
-        System.out.println("1");
-        System.out.println("1");
-        System.out.println("1");
-        System.out.println("1");
-    } 
+    private void testNothing(String testStringParameter, int testIntParameter) {
+        // I didn't overpromise...
+    }
 }

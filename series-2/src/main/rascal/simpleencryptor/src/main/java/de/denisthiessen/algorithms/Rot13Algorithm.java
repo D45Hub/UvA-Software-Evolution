@@ -10,12 +10,11 @@ public class Rot13Algorithm implements IAlgorithm {
     public String executeAlgorithm(String sourceString) {
         StringBuilder sb = new StringBuilder();
 
-        System.out.println("ye");
-        System.out.println("ye");
-        System.out.println("ye");
-        System.out.println("ye");
-        System.out.println("ye");
-        System.out.println("ye");
+        // Type 2 example clone (4)
+        testNothing("Test", 1);
+        testNothing("Hello", 5);
+        testNothing("Please. Send. Help", 69);
+        testNothing("I'm stuck in this array of characters", 420);
 
         for (int i = 0; i < sourceString.length(); i++) {
             char c = sourceString.charAt(i);
@@ -29,7 +28,23 @@ public class Rot13Algorithm implements IAlgorithm {
                 c -= 13;
             sb.append(c);
         }
+
+        // Type 2 example clone (2)
+        int i = 1;
+        i += 1;
+        i += 1;
+        i += 1;
+        i += 1;
+        i += 1;
+        i += 1;
+        i += 1;
+        i += 1;
+        System.out.println(i);
         
         return sb.toString();
+    }
+
+    private void testNothing(String testStringParameter, int testIntParameter) {
+        // I didn't overpromise...
     }
 }

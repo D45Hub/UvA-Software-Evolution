@@ -19,6 +19,38 @@ public class XORAlgorithm implements IAlgorithm {
             char encryptedChar = (char) (plainChar ^ keyChar);
             encryptedText.append(encryptedChar);
         }
+
+        // Type 3 example clone (3)
+        int i = 5;
+        i += 5;
+        i += 3;
+        i -= 4;
+        i = 3;
+        testFunction();
+        i += 1;
+        i += 1;
+        i += 1;
+        i += 1;
+        System.out.println(i);
+
         return encryptedText.toString();
+    }
+
+    private void testFunction() {
+        System.out.println("Hello World");
+    }
+
+    // Type 1 Example Clone. (1)
+    public void printHey() {
+        System.out.println("Hey!");
+        System.out.println("Hey!");
+        System.out.println("Hey!");
+        System.out.println("Hey!");
+        System.out.println("Hey!");
+        System.out.println("Hey!");
+        System.out.println("Hey!");
+        System.out.println("Hey!");
+        System.out.println("Hey!");
+        System.out.println("Hey!");
     }
 }
