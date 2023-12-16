@@ -19,7 +19,7 @@ import Location;
 loc encryptorProject = |project://series-2/src/main/rascal/simpleencryptor|;
 public list[DuplicationResult] classes = [];
 
-void main(bool performanceMode=false) {
+void main(bool performanceMode=falsebool performanceMode=false) {
     str startBenchmarkTime = startBenchmark("benchmark");
     println(startBenchmarkTime);
     
@@ -54,11 +54,14 @@ void main(bool performanceMode=false) {
             }
         }
 
-        int projectLoc = size(getLOC(getConcatenatedProjectFile(model)));
-        writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestLinesDuplicationClass, biggestMemberDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
-        writeMarkdownResult(|project://series-2/src/main/rsc/output/report.md|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestLinesDuplicationClass, biggestMemberDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
-        printCloneDetectionResults(classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestLinesDuplicationClass, biggestMemberDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
-        
+            int projectLoc = size(getLOC(getConcatenatedProjectFile(model)));
+            writeJSONFile(|project://series-2/src/main/rsc/output/report.json|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestLinesDuplicationClass, biggestMemberDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
+            writeMarkdownResult(|project://series-2/src/main/rsc/output/report.md|, classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestLinesDuplicationClass, biggestMemberDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
+            printCloneDetectionResults(classes, encryptorProject.uri, projectLoc, duplicatedLinesAmount, size(classes), biggestLinesDuplicationClass, biggestMemberDuplicationClass, MASS_THRESHOLD, SIMILARTY_THRESHOLD);
+            
+    } else {
+        println("Clone Detection finished!");
+    }
     } else {
         println("Clone Detection finished!");
     }
