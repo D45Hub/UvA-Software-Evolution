@@ -16,7 +16,7 @@ import Helper::CloneHelper;
 
 import Location;
 
-loc encryptorProject = |file:///C:/Users/denis/Documents/Software-Evolution/UvA-Software-Evolution/series-1/smallsql|;
+loc encryptorProject = |project://series-2/src/main/rascal/simpleencryptor|;
 public list[DuplicationResult] classes = [];
 
 void main(bool performanceMode=false) {
@@ -26,7 +26,7 @@ void main(bool performanceMode=false) {
     M3 model = createM3FromMavenProject(encryptorProject);
     list[Declaration] asts = [createAstFromFile(f, true) | f <- files(model.containment), isCompilationUnit(f)];
 
-    BlocksMap bMap = getSubtrees(asts, MASS_THRESHOLD, LINE_THRESHOLD, CLONE_TYPE);
+    map[str, list[node]] bMap = getSubtrees(asts, MASS_THRESHOLD, LINE_THRESHOLD, CLONE_TYPE);
     list[tuple[node, node]] wholeClones = findClones(bMap);
 
     map[str, list[list[node]]] sequences2 = createSequenceHashTable(asts, wholeClones, MASS_THRESHOLD, CLONE_TYPE);
@@ -39,7 +39,6 @@ void main(bool performanceMode=false) {
     TransitiveCloneConnections allCloneConnections = getCloneConnections(extractIDPairs(duplicationResults));
     map[str, list[str]] cloneConnectionMap = generateCloneConnectionMap(allCloneConnections);
     classes = getFilteredDuplicationResultList(classes, cloneConnectionMap);
-    println(typeOf(classes));
 
     if(!performanceMode){
         DuplicationResult biggestLinesDuplicationClass = getLargestLinesDuplicationClass(classes);
