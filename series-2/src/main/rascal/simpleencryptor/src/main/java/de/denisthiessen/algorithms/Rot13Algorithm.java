@@ -11,8 +11,8 @@ public class Rot13Algorithm implements IAlgorithm {
         StringBuilder sb = new StringBuilder();
 
         // Type 2 example clone (4)
-        testNothing("Test", 1);
-        testNothing("Hello", 5);
+        testNothing("Test123", 1);
+        testNothing("Hello", 4);
         testNothing("Please. Send. Help", 69);
         testNothing("I'm stuck in this array of characters", 420);
 
@@ -28,18 +28,6 @@ public class Rot13Algorithm implements IAlgorithm {
                 c -= 13;
             sb.append(c);
         }
-
-        // Type 2 example clone (2)
-        int i = 1;
-        i += 1;
-        i += 1;
-        i += 1;
-        i += 1;
-        i += 1;
-        i += 1;
-        i += 1;
-        i += 1;
-        System.out.println(i);
         
         return sb.toString();
     }
